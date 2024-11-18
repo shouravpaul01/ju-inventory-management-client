@@ -13,8 +13,43 @@ module.exports = {
         sans: ["var(--font-sans)"],
         mono: ["var(--font-mono)"],
       },
+      backgroundColor: {
+        "true-blue": "#035bbc", 
+      }
     },
   },
   darkMode: "class",
-  plugins: [nextui()],
+  plugins: [nextui({
+    
+    themes: {
+      light: {
+      
+        colors: {
+          // background: '#7c3aed', 
+          // foreground: "#11181C", 
+          primary: {
+           
+            foreground: "#FFFFFF",
+            DEFAULT: '#7c3aed',
+
+        },
+          
+        },
+      },
+      dark: {
+        colors: {
+          // background: '#7c3aed', 
+          // foreground: "#11181C", 
+          primary: {
+           
+            foreground: "#FFFFFF",
+            DEFAULT: '#7c3aed',
+
+        },
+          
+        },
+      },
+      
+    },
+  })],
 }
