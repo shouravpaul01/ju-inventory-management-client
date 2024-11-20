@@ -3,6 +3,7 @@ import JUInput from "@/src/components/form/JUInput";
 import JUSelect from "@/src/components/form/JUSelect";
 import { designationOptions } from "@/src/constents";
 import { createFacultyReq } from "@/src/services/Faculty";
+import { TErrorMessage } from "@/src/types";
 import { facultyValidation } from "@/src/validations/faculty.validation";
 import { Button } from "@nextui-org/button";
 import {
@@ -15,19 +16,29 @@ import {
 } from "@nextui-org/modal";
 import { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
+import { toast } from "sonner";
 
 interface IProps {
   useDisclosure: UseDisclosureProps | any;
 }
 export default function CreateUpdateUserFromModal({ useDisclosure }: IProps) {
-    const [isLoading,setIsLoading]=useState<boolean>(false)
-  const handleCreateFaculty: SubmitHandler<FieldValues> = async(data) => {
-    console.log(data);
-    setIsLoading(true)
-    const res=await createFacultyReq(data)
-    console.log(res)
-    setIsLoading(false)
-    
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
+  const [isResetForm, setIsResetForm] = useState<boolean>(false);
+  const handleCreateFaculty: SubmitHandler<FieldValues> = async (data) => {
+    setIsLoading(true);
+    const res = await createFacultyReq(data);
+    if (res?.success) {
+      toast.success(res?.message);
+      setIsResetForm(true);
+    } else if (!res?.success && res?.errorMessages?.length > 0) {
+      if (res?.errorMessages[0]?.path == "facultyError") {
+        toast.error(res?.errorMessages[0]?.message);
+      }
+      setValidationErrors(res?.errorMessages);
+    }
+
+    setIsLoading(false);
   };
   return (
     <Modal
@@ -38,7 +49,12 @@ export default function CreateUpdateUserFromModal({ useDisclosure }: IProps) {
     >
       <ModalContent>
         {(onClose) => (
-          <JUForm onSubmit={handleCreateFaculty} validation={facultyValidation}>
+          <JUForm
+            onSubmit={handleCreateFaculty}
+            validation={facultyValidation}
+            errors={validationErrors}
+            reset={isResetForm}
+          >
             <ModalHeader className="flex flex-col gap-1">
               Create Faculty
             </ModalHeader>
@@ -55,6 +71,7 @@ export default function CreateUpdateUserFromModal({ useDisclosure }: IProps) {
                   />
                   <JUInput
                     name="roomNo"
+                    registerOptions={{ valueAsNumber: true }}
                     inputProps={{
                       label: "Room No",
                       type: "number",

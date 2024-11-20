@@ -1,15 +1,16 @@
 "use client";
 
 import { Input, InputProps } from "@nextui-org/input";
-import { useFormContext } from "react-hook-form";
+import { RegisterOptions, useFormContext } from "react-hook-form";
 
 interface IProps {
   name: string;
   inputProps?: InputProps;
+  registerOptions?:RegisterOptions
 }
-export default function JUInput({ name, inputProps}: IProps) {
+export default function JUInput({ name, inputProps,registerOptions}: IProps) {
   const { register,formState:{errors} } = useFormContext();
  
-  return <Input variant="bordered"  {...register(name)} {...inputProps} isInvalid={!!errors[name]}
+  return <Input variant="bordered"  {...register(name,registerOptions)} {...inputProps} isInvalid={!!errors[name]}
   errorMessage={errors[name]?.message as string}/>;
 }
