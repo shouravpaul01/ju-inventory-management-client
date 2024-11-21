@@ -2,6 +2,7 @@
 
 import { CategoryIcon, GroupUserIcon, HomeIcon, ReturnedIcon } from "@/src/components/icons";
 import { Tab, Tabs } from "@nextui-org/tabs";
+import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 export default function MenuTabs() {
@@ -20,7 +21,9 @@ export default function MenuTabs() {
      selectedKey={pathname}
     >
       <Tab
-        key="dashboard"
+        key="/admin/dashboard"
+        href="/admin/dashboard"
+        as={Link}
         title={
           <div className="flex items-center space-x-2">
             <HomeIcon />
@@ -30,8 +33,9 @@ export default function MenuTabs() {
       />
 
       <Tab
-        key="/manage-users"
-        href="/manage-users"
+        key="/admin/manage-users"
+        href="/admin/manage-users"
+        as={Link}
         title={
           <div className="flex items-center space-x-2">
             <GroupUserIcon />

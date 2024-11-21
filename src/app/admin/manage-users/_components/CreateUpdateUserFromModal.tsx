@@ -1,7 +1,9 @@
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
 import JUSelect from "@/src/components/form/JUSelect";
+import JULoading from "@/src/components/ui/JULoading";
 import { designationOptions } from "@/src/constents";
+import { getSingleUser } from "@/src/hooks/User";
 import { createFacultyReq } from "@/src/services/Faculty";
 import { TErrorMessage } from "@/src/types";
 import { facultyValidation } from "@/src/validations/faculty.validation";
@@ -14,17 +16,34 @@ import {
   ModalHeader,
   UseDisclosureProps,
 } from "@nextui-org/modal";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 
 interface IProps {
   useDisclosure: UseDisclosureProps | any;
+  userId: string;
 }
-export default function CreateUpdateUserFromModal({ useDisclosure }: IProps) {
+export default function CreateUpdateUserFromModal({
+  useDisclosure,
+  userId,
+}: IProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
   const [isResetForm, setIsResetForm] = useState<boolean>(false);
+  const { data: singleUser, isLoading: isSingleUserLoading } = getSingleUser(
+    userId!
+  );
+  
+  const defaultValues = useMemo(() => {
+    if (!userId) return {};
+    return {
+      name: singleUser?.faculty?.name || "",
+      roomNo: singleUser?.faculty?.roomNo || "",
+      email: singleUser?.email || "",
+      designation: singleUser?.faculty?.designation || "",
+    };
+  }, [userId,singleUser]);
   const handleCreateFaculty: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
     const res = await createFacultyReq(data);
@@ -46,14 +65,18 @@ export default function CreateUpdateUserFromModal({ useDisclosure }: IProps) {
       onOpenChange={useDisclosure.onOpenChange}
       size="2xl"
       classNames={{ closeButton: "bg-violet-100 hover:bg-red-200" }}
+      
     >
       <ModalContent>
         {(onClose) => (
+          <>
+          {isSingleUserLoading ?<JULoading className="h-[300px]"/>:
           <JUForm
             onSubmit={handleCreateFaculty}
             validation={facultyValidation}
             errors={validationErrors}
             reset={isResetForm}
+            defaultValues={defaultValues}
           >
             <ModalHeader className="flex flex-col gap-1">
               Create Faculty
@@ -112,10 +135,11 @@ export default function CreateUpdateUserFromModal({ useDisclosure }: IProps) {
             </ModalBody>
             <ModalFooter>
               <Button type="submit" color="primary" isLoading={isLoading}>
-                Submit
+              {userId ? "Update" : "Submit"}
               </Button>
             </ModalFooter>
-          </JUForm>
+          </JUForm>}
+          </>
         )}
       </ModalContent>
     </Modal>

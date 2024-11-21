@@ -9,25 +9,14 @@ import {
   NavbarMenuItem,
 } from "@nextui-org/navbar";
 import { Button } from "@nextui-org/button";
-import { Kbd } from "@nextui-org/kbd";
+
 import { Link } from "@nextui-org/link";
-import { Input } from "@nextui-org/input";
-import { link as linkStyles } from "@nextui-org/theme";
+
 import NextLink from "next/link";
-import clsx from "clsx";
 
 import { siteConfig } from "@/src/config/site";
-import { ThemeSwitch } from "@/src/components/theme-switch";
-import {
-  TwitterIcon,
-  GithubIcon,
-  DiscordIcon,
-  HeartFilledIcon,
-  SearchIcon,
-  Logo,
-  LocalMallIcon,
-  LogoutIcon,
-} from "@/src/components/icons";
+
+import { LocalMallIcon, LogoutIcon } from "@/src/components/icons";
 import Image from "next/image";
 import {
   Dropdown,
@@ -37,29 +26,9 @@ import {
 } from "@nextui-org/dropdown";
 import { Avatar } from "@nextui-org/avatar";
 import { Badge } from "@nextui-org/badge";
+import SearchInput from "./ui/SearchInput";
 
 export const Navbar = () => {
-  const searchInput = (
-    <Input
-      aria-label="Search"
-      classNames={{
-        inputWrapper: "bg-default-100",
-        input: "text-sm",
-      }}
-      endContent={
-        <Kbd className="hidden lg:inline-block" keys={["command"]}>
-          K
-        </Kbd>
-      }
-      labelPlacement="outside"
-      placeholder="Search..."
-      startContent={
-        <SearchIcon className="text-base text-default-400 pointer-events-none flex-shrink-0" />
-      }
-      type="search"
-    />
-  );
-
   return (
     <NextUINavbar
       position="sticky"
@@ -114,9 +83,13 @@ export const Navbar = () => {
           </NextLink>
         </NavbarBrand>
       </NavbarContent>
-
+      <NavbarContent className="hidden sm:flex " justify="center">
+        <div className="w-80 ">
+          <SearchInput />
+        </div>
+      </NavbarContent>
       <NavbarContent
-        className="hidden sm:flex basis-1/5 sm:basis-full"
+        className="hidden sm:flex basis-1/5 sm:basis-full "
         justify="end"
       >
         <NavbarItem>
@@ -130,7 +103,12 @@ export const Navbar = () => {
           </Link>
         </NavbarItem>
         <NavbarItem>
-          <Badge content="99+" shape="circle" color="warning" showOutline={false}>
+          <Badge
+            content="99+"
+            shape="circle"
+            color="warning"
+            showOutline={false}
+          >
             <Button
               radius="full"
               isIconOnly
@@ -153,9 +131,11 @@ export const Navbar = () => {
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
-            
-            
-            <DropdownItem key="logout" color="danger" startContent={<LogoutIcon />}>
+            <DropdownItem
+              key="logout"
+              color="danger"
+              startContent={<LogoutIcon />}
+            >
               Log Out
             </DropdownItem>
           </DropdownMenu>
@@ -163,7 +143,6 @@ export const Navbar = () => {
       </NavbarContent>
 
       <NavbarMenu>
-        {searchInput}
         <div className="mx-4 mt-2 flex flex-col gap-2">
           {siteConfig.navMenuItems.map((item, index) => (
             <NavbarMenuItem key={`${item}-${index}`}>

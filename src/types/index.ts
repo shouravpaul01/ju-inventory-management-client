@@ -10,9 +10,14 @@ export type TErrorMessage={
   path:string ,
   message:string
 }
+export type TQuery={
+  name:string ,
+  value:any
+}
 export type TUser = {
   _id:string;
   userId: string;
+  faculty:TFaculty;
   email:string;
   password: string;
   needChangePassword?: boolean;
@@ -33,7 +38,6 @@ export type TPublication = {
 export type TFaculty = {
   _id:string;
   userId: string;
-  user?:TUser;
   name: string;
   image?: string;
   designation: string;
