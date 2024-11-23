@@ -40,10 +40,12 @@ import { BlobOptions } from "buffer";
 import Swal from "sweetalert2";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { TQuery } from "@/src/types";
 
 export default function ManageUsers() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
+  const searchTerm=searchParams.get("search")
   const modalForm = useDisclosure();
   const queryClient = useQueryClient();
   const [page, setPage] = useState<number>(1);
@@ -53,11 +55,18 @@ export default function ManageUsers() {
       setUerId(null);
     }
   }, [modalForm.isOpen]);
-  const { data, isLoading } = getAllUsers({
-    query: [
+  const queryParams = useMemo(() => {
+    const params:TQuery[] = [
       { name: "page", value: page },
-      { name: "isDeleted", value: tab == "trash" ? true : false },
-    ],
+      { name: "isDeleted", value: tab === "trash" },
+    ];
+    if (searchTerm) {
+      params.push({ name: "search", value: searchTerm });
+    }
+    return params;
+  }, [page, tab, searchParams]);
+  const { data, isLoading } = getAllUsers({
+    query:queryParams,
   });
 
   const loadingState = isLoading ? "loading" : "idle";
@@ -200,11 +209,14 @@ export default function ManageUsers() {
                 <TableCell>
                   <User
                     avatarProps={{ radius: "lg", src: item?.faculty?.image }}
-                    description={item.email}
+                    description={
+                      <div>
+                        <p>ID: {item.userId}</p>
+                        {item.email}
+                      </div>
+                    }
                     name={item?.faculty?.name}
-                  >
-                    {item.email}
-                  </User>
+                  />
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">

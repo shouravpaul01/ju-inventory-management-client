@@ -27,8 +27,11 @@ import {
 import { Avatar } from "@nextui-org/avatar";
 import { Badge } from "@nextui-org/badge";
 import SearchInput from "./ui/SearchInput";
+import { useUser } from "../context/user.provider";
+import { logoutUser } from "../services/Auth";
 
 export const Navbar = () => {
+  const { user, setIsLoading } = useUser();
   return (
     <NextUINavbar
       position="sticky"
@@ -127,14 +130,19 @@ export const Navbar = () => {
               as="button"
               size="sm"
               className="transition-transform"
-              src="https://i.pravatar.cc/150?u=a042581f4e29026704d"
+              src={user?.profileImage!}
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
             <DropdownItem
+              href="/login"
+              as={Link}
               key="logout"
               color="danger"
               startContent={<LogoutIcon />}
+              onPress={async () => {
+                await logoutUser(), setIsLoading(true);
+              }}
             >
               Log Out
             </DropdownItem>

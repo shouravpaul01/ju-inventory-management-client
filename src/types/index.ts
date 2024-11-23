@@ -49,3 +49,20 @@ export type TFaculty = {
   coursesTaught?: string[];
   publications?: TPublication[];
 };
+export type TRole={
+  Admin:string,
+  Faulty:string
+}
+export type TCurrentUser={
+  _id: string; 
+  name: string; 
+  profileImage: string | null; 
+  userId: string; 
+  email: string; 
+  role: string; 
+  userAccess: string[];
+}
+export type TResetDetails = {
+  email: string;
+  otp?: string;
+};

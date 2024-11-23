@@ -1,14 +1,15 @@
 "use server";
 
 import { axiosInstance } from "@/src/lib/AxiosInstence";
-import { TQuery, TUser } from "@/src/types";
+import { TErrorMessage, TQuery, TUser } from "@/src/types";
+import { FieldValues } from "react-hook-form";
 
 export const getAllUsersReq = async ({
   query,
 }: {
   query: TQuery[];
 }): Promise<{
-  status: string;
+  success: string;
   message: string;
   data: { data: TUser[]; totalPages: number } | undefined;
 }> => {
@@ -23,13 +24,27 @@ export const getAllUsersReq = async ({
     return error?.response?.data;
   }
 };
-export const getSingleUserReq = async (userId: string):Promise<{
-    status: string;
-    message: string;
-    data:  TUser ;
-  }> => {
+export const getSingleUserReq = async (
+  userIdOrEmail: string
+): Promise<{
+  success: string;
+  message: string;
+  data: TUser;
+  errorMessages?: TErrorMessage[];
+}> => {
   try {
-    const res = await axiosInstance.get(`/users/single-user/${userId}`);
+    const res = await axiosInstance.get(`/users/single-user/${userIdOrEmail}`);
+    return res.data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};
+export const updateUserReq = async (payload: FieldValues) => {
+  try {
+    const res = await axiosInstance.patch(
+      `/users/update-user/${payload.userId}`,
+      payload.data
+    );
     return res.data;
   } catch (error: any) {
     return error?.response?.data;
