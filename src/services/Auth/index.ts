@@ -47,7 +47,7 @@ export const changePasswordReq = async (bodyData: FieldValues) => {
 export const sendOTPReq = async (email: string) => {
   try {
     const { data } = await axiosInstance.patch(`/auth/send-otp?email=${email}`);
-    if (data?.status) {
+    if (data?.success) {
       cookies().set("resetPasswordToken", data?.data?.resetPasswordToken);
     }
 
@@ -56,6 +56,7 @@ export const sendOTPReq = async (email: string) => {
     return error?.response?.data;
   }
 };
+
 export const getResetDetails = async () => {
   const resetPasswordToken = cookies().get("resetPasswordToken")?.value;
   let decodedResult: Partial<TResetDetails> = {};
@@ -86,6 +87,18 @@ export const resetPasswordReq = async (bodyData: FieldValues) => {
     if (data?.status) {
       cookies().delete("resetPasswordToken");
     }
+
+    return data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};
+export const deleteOTPReq = async () => {
+  try {
+    const resetDetails=await getResetDetails()
+    const { data } = await axiosInstance.patch(`/auth/delete-otp?email=${resetDetails.email}`);
+   
+
 
     return data;
   } catch (error: any) {

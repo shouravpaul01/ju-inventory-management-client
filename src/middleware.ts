@@ -4,7 +4,7 @@ import { getCurrentuser } from "./services/Auth";
 
 
 type TRole = keyof typeof roleBasedRoutesAccess;
-const authRoutes = ["/login","/find-account"];
+const authRoutes = ["/login","/find-account","/confirm-identity"];
 const roleBasedRoutesAccess:any = {
   Faculty: [/^(?!\/admin).*/],
   Admin: [/^\/.*/],

@@ -3,35 +3,35 @@
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
 import { XmarkIcon } from "@/src/components/icons";
-import {
-  cencelResetPasswordProcces,
-  sendOTPReq,
-} from "@/src/services/Auth";
+import { useUser } from "@/src/context/user.provider";
+import { cencelResetPasswordProcces, sendOTPReq } from "@/src/services/Auth";
 import { getSingleUserReq } from "@/src/services/User";
 // import { getSingleUserByEmailReq } from "@/src/services/UserService";
 import { TUser } from "@/src/types";
 import { findAccountValidation } from "@/src/validations/auth.validation";
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Avatar } from "@nextui-org/avatar";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
-import { useRouter } from "next/navigation";
+import { User } from "@nextui-org/user";
+import { redirect, useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 
 export default function FindAccountPage() {
+  const {resetPasswordDetails,user:currentUser}=useUser()
+  const router=useRouter()
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const [user, setUser] = useState<Partial<TUser> | null>();
+  console.log(resetPasswordDetails,currentUser,"ss")
   const handleFindAccount: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-    console.log(data)
-    const res = await getSingleUserReq(data.email);
-    console.log(res)
+    console.log(data);
+    const res = await getSingleUserReq(data.userIdorEmail);
+    console.log(res);
     if (res?.success && res?.data) {
       setUser(res.data);
-      setError('')
+      setError("");
     }
     if (!res?.success && res?.errorMessages) {
       setError(res?.errorMessages[0]?.message);
@@ -40,15 +40,18 @@ export default function FindAccountPage() {
     setIsLoading(false);
   };
   const handleSendOTP = async (email: string) => {
-    // const res = await sendOTPReq(email);
-    // if (res?.status && res?.data) {
-    //   router.push("/confirm-identity");
-    // }
-    // if (!res?.status && res?.errorMessages) {
-    //   setError(res?.errorMessages[0]?.message);
-    // }
+    setIsLoading(true);
+    const res = await sendOTPReq(email);
+    console.log(res,'res')
+    if (res?.success && res?.data) {
+      router.push("/confirm-identity");
+    }
+    if (!res?.status && res?.errorMessages) {
+      setError(res?.errorMessages[0]?.message);
+    }
+    setIsLoading(false);
   };
-  
+
   return (
     <div className="shadow-small w-full md:max-w-md rounded-md p-8">
       <p className="font-bold text-xl">Find your account..</p>
@@ -56,65 +59,52 @@ export default function FindAccountPage() {
         Please enter your User ID or Email address to search for your account.
       </p>
       {error && (
-        <Chip
-          color="danger"
-          variant="flat"
-        
-          onClose={() => setError("")}
-        >
+        <Chip color="danger" variant="flat" onClose={() => setError("")}>
           {error}
         </Chip>
       )}
-      <JUForm
-        onSubmit={handleFindAccount}
-        validation={findAccountValidation}
-      >
+      <JUForm onSubmit={handleFindAccount} validation={findAccountValidation}>
         <JUInput
           name="userIdorEmail"
           inputProps={{
             variant: "bordered",
             label: "User ID or Email",
-            
-            className:"mt-2"
+
+            className: "mt-2",
           }}
         />
         {user && (
           <div className="mt-5">
             <p className="text-xl font-bold mb-3">Your Account</p>
-          <div className="flex items-center ">
-            <div className="flex flex-1 gap-3">
-              <Avatar
-                isBordered
-                radius="full"
-                src={user?.faculty?.image}
+            <div className="flex  items-center ">
+              <div className="flex-1">
+              <User
+                name={user.faculty?.name}
+                description={
+                  <div>
+                    <p>ID: {user.userId}</p>
+                    <p>Email: {user.email}</p>
+                  </div>
+                }
+                avatarProps={{
+                  src: user.faculty?.image,
+                }}
+                
               />
-              <div>
-                <p className="font-bold">{user?.faculty?.name}</p>
-                <p className="font-semibold text-gray-400 -mt-1">
-                  @{user?.userId}
-                </p>
               </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <Button
-              variant="flat"
-                className="bg-black bg-opacity-50"
-                isIconOnly
-                radius="full"
-                onPress={() => setUser(null)}
-              >
-                <XmarkIcon className="fill-white"/>
-              </Button>
-              <Button
               
-                color="primary"
-                isLoading={isLoading}
-                onPress={() => handleSendOTP(user?.email!)}
-              >
-                Send OTP
-              </Button>
+                <Button
+                  variant="flat"
+                  className="bg-black bg-opacity-50 "
+                  isIconOnly
+                  radius="full"
+                  onPress={() => setUser(null)}
+                  
+                >
+                  <XmarkIcon className="fill-white" />
+                </Button>
+              
             </div>
-          </div>
           </div>
         )}
         <div className="flex justify-end gap-3 mt-3">
@@ -125,7 +115,15 @@ export default function FindAccountPage() {
           >
             Cencel
           </Button>
-          {!user && (
+          {user ? (
+            <Button
+              color="primary"
+              isLoading={isLoading}
+              onPress={() => handleSendOTP(user?.email!)}
+            >
+              Send OTP
+            </Button>
+          ) : (
             <Button type="submit" color="primary" isLoading={isLoading}>
               Submit
             </Button>
