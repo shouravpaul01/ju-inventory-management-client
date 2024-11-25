@@ -18,17 +18,16 @@ import { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 
 export default function FindAccountPage() {
-  const {resetPasswordDetails,user:currentUser}=useUser()
-  const router=useRouter()
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const [user, setUser] = useState<Partial<TUser> | null>();
-  console.log(resetPasswordDetails,currentUser,"ss")
+
   const handleFindAccount: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-    console.log(data);
+
     const res = await getSingleUserReq(data.userIdorEmail);
-    console.log(res);
+
     if (res?.success && res?.data) {
       setUser(res.data);
       setError("");
@@ -42,9 +41,9 @@ export default function FindAccountPage() {
   const handleSendOTP = async (email: string) => {
     setIsLoading(true);
     const res = await sendOTPReq(email);
-    console.log(res,'res')
+
     if (res?.success && res?.data) {
-      router.push("/confirm-identity");
+      router.push("/verify-identity");
     }
     if (!res?.status && res?.errorMessages) {
       setError(res?.errorMessages[0]?.message);
@@ -78,32 +77,29 @@ export default function FindAccountPage() {
             <p className="text-xl font-bold mb-3">Your Account</p>
             <div className="flex  items-center ">
               <div className="flex-1">
-              <User
-                name={user.faculty?.name}
-                description={
-                  <div>
-                    <p>ID: {user.userId}</p>
-                    <p>Email: {user.email}</p>
-                  </div>
-                }
-                avatarProps={{
-                  src: user.faculty?.image,
-                }}
-                
-              />
+                <User
+                  name={user.faculty?.name}
+                  description={
+                    <div>
+                      <p>ID: {user.userId}</p>
+                      <p>Email: {user.email}</p>
+                    </div>
+                  }
+                  avatarProps={{
+                    src: user.faculty?.image,
+                  }}
+                />
               </div>
-              
-                <Button
-                  variant="flat"
-                  className="bg-black bg-opacity-50 "
-                  isIconOnly
-                  radius="full"
-                  onPress={() => setUser(null)}
-                  
-                >
-                  <XmarkIcon className="fill-white" />
-                </Button>
-              
+
+              <Button
+                variant="flat"
+                className="bg-black bg-opacity-50 "
+                isIconOnly
+                radius="full"
+                onPress={() => setUser(null)}
+              >
+                <XmarkIcon className="fill-white" />
+              </Button>
             </div>
           </div>
         )}

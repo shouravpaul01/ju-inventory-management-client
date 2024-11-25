@@ -12,7 +12,7 @@ export const useCountdownOTPTimeout = (onTimeout?: () => void) => {
         setIsLoading(true);
         const { exp } = await getResetDetails(); // Fetch expiry time
         const currentTimeInSeconds = Math.floor(Date.now() / 1000);
-        const remainingTimeInSeconds = exp! - currentTimeInSeconds;
+        const remainingTimeInSeconds = exp!? exp! - currentTimeInSeconds:0;
 
         setTimeLeft(Math.max(remainingTimeInSeconds, 0)); // Prevent negative time
         

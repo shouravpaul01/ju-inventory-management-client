@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { axiosInstance } from "@/src/lib/AxiosInstence";
 import { TCurrentUser, TResetDetails } from "@/src/types";
@@ -8,18 +8,18 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 
-export const loginReq=async(payload:FieldValues)=>{
-    try {
-        const {data} = await axiosInstance.post("/auth/login", payload);
-        
-        if (data?.success) {
-            cookies().set("accessToken",data?.data?.accessToken)
-        }
-        return data;
-      } catch (error: any) {
-        return error?.response?.data;
-      }
-}
+export const loginReq = async (payload: FieldValues) => {
+  try {
+    const { data } = await axiosInstance.post("/auth/login", payload);
+
+    if (data?.success) {
+      cookies().set("accessToken", data?.data?.accessToken);
+    }
+    return data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};
 export const getCurrentuser = async () => {
   const accessToken = cookies().get("accessToken")?.value;
   let decodedResult: Partial<TCurrentUser> = {};
@@ -56,7 +56,11 @@ export const sendOTPReq = async (email: string) => {
     return error?.response?.data;
   }
 };
+export const getResetPasswordToken = async () => {
+  const token = cookies().get("resetPasswordToken")?.value;
 
+  return { token };
+};
 export const getResetDetails = async () => {
   const resetPasswordToken = cookies().get("resetPasswordToken")?.value;
   let decodedResult: Partial<TResetDetails> = {};
@@ -95,10 +99,10 @@ export const resetPasswordReq = async (bodyData: FieldValues) => {
 };
 export const deleteOTPReq = async () => {
   try {
-    const resetDetails=await getResetDetails()
-    const { data } = await axiosInstance.patch(`/auth/delete-otp?email=${resetDetails.email}`);
-   
-
+    const resetDetails = await getResetDetails();
+    const { data } = await axiosInstance.patch(
+      `/auth/delete-otp?email=${resetDetails.email}`
+    );
 
     return data;
   } catch (error: any) {

@@ -64,6 +64,7 @@ export type TCurrentUser={
 }
 export type TResetDetails = {
   email: string;
+  otp?:number;
   iat: number,
   exp: number,
 };
