@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteOTPReq, getResetDetails } from "../services/Auth";
+import { deleteOTPReq, getVerificationTokenDecodeData,  } from "../services/Auth";
 
 export const useCountdownOTPTimeout = (onTimeout?: () => void) => {
   const [timeLeft, setTimeLeft] = useState<number | null>(null); // Timer in seconds
@@ -10,7 +10,7 @@ export const useCountdownOTPTimeout = (onTimeout?: () => void) => {
     const fetchExpiryDetails = async () => {
       try {
         setIsLoading(true);
-        const { exp } = await getResetDetails(); // Fetch expiry time
+        const { exp } = await getVerificationTokenDecodeData(); // Fetch expiry time
         const currentTimeInSeconds = Math.floor(Date.now() / 1000);
         const remainingTimeInSeconds = exp!? exp! - currentTimeInSeconds:0;
 
@@ -27,8 +27,9 @@ export const useCountdownOTPTimeout = (onTimeout?: () => void) => {
   }, [isResendSuccess]);
 
   const deleteOTP = async () => {
+    const {email } = await getVerificationTokenDecodeData();
     setIsResendSuccess(false)
-    await deleteOTPReq();
+    await deleteOTPReq(email!);
   };
   useEffect(() => {
     if (timeLeft === null || timeLeft <= 0) return;

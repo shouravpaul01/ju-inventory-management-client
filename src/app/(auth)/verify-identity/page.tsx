@@ -6,9 +6,9 @@ import { TimerIcon } from "@/src/components/icons";
 import { useUser } from "@/src/context/user.provider";
 import { useCountdownOTPTimeout } from "@/src/hooks";
 import {
-  cencelResetPasswordProcces,
-  getResetDetails,
-  getResetPasswordToken,
+  cencelVerificationProcces,
+  getVerificationTokenDecodeData,
+  getVerificationTokenToken,
   matchedOTPReq,
   sendOTPReq,
 } from "@/src/services/Auth";
@@ -18,15 +18,14 @@ import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { Link } from "@nextui-org/link";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function ConfirmIdentityPage() {
   const router = useRouter();
-  const { resetPasswordDetails, user: currentUser } = useUser();
   const [error, setError] = useState<string>();
   const { formattedTime, timeLeft, isLoading, setIsResendSuccess, reset } =
     useCountdownOTPTimeout();
@@ -35,34 +34,36 @@ export default function ConfirmIdentityPage() {
   // Format time in mm:ss format
 
   const handleVerifyIdentity: SubmitHandler<FieldValues> = async (data) => {
-    const {token}=await getResetPasswordToken()
-    console.log(token)
-  //  if (timeLeft==0) {
-  //   setError("OTP is expired.Please try again.");
-  //   return
-  //  }
+    const { token } = await getVerificationTokenToken();
+    if (!token || timeLeft! <= 0) {
+      setError("The OTP has expired. Please try again.");
+      return;
+    }
+
     const res = await matchedOTPReq({
       token,
       otp: data.otp,
     });
-    console.log(res)
+
     if (res.success && res?.data) {
+      toast.success(res?.message);
+
       router.push("/reset-password");
     }
-    if (!res?.status && res?.errorMessages) {
+    if (!res?.success && res?.errorMessages) {
       setError(res?.errorMessages[0]?.message);
     }
   };
   const handleSendOTP = async () => {
-    const resetDetails = await getResetDetails();
-    const res = await sendOTPReq(resetDetails.email!);
+    const verificationToken = await getVerificationTokenDecodeData();
+    const res = await sendOTPReq(verificationToken.email!);
     if (res?.success && res?.data) {
       setIsResendSuccess(true);
       reset();
       toast.success(res?.message);
       setError("");
     }
-    if (!res?.status && res?.errorMessages) {
+    if (!res?.success && res?.errorMessages) {
       setError(res?.errorMessages[0]?.message);
     }
   };
@@ -94,13 +95,12 @@ export default function ConfirmIdentityPage() {
               name="otp"
               inputProps={{
                 variant: "bordered",
-                
+                isDisabled: timeLeft! <= 0,
                 placeholder: "6-Digits OTP ",
                 width: "max-w-xl",
                 size: "md",
-               
               }}
-              registerOptions={{valueAsNumber:true}}
+              registerOptions={{ valueAsNumber: true }}
             />
             <Link
               underline="hover"
@@ -130,7 +130,7 @@ export default function ConfirmIdentityPage() {
           <Button
             variant="faded"
             color="secondary"
-            onPress={() => cencelResetPasswordProcces()}
+            onPress={() => cencelVerificationProcces()}
           >
             Cencel
           </Button>

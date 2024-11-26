@@ -1,7 +1,7 @@
 "use client";
 import JUForm from "@/src/components/form/JUForm";
 import JUPasswordInput from "@/src/components/form/JUPasswordInput";
-import { getResetPasswordToken, resetPasswordReq } from "@/src/services/Auth";
+import {  getResetPasswordToken, getVerificationTokenToken, resetPasswordReq } from "@/src/services/Auth";
 import { resetPasswordValidation } from "@/src/validations/auth.validation";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
@@ -16,14 +16,17 @@ export default function page() {
   const [error, setError] = useState<string>();
   const handleResetPassword: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true)
-      const token = await getResetPasswordToken();
-      if (!token) {
-          router.push("/find-account");
-      }
+      const {token} = await getResetPasswordToken();
+      console.log(token,"dd",data)
+      // if (!!token) {
+      //     router.push("/find-account");
+      //     return
+      // }
       const res = await resetPasswordReq({
         token,
         password: data.password,
       });
+      console.log(res)
       if (res?.success && res?.data) {
         router.push("/login");
         toast.success(res?.message);
@@ -35,8 +38,9 @@ export default function page() {
   };
   return (
     <div className="shadow-small w-full md:max-w-md rounded-md p-5 md:p-10">
+      <div className="mb-3">
       <p className="font-bold text-xl ">Reset Password</p>
-      <p className=" text-gray-500 mb-3">
+      <p className=" text-gray-500  ">
         Please reset your password within 10 minutes.
       </p>
       {error && (
@@ -44,13 +48,16 @@ export default function page() {
           color="danger"
           variant="flat"
           classNames={{
-            closeButton: "text-xl ms-5",
+            base:"h-full flex-wrap",
+            content:"text-wrap",
+            closeButton: "text-xl ",
           }}
           onClose={() => setError("")}
         >
           {error}
         </Chip>
       )}
+      </div>
       <JUForm onSubmit={handleResetPassword} validation={resetPasswordValidation}>
         <div className="space-y-2">
           <JUPasswordInput

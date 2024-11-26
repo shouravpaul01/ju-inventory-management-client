@@ -20,12 +20,15 @@ export const resetPasswordValidation = z
   .object({
     password: z
       .string()
-      .nonempty("The field is required.")
-      .min(6, { message: "Password must be six charecters." }),
+      .nonempty("Password is required.")
+      .min(6, { message: "Password must be at least 6 characters." })
+      .regex(/[!@#$%^&*(),.?":{}|<>]/, {
+        message: "Password must contain at least one special character.",
+      }),
 
-    confirmPassword: z.string().nonempty("The field is required"),
+    confirmPassword: z.string().nonempty("Confirm Password is required."),
   })
-  .refine((data: any) => data.password == data.confirmPassword, {
-    message: "Passwords do not match",
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match.",
     path: ["confirmPassword"],
   });

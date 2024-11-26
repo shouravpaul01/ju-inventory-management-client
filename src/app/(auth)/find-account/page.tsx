@@ -3,8 +3,7 @@
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
 import { XmarkIcon } from "@/src/components/icons";
-import { useUser } from "@/src/context/user.provider";
-import { cencelResetPasswordProcces, sendOTPReq } from "@/src/services/Auth";
+import { cencelVerificationProcces, sendOTPReq } from "@/src/services/Auth";
 import { getSingleUserReq } from "@/src/services/User";
 // import { getSingleUserByEmailReq } from "@/src/services/UserService";
 import { TUser } from "@/src/types";
@@ -13,7 +12,7 @@ import { findAccountValidation } from "@/src/validations/auth.validation";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { User } from "@nextui-org/user";
-import { redirect, useRouter } from "next/navigation";
+import {  useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 
@@ -107,7 +106,7 @@ export default function FindAccountPage() {
           <Button
             variant="faded"
             color="primary"
-            onPress={() => cencelResetPasswordProcces()}
+            onPress={() => cencelVerificationProcces()}
           >
             Cencel
           </Button>
