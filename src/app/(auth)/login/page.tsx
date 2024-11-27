@@ -20,9 +20,9 @@ export default function LoginPage() {
   const [authError, setAuthError] = useState<string>("");
   const handleLogin: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-console.log(data)
+
     const res = await loginReq(data);
-console.log(res)
+
     if (res?.success) {
       toast.success(res?.message);
     } else if (!res?.success && res?.errorMessages?.length > 0) {

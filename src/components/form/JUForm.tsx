@@ -36,11 +36,13 @@ export default function JUForm({
   //Handle server side vailidation errors
   useEffect(() => {
     if (Array.isArray(errors) && errors?.length! > 0) {
+    
       errors?.forEach((err: TErrorMessage) => {
         methods.setError(err.path, { type: "server", message: err.message });
       });
     }
     if (reset) {
+     
       methods.reset();
     }
   }, [errors, reset]);

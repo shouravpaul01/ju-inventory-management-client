@@ -45,7 +45,8 @@ export default function MenuTabs() {
       />
 
       <Tab
-        key="videos"
+       key="/admin/manage-categories"
+        href="/admin/manage-categories"
         title={
           <div className="flex items-center space-x-2">
             <CategoryIcon />

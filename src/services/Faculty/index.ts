@@ -1,8 +1,6 @@
 "use server";
 
 import { axiosInstance } from "@/src/lib/AxiosInstence";
-import { TFaculty, TQuery } from "@/src/types";
-import { it } from "node:test";
 import { FieldValues } from "react-hook-form";
 
 export const createFacultyReq = async (payload: FieldValues) => {
