@@ -1,6 +1,6 @@
 "use client";
 
-import { CategoryIcon, GroupUserIcon, HomeIcon, ReturnedIcon } from "@/src/components/icons";
+import { CategoryIcon, GroupUserIcon, HomeIcon, HubIcon, ReturnedIcon } from "@/src/components/icons";
 import { Tab, Tabs } from "@nextui-org/tabs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -55,10 +55,11 @@ export default function MenuTabs() {
         }
       />
       <Tab
-        key="Manage Sub-Category"
+      key="/admin/manage-subcategories"
+        href="/admin/manage-subcategories"
         title={
           <div className="flex items-center space-x-2">
-            <CategoryIcon />
+            <HubIcon />
             <span>Manage Sub-Category</span>
           </div>
         }

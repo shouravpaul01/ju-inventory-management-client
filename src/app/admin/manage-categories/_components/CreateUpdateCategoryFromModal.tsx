@@ -20,6 +20,7 @@ import {
   ModalHeader,
   UseDisclosureProps,
 } from "@nextui-org/modal";
+import { Skeleton } from "@nextui-org/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
@@ -37,24 +38,21 @@ export default function CreateUpdateCategoryFromModal({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
   const [isResetForm, setIsResetForm] = useState<boolean>(false);
-  const { data: singleUser, isLoading: isSingleUserLoading } = getSingleCategory(
-    categoryId!
-  );
+  const { data: category, isLoading: isCategoryLoading } =
+    getSingleCategory(categoryId!);
 
   const defaultValues = useMemo(() => {
     if (!categoryId) return {};
     return {
-     
-      name: singleUser?.name || "",
-     
+      name: category?.name || "",
     };
-  }, [categoryId, singleUser]);
-  const handleCreateUpdateFaculty: SubmitHandler<FieldValues> = async (data) => {
+  }, [categoryId, category]);
+  const handleCreateUpdate: SubmitHandler<FieldValues> = async (
+    data
+  ) => {
     setIsLoading(true);
-    
-
     const res = categoryId
-      ? await updateCategoryReq(categoryId,data)
+      ? await updateCategoryReq(categoryId, data)
       : await createCategoryReq(data);
 
     if (res?.success) {
@@ -71,7 +69,7 @@ export default function CreateUpdateCategoryFromModal({
 
     setIsLoading(false);
   };
-  console.log(validationErrors)
+  console.log(validationErrors);
   return (
     <Modal
       isOpen={useDisclosure.isOpen}
@@ -82,26 +80,33 @@ export default function CreateUpdateCategoryFromModal({
       <ModalContent>
         {(onClose) => (
           <>
-            {isSingleUserLoading ? (
+            <ModalHeader className="flex flex-col gap-1">
+              {isCategoryLoading ? (
+                <Skeleton className="w-2/5 rounded-lg">
+                  <div className="h-3 w-2/5 rounded-lg bg-default-200"></div>
+                </Skeleton>
+              ) : categoryId ? (
+                "Update Category"
+              ) : (
+                "Create Category"
+              )}
+            </ModalHeader>
+            {isCategoryLoading ? (
               <JULoading className="h-[300px]" />
             ) : (
               <JUForm
-                onSubmit={handleCreateUpdateFaculty}
+                onSubmit={handleCreateUpdate}
                 validation={categoryValidation}
                 errors={validationErrors}
                 reset={isResetForm}
                 defaultValues={defaultValues}
               >
-                <ModalHeader className="flex flex-col gap-1">
-                  {categoryId ? "Update Category" : "Create Category"}
-                </ModalHeader>
                 <ModalBody>
                   <JUInput
                     name="name"
                     inputProps={{
                       label: "Name",
                       type: "text",
-                      
                     }}
                   />
                 </ModalBody>

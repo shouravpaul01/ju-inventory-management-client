@@ -1,50 +1,33 @@
-"use client";
-import {
-  AddIcon,
-  CategoryIcon,
-  DeleteIcon,
-  EditIcon,
-  InfoIcon,
-  MoreIcon,
-} from "@/src/components/icons";
-import { Button, ButtonGroup } from "@nextui-org/button";
+"use client"
+import { AddIcon, EditIcon, InfoIcon, MoreIcon } from "@/src/components/icons";
+import { Button } from "@nextui-org/button";
 import { useDisclosure } from "@nextui-org/modal";
+import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import CreateUpdateCategoryFromModal from "./_components/CreateUpdateCategoryFromModal";
+import CreateUpdateSubCategoryFromModal from "./_components/CreateUpdateSubCategoryFromModal";
 import { useEffect, useMemo, useState } from "react";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
-} from "@nextui-org/table";
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/table";
 import { Pagination } from "@nextui-org/pagination";
+import JULoading from "@/src/components/ui/JULoading";
 import { Chip } from "@nextui-org/chip";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { TQuery } from "@/src/types";
-import { getAllCategories } from "@/src/hooks/Category";
-import { useQueryClient } from "@tanstack/react-query";
-import JULoading from "@/src/components/ui/JULoading";
-import { Tooltip } from "@nextui-org/tooltip";
-import {
-  updateCategoryActiveStatus,
-  updateCategoryApprovedStatus,
-} from "@/src/services/Category";
+import { getAllSubCategories } from "@/src/hooks/Sub Category";
+import { updateSubCategoryActiveStatus, updateSubCategoryApprovedStatus } from "@/src/services/Sub Category";
 import { toast } from "sonner";
+import { Tooltip } from "@nextui-org/tooltip";
 import DetailsModal from "./_components/DetailsModal";
 
-export default function ManageCategories() {
+export default function ManageSubCategories() {
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("search");
   const modalForm = useDisclosure();
   const modalDetails = useDisclosure();
   const queryClient = useQueryClient();
   const [page, setPage] = useState<number>(1);
-  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [subCategoryId, setSubCategoryId] = useState<string | null>(null);
   const queryParams = useMemo(() => {
     const params: TQuery[] = [{ name: "page", value: page }];
     if (searchTerm) {
@@ -52,38 +35,39 @@ export default function ManageCategories() {
     }
     return params;
   }, [page, searchParams]);
-  const { data, isLoading } = getAllCategories({
+  const { data, isLoading } = getAllSubCategories({
     query: queryParams,
   });
   const loadingState = isLoading ? "loading" : "idle";
   useEffect(() => {
     if (!modalForm.isOpen) {
-      setCategoryId(null);
+        setSubCategoryId(null);
     }
   }, [modalForm.isOpen]);
 
   const handleActiveOrInactive = async (
-    categoryId: string,
+    subCategoryId: string,
     isActive: boolean
   ) => {
-    const res = await updateCategoryActiveStatus(categoryId, isActive);
+    const res = await updateSubCategoryActiveStatus(subCategoryId, isActive);
 
     if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["sub-categories"] });
       toast.success(res?.message);
     } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "categoryError") {
+      if (res?.errorMessages[0]?.path == "subCategoryError") {
         toast.error(res?.errorMessages[0]?.message);
       }
     }
   };
-  const handleApproved = async (categoryId: string) => {
-    const res = await updateCategoryApprovedStatus(categoryId);
+  const handleApproved = async (subCategoryId: string) => {
+    const res = await updateSubCategoryApprovedStatus(subCategoryId);
+    console.log(res)
     if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
+      queryClient.invalidateQueries({ queryKey: ["sub-categories"] });
       toast.success(res?.message);
     } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "categoryError") {
+      if (res?.errorMessages[0]?.path == "subCategoryError") {
         toast.error(res?.errorMessages[0]?.message);
       }
     }
@@ -91,13 +75,13 @@ export default function ManageCategories() {
   return (
     <div>
       <div className="flex border-b pb-2">
-        <p className="text-lg font-bold flex-1">Manage Categories</p>
+        <p className="text-lg font-bold flex-1">Manage Sub-Categories</p>
         <div>
           <Button
             size="sm"
             color="primary"
             variant="ghost"
-            href="/admin/manage-categories"
+            href="/admin/manage-subcategories"
             as={Link}
             onPress={() => modalForm.onOpen()}
             startContent={<AddIcon className="size-5 " />}
@@ -127,6 +111,7 @@ export default function ManageCategories() {
       >
         <TableHeader>
           <TableColumn key="name">NAME</TableColumn>
+          <TableColumn key="category">Category</TableColumn>
           <TableColumn key="status">Status</TableColumn>
           <TableColumn key="approval">Approval</TableColumn>
           <TableColumn key="action">Action</TableColumn>
@@ -140,6 +125,7 @@ export default function ManageCategories() {
           {(item) => (
             <TableRow key={item._id}>
               <TableCell>{item.name}</TableCell>
+              <TableCell>{item.category.name}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
                   <Chip color={item?.isActive ?"success":"danger"} variant="flat" size="sm">
@@ -250,7 +236,7 @@ export default function ManageCategories() {
                       variant="flat"
                       size="sm"
                       onPress={() => {
-                        setCategoryId(item._id), modalDetails.onOpen();
+                        setSubCategoryId(item._id), modalDetails.onOpen();
                       }}
                     >
                       <InfoIcon />
@@ -264,7 +250,7 @@ export default function ManageCategories() {
                       variant="flat"
                       size="sm"
                       onPress={() => {
-                        setCategoryId(item._id), modalForm.onOpen();
+                        setSubCategoryId(item._id), modalForm.onOpen();
                       }}
                     >
                       <EditIcon />
@@ -276,11 +262,8 @@ export default function ManageCategories() {
           )}
         </TableBody>
       </Table>
-      <CreateUpdateCategoryFromModal
-        categoryId={categoryId!}
-        useDisclosure={modalForm}
-      />
-      <DetailsModal categoryId={categoryId!} useDisclosure={modalDetails} />
+      <CreateUpdateSubCategoryFromModal subCategoryId={subCategoryId!} useDisclosure={modalForm}/>
+      <DetailsModal subCategoryId={subCategoryId!} useDisclosure={modalDetails}/>
     </div>
   );
 }

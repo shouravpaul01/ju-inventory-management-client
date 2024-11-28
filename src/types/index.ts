@@ -76,3 +76,11 @@ export type TCategory = {
   isActive: boolean;
   isApproved: boolean;
 };
+export type TSubCategory = {
+  _id: string;
+  name: string;
+  category: TCategory;
+  description?: string;
+  isActive: boolean;
+  isApproved: boolean;
+};
