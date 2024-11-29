@@ -1,6 +1,13 @@
 "use client";
 
-import { CategoryIcon, GroupUserIcon, HomeIcon, HubIcon, ReturnedIcon } from "@/src/components/icons";
+import {
+  CategoryIcon,
+  GroupUserIcon,
+  HomeIcon,
+  HubIcon,
+  ReturnedIcon,
+  WidgetIcon,
+} from "@/src/components/icons";
 import { Tab, Tabs } from "@nextui-org/tabs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,7 +25,7 @@ export default function MenuTabs() {
         base: " flex-col",
         tab: "justify-normal ",
       }}
-     selectedKey={pathname}
+      selectedKey={pathname}
     >
       <Tab
         key="/admin/dashboard"
@@ -45,7 +52,7 @@ export default function MenuTabs() {
       />
 
       <Tab
-       key="/admin/manage-categories"
+        key="/admin/manage-categories"
         href="/admin/manage-categories"
         title={
           <div className="flex items-center space-x-2">
@@ -55,7 +62,7 @@ export default function MenuTabs() {
         }
       />
       <Tab
-      key="/admin/manage-subcategories"
+        key="/admin/manage-subcategories"
         href="/admin/manage-subcategories"
         title={
           <div className="flex items-center space-x-2">
@@ -65,10 +72,11 @@ export default function MenuTabs() {
         }
       />
       <Tab
-        key="Manage Accessories"
+        key="/admin/manage-accessories"
+        href="/admin/manage-accessories"
         title={
           <div className="flex items-center space-x-2">
-            <CategoryIcon />
+            <WidgetIcon />
             <span>Manage Accessories</span>
           </div>
         }

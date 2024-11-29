@@ -15,4 +15,6 @@ export const designationOptions = [
     { value: "director", label: "Director" },
     { value: "programCoordinator", label: "Program Coordinator" },
   ];
-  
+  export const returnableOptions = [
+    { value: "true", label: "Yes" },
+    { value: "false", label: "No" }]
