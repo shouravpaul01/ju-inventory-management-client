@@ -10,3 +10,12 @@
   background-color: rgb(196 181 253);
   z-index: 1;
 }
+
+ .ql-toolbar {
+ @apply  rounded-t-md bg-gray-50
+
+}
+.ql-container {
+
+  @apply rounded-b-md 
+}

@@ -13,11 +13,16 @@ interface IProps {
 export default function JUSelect({ name, selectProps, options,onChange }: IProps) {
   const {
     register,
+    setValue,
+    clearErrors,
     formState: { errors },
   } = useFormContext();
   const handleChange = (selectedValue: any) => {
+
+     setValue(name,selectedValue.target?.value)
+    onChange?.(selectedValue.target?.value); 
+    clearErrors()
      
-    onChange?.(selectedValue.target?.value);  
   };
   return (
     <Select variant="bordered" {...register(name)} {...selectProps} isInvalid={!!errors[name]}

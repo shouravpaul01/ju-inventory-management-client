@@ -77,3 +77,18 @@ export const createSubCategoryReq = async (payload: FieldValues) => {
       return error?.response?.data;
     }
   };
+  export const getAllActiveSubCatgoriesByCategoryReq = async (
+    categoryId: string
+  ): Promise<{
+    success: string;
+    message: string;
+    data: TSubCategory[];
+    errorMessages?: TErrorMessage[];
+  }> => {
+    try {
+      const res = await axiosInstance.get(`/sub-categories/all-active-sub-categories/${categoryId}`);
+      return res.data;
+    } catch (error: any) {
+      return error?.response?.data;
+    }
+  };

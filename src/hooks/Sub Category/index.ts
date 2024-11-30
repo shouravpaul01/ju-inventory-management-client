@@ -3,7 +3,7 @@ import {
   getAllCategoriesReq,
   getSingleCategotyReq,
 } from "@/src/services/Category";
-import { getAllSubCategoriesReq, getSingleSubCategotyReq } from "@/src/services/Sub Category";
+import { getAllActiveSubCatgoriesByCategoryReq, getAllSubCategoriesReq, getSingleSubCategotyReq } from "@/src/services/Sub Category";
 import { TCategory, TErrorMessage, TQuery } from "@/src/types";
 import { useQuery } from "@tanstack/react-query";
 
@@ -25,5 +25,15 @@ export const getSingleSubCategory = (subCategoryId: string) => {
       return res?.data;
     },
     enabled: !!subCategoryId,
+  });
+};
+export const getAllActiveSubCatgoriesByCategory = (categoryId: string) => {
+  return useQuery({
+    queryKey: ["allActive-subcategories", categoryId],
+    queryFn: async () => {
+      const res = await getAllActiveSubCatgoriesByCategoryReq(categoryId!);
+      return res?.data;
+    },
+    enabled: !!categoryId,
   });
 };

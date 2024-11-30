@@ -1,3 +1,4 @@
+import JUFileInput from "@/src/components/form/JUFileInput";
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
 import JUSelect from "@/src/components/form/JUSelect";
@@ -5,12 +6,13 @@ import JUTextEditor from "@/src/components/form/JUTextEditor";
 import JULoading from "@/src/components/ui/JULoading";
 import { returnableOptions } from "@/src/constents";
 import { getAllCategories } from "@/src/hooks/Category";
-import { getAllSubCategories, getSingleSubCategory } from "@/src/hooks/Sub Category";
+import { getAllActiveSubCatgoriesByCategory, getAllSubCategories, getSingleSubCategory } from "@/src/hooks/Sub Category";
 import {
   createSubCategoryReq,
   updateSubCategoryReq,
 } from "@/src/services/Sub Category";
 import { TErrorMessage } from "@/src/types";
+import { accessoryValidation } from "@/src/validations/accessory.validation";
 import { subCategoryValidation } from "@/src/validations/subCategory.validation";
 import { Button } from "@nextui-org/button";
 import {
@@ -47,13 +49,7 @@ export default function CreateUpdateAccessoryFromModal({
       { name: "isApproved", value: true },
     ],
   });
-  const { data: allActiveSubCategories,isLoading:isSubCatLoading } = getAllSubCategories({
-    query: [
-      {name:"category",value:selectCategoryId},
-      { name: "isActive", value: true },
-      { name: "isApproved", value: true },
-    ],
-  });
+  const { data: allActiveSubCategories,isLoading:isSubCatLoading } = getAllActiveSubCatgoriesByCategory(selectCategoryId!);
   // const { data: subCategory, isLoading: isSubCategoryLoading } = getSingleSubCategory(
   //   subCategoryId!
   // );
@@ -65,7 +61,7 @@ export default function CreateUpdateAccessoryFromModal({
     }));
   }, [allActiveCategories]);
   const activeSubCategoriesOptions = useMemo(() => {
-    return allActiveSubCategories?.data?.map((subCategory) => ({
+    return allActiveSubCategories?.map((subCategory) => ({
       label: subCategory.name,
       value: subCategory._id,
     }));
@@ -81,6 +77,7 @@ export default function CreateUpdateAccessoryFromModal({
     setSelectCategoryId(value);
   };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
+    console.log(data)
     setIsLoading(true);
     // const res = subCategoryId
     //   ? await updateSubCategoryReq(subCategoryId, data)
@@ -130,7 +127,7 @@ export default function CreateUpdateAccessoryFromModal({
             ) : (
               <JUForm
                 onSubmit={handleCreateUpdate}
-                validation={subCategoryValidation}
+              
                 errors={validationErrors}
                 reset={isResetForm}
               >
@@ -187,14 +184,9 @@ export default function CreateUpdateAccessoryFromModal({
                   />
                   </div>
                   <div className="flex flex-col md:flex-row gap-5">
-                  <JUInput
-                    name="name"
-                    inputProps={{
-                      label: "Name",
-                      type: "text",
-                      className: "w-full md:w-[66%]",
-                    }}
-                  />
+                  <div className="w-full md:w-[66%]">
+                  <JUFileInput name="image" />
+                  </div>
                   <JUInput
                     name="quantity"
                     inputProps={{
@@ -204,7 +196,8 @@ export default function CreateUpdateAccessoryFromModal({
                     }}
                   />
                   </div>
-                  <JUTextEditor name="description"/>
+                  <JUTextEditor name="description" label="Description"/>
+                
                 </ModalBody>
                 <ModalFooter>
                   <Button type="submit" color="primary" isLoading={isLoading}>

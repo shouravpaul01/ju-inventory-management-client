@@ -1,82 +1,83 @@
 "use client";
-import React, {  useRef, useMemo } from "react";
+
 import dynamic from "next/dynamic";
 import { Controller, useFormContext } from "react-hook-form";
-// import JoditEditor from "jodit-react"
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css"; // Import Quill styles
 
-/* Using dynamic import of Jodit component as it can't render in server side*/
- const JoditEditor = dynamic(() => import("jodit-react"), { ssr: false });
-
+const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
 
 type TProps = {
   name: string;
-  placeholder?:string
+  label:string;
+  placeholder?: string;
 };
-export default function JUTextEditor({ name,placeholder }: TProps) {
+export default function JUTextEditor({ name,label, placeholder }: TProps) {
   const {
     control,
     formState: { errors },
   } = useFormContext();
 
-  const editor = useRef(null);
-
-  /* The most important point*/
-  // const config = useMemo(
-  //   () => ({
-  //     height: 400, 
-  //     toolbar: true, 
-  //     readonly: false,
-  //    autofocus: true,
-  //     uploader: {
-  //       insertImageAsBase64URI: true,
-  //       imagesExtensions: ["jpg", "png", "jpeg", "gif", "svg", "webp"],
-  //     },
-  //     toolbarButtons: [
-  //       'bold', 'italic', 'underline', 'strikethrough', '|',
-  //       'ul', 'ol', 'outdent', 'indent', '|',
-  //       'link', 'image', 'video', '|',
-  //       'undo', 'redo', '|',
-  //       'brush', 'align', 'font', 'fontsize', '|',
-  //       'code', 'table', 'fullsize', 'preview'
-  //     ],
-  //     placeholder: placeholder || 'Start typings...'
-  //   }),
-  //   [placeholder]
-  // );
-  const config = {
-    toolbarSticky: false,
-    buttons: [
-      "bold",
-      "italic",
-      "underline",
-      "|",
-      "ul", // Unordered List
-      "ol", // Ordered List
-      "|",
-      "link",
-      "image",
-      "eraser",
-      "undo",
-      "redo",
+  const modules = {
+    toolbar: [
+      [{ font: [] }],
+      [{ header: [1, 2, 3, false] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ script: "sub" }, { script: "super" }],
+      [{ indent: "-1" }, { indent: "+1" }],
+      [{ direction: "rtl" }],
+      ["link"],
+      [{ align: [] }],
+      [{ color: [] }, { background: [] }],
+      ["code-block"],
+      ["clean"],
     ],
-    placeholder: "Start typing here...",
   };
+
+  const formats = [
+    "font",
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "strike",
+    "blockquote",
+    "list",
+    "bullet",
+    "script",
+    "bullet",
+    "indent",
+    "link",
+    "align",
+    "color",
+    "background",
+    "code-block",
+  ];
   return (
-    <>
-    <Controller
-      name={name}
-      control={control}
-      render={({ field }) => (
-        <JoditEditor
-          ref={editor}
-          value={field.value || ""} // Use field.value as the editor's value
-          config={config}
-          onChange={field.onChange}
-          className="w-full h-[70%]  bg-white"
-        />
+    <div>
+      <h3 className="mb-[2px]">{label}</h3>
+      {/* Controller for Quill */}
+      <Controller
+        name={name}
+        control={control}
+        defaultValue=""
+        render={({ field }) => (
+         
+           <ReactQuill
+            value={field.value}
+            onChange={field.onChange}
+            modules={modules}
+            formats={formats}
+            placeholder={placeholder || "Start typing..."}
+           
+          />
+      
+        )}
+      />
+      {errors[name] && (
+        <p className="text-red-500">{errors[name]?.message as string}</p>
       )}
-    />
-    {errors[name] && <p className="text-red-500">{errors[name]?.message as string}</p>}
-    </>
+    </div>
   );
 }
