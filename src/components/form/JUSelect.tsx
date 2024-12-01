@@ -15,13 +15,14 @@ export default function JUSelect({ name, selectProps, options,onChange }: IProps
     register,
     setValue,
     clearErrors,
+
     formState: { errors },
   } = useFormContext();
   const handleChange = (selectedValue: any) => {
 
      setValue(name,selectedValue.target?.value)
     onChange?.(selectedValue.target?.value); 
-    clearErrors()
+    clearErrors(name)
      
   };
   return (

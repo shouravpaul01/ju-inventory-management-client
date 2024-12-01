@@ -6,7 +6,12 @@ import JUTextEditor from "@/src/components/form/JUTextEditor";
 import JULoading from "@/src/components/ui/JULoading";
 import { returnableOptions } from "@/src/constents";
 import { getAllCategories } from "@/src/hooks/Category";
-import { getAllActiveSubCatgoriesByCategory, getAllSubCategories, getSingleSubCategory } from "@/src/hooks/Sub Category";
+import {
+  getAllActiveSubCatgoriesByCategory,
+  getAllSubCategories,
+  getSingleSubCategory,
+} from "@/src/hooks/Sub Category";
+import { createAccessoryReq } from "@/src/services/Accessory";
 import {
   createSubCategoryReq,
   updateSubCategoryReq,
@@ -39,20 +44,25 @@ export default function CreateUpdateAccessoryFromModal({
 }: IProps) {
   const queryClient = useQueryClient();
   const [selectCategoryId, setSelectCategoryId] = useState<string | null>(null);
+  const [selectSubCategoryId, setSelectSubCategoryId] = useState<string | null>(
+    null
+  );
+  const [accessoryId, setAccessoryId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
   const [isResetForm, setIsResetForm] = useState<boolean>(false);
-  const { data: allActiveCategories, isLoading:isCatLoading} = getAllCategories({
-    query: [
-      { name: "isActive", value: true },
-      { name: "isApproved", value: true },
-    ],
-  });
-  const { data: allActiveSubCategories,isLoading:isSubCatLoading } = getAllActiveSubCatgoriesByCategory(selectCategoryId!);
-  // const { data: subCategory, isLoading: isSubCategoryLoading } = getSingleSubCategory(
-  //   subCategoryId!
-  // );
+  const { data: allActiveCategories, isLoading: isCatLoading } =
+    getAllCategories({
+      query: [
+        { name: "isActive", value: true },
+        { name: "isApproved", value: true },
+      ],
+    });
+  const { data: allActiveSubCategories, isLoading: isActiveSubCatLoading } =
+    getAllActiveSubCatgoriesByCategory(selectCategoryId!);
+  const { data: singleSubCategory, isLoading: isSubCatLoading } =
+    getSingleSubCategory(selectSubCategoryId!);
 
   const activeCategoriesOptions = useMemo(() => {
     return allActiveCategories?.data?.map((category) => ({
@@ -66,6 +76,10 @@ export default function CreateUpdateAccessoryFromModal({
       value: subCategory._id,
     }));
   }, [allActiveSubCategories]);
+  const generateCodeTitle = useMemo(() => {
+    const code = singleSubCategory?.name?.substring(0, 4).toUpperCase();
+    return singleSubCategory ? `CSE-${code}-` : "";
+  }, [selectSubCategoryId, isSubCatLoading]);
   // const defaultValues = useMemo(() => {
   //   if (!subCategoryId) return {};
   //   return {
@@ -76,30 +90,41 @@ export default function CreateUpdateAccessoryFromModal({
   const handleSelectCategory = (value: string) => {
     setSelectCategoryId(value);
   };
+  const handleSelectSubCategory = (value: string) => {
+    setSelectSubCategoryId(value);
+  };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data)
+    console.log(data);
     setIsLoading(true);
-    // const res = subCategoryId
-    //   ? await updateSubCategoryReq(subCategoryId, data)
-    //   : await createSubCategoryReq(data);
-
-    // if (res?.success) {
-    //   queryClient.invalidateQueries({ queryKey: ["sub-categories"] });
-    //   queryClient.invalidateQueries({ queryKey: ["single-subcategory"] });
-    //   toast.success(res?.message);
-    //   !subCategoryId && setIsResetForm(true);
-    // } else if (!res?.success && res?.errorMessages?.length > 0) {
-    //   if (res?.errorMessages[0]?.path == "subCategoryError") {
-    //     toast.error(res?.errorMessages[0]?.message);
-    //   }
-    //   setValidationErrors(res?.errorMessages);
-    // }
+    const formData=new FormData()
+    formData.append("file",data.image)
+    delete data["image"]
+    formData.append("data",JSON.stringify(data))
+    const res = accessoryId
+      ? await updateSubCategoryReq(accessoryId, data)
+      : await createAccessoryReq(formData);
+console.log(res)
+    if (res?.success) {
+      queryClient.invalidateQueries({ queryKey: ["sub-categories"] });
+      queryClient.invalidateQueries({ queryKey: ["single-subcategory"] });
+      toast.success(res?.message);
+      !subCategoryId && setIsResetForm(true);
+    } else if (!res?.success && res?.errorMessages?.length > 0) {
+      if (res?.errorMessages[0]?.path == "subCategoryError") {
+        toast.error(res?.errorMessages[0]?.message);
+      }
+      setValidationErrors(res?.errorMessages);
+    }
 
     setIsLoading(false);
   };
-  
+
   const isSubCategoryLoading = false;
-  console.log(selectCategoryId,activeSubCategoriesOptions,allActiveSubCategories);
+  console.log(
+    selectCategoryId,
+    activeSubCategoriesOptions,
+    allActiveSubCategories
+  );
   return (
     <Modal
       isOpen={useDisclosure.isOpen}
@@ -127,8 +152,9 @@ export default function CreateUpdateAccessoryFromModal({
             ) : (
               <JUForm
                 onSubmit={handleCreateUpdate}
-              
+                validation={accessoryValidation}
                 errors={validationErrors}
+                defaultValues={{ codeTitle: generateCodeTitle }}
                 reset={isResetForm}
               >
                 <ModalBody>
@@ -138,9 +164,11 @@ export default function CreateUpdateAccessoryFromModal({
                       options={activeCategoriesOptions!}
                       selectProps={{
                         label: "Category",
-                        placeholder: isCatLoading?"Loading..":"Select Category",
+                        placeholder: isCatLoading
+                          ? "Loading.."
+                          : "Select Category",
                         selectionMode: "single",
-                        isDisabled:isCatLoading,
+                        isDisabled: isCatLoading,
                         className: "w-full md:w-[33%]",
                       }}
                       onChange={handleSelectCategory}
@@ -150,54 +178,64 @@ export default function CreateUpdateAccessoryFromModal({
                       options={activeSubCategoriesOptions!}
                       selectProps={{
                         label: "Sub Category",
-                        placeholder: isSubCatLoading?"Loading..":"Select Sub Category",
-                        isDisabled:isSubCatLoading,
+                        placeholder: isActiveSubCatLoading
+                          ? "Loading.."
+                          : "Select Sub Category",
+                        isDisabled: isActiveSubCatLoading,
                         className: "w-full md:w-[33%]",
                       }}
+                      onChange={handleSelectSubCategory}
                     />
                     <JUSelect
                       name="isItReturnable"
                       options={returnableOptions!}
                       selectProps={{
                         label: "Returnable",
-                        placeholder: "Select whether the accessory is returnable.",
+                        placeholder:
+                          "Select whether the accessory is returnable.",
                         className: "w-full md:w-[33%]",
                       }}
                     />
                   </div>
-                  <div className="flex flex-col md:flex-row gap-5">
-                  <JUInput
-                    name="name"
-                    inputProps={{
-                      label: "Name",
-                      type: "text",
-                      className: "w-full md:w-[66%]",
-                    }}
-                  />
-                  <JUInput
-                    name="codeTitle"
-                    inputProps={{
-                      label: "Code Title",
-                      type: "text",
-                      className: "w-full md:w-[33%]",
-                    }}
-                  />
+                  <div className="flex flex-col md:flex-row gap-5 ">
+                    <JUInput
+                      name="name"
+                      inputProps={{
+                        label: "Name",
+                        type: "text",
+                        className: "w-full md:w-[66%]",
+                      }}
+                    />
+                    <JUInput
+                      name="codeTitle"
+                      inputProps={{
+                        label: "Code Title",
+                        type: "text",
+                        className: "w-full md:w-[33%] ",
+                        classNames: { input: "uppercase p-0 mb-[2px] f" },
+                        startContent: (
+                          <div className="pointer-events-none w-36 ">
+                            {generateCodeTitle}
+                          </div>
+                        ),
+                      }}
+                    />
                   </div>
                   <div className="flex flex-col md:flex-row gap-5">
-                  <div className="w-full md:w-[66%]">
-                  <JUFileInput name="image" />
+                    <div className="w-full md:w-[66%]">
+                      <JUFileInput name="image" />
+                    </div>
+                    <JUInput
+                      name="quantity"
+                      inputProps={{
+                        label: "Quantity",
+                        type: "number",
+                        className: "w-full md:w-[33%]",
+                      }}
+                      registerOptions={{ valueAsNumber: true }}
+                    />
                   </div>
-                  <JUInput
-                    name="quantity"
-                    inputProps={{
-                      label: "Quantity",
-                      type: "text",
-                      className: "w-full md:w-[33%]",
-                    }}
-                  />
-                  </div>
-                  <JUTextEditor name="description" label="Description"/>
-                
+                  <JUTextEditor name="description" label="Description" />
                 </ModalBody>
                 <ModalFooter>
                   <Button type="submit" color="primary" isLoading={isLoading}>
