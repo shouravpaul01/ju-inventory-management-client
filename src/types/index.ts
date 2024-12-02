@@ -84,3 +84,30 @@ export type TSubCategory = {
   isActive: boolean;
   isApproved: boolean;
 };
+export type TAccessory = {
+  _id:string;
+  name: string; 
+  category: TCategory; 
+  subCategory: TSubCategory;  
+  image?: string; 
+  quantityDetails: {
+    totalQuantity: number; 
+    currentQuantity: number; 
+    distributedQuantity?: number; 
+    orderQuantity?: number; 
+  };
+  codeDetails:{
+    codeTitle: string; 
+    totalCodes:string[];
+    currentCodes:string[];
+    distributedCodes?:string[];
+    orderCodes?:string[];
+  },
+  
+  description?: string; 
+  isItReturnable?: boolean; 
+  status?: 'Available' |  'Out of Stock';
+  isActive:boolean;
+  isApproved:boolean;
+  isDeleted:boolean;
+};

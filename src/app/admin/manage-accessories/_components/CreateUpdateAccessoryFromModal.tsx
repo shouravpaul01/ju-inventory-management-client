@@ -5,6 +5,7 @@ import JUSelect from "@/src/components/form/JUSelect";
 import JUTextEditor from "@/src/components/form/JUTextEditor";
 import JULoading from "@/src/components/ui/JULoading";
 import { returnableOptions } from "@/src/constents";
+import { getSingleAccessory } from "@/src/hooks/Accessory";
 import { getAllCategories } from "@/src/hooks/Category";
 import {
   getAllActiveSubCatgoriesByCategory,
@@ -30,24 +31,25 @@ import {
 } from "@nextui-org/modal";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
+import { describe } from "node:test";
 import { useMemo, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 
 interface IProps {
   useDisclosure: UseDisclosureProps | any;
-  subCategoryId?: string;
+  accessoryId?: string;
 }
 export default function CreateUpdateAccessoryFromModal({
   useDisclosure,
-  subCategoryId,
+  accessoryId,
 }: IProps) {
   const queryClient = useQueryClient();
-  const [selectCategoryId, setSelectCategoryId] = useState<string | null>(null);
+  const [selectCategoryId, setSelectCategoryId] = useState<string | null>(accessoryId?accessoryId:null);
   const [selectSubCategoryId, setSelectSubCategoryId] = useState<string | null>(
     null
   );
-  const [accessoryId, setAccessoryId] = useState<string | null>(null);
+ 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
@@ -63,7 +65,7 @@ export default function CreateUpdateAccessoryFromModal({
     getAllActiveSubCatgoriesByCategory(selectCategoryId!);
   const { data: singleSubCategory, isLoading: isSubCatLoading } =
     getSingleSubCategory(selectSubCategoryId!);
-
+console.log(selectCategoryId,allActiveSubCategories,"k")
   const activeCategoriesOptions = useMemo(() => {
     return allActiveCategories?.data?.map((category) => ({
       label: category.name,
@@ -80,13 +82,18 @@ export default function CreateUpdateAccessoryFromModal({
     const code = singleSubCategory?.name?.substring(0, 4).toUpperCase();
     return singleSubCategory ? `CSE-${code}-` : "";
   }, [selectSubCategoryId, isSubCatLoading]);
-  // const defaultValues = useMemo(() => {
-  //   if (!subCategoryId) return {};
-  //   return {
-  //     name: subCategory?.name || "",
-  //     category:subCategory?.category._id
-  //   };
-  // }, [subCategoryId, subCategory]);
+
+  const {data:accessory,isLoading:isAccessoryLoading}=getSingleAccessory(accessoryId!)
+  const defaultValues = useMemo(() => {
+    if (!accessoryId) return {};
+    return {
+      name: accessory?.name || "",
+      category:accessory?.category,
+      subCategory:accessory?.subCategory,
+      isItReturnable:accessory?.isItReturnable,
+      describtion:accessory?.description
+    };
+  }, [ accessory]);
   const handleSelectCategory = (value: string) => {
     setSelectCategoryId(value);
   };
@@ -94,7 +101,7 @@ export default function CreateUpdateAccessoryFromModal({
     setSelectSubCategoryId(value);
   };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data);
+ 
     setIsLoading(true);
     const formData=new FormData()
     formData.append("file",data.image)
@@ -103,14 +110,14 @@ export default function CreateUpdateAccessoryFromModal({
     const res = accessoryId
       ? await updateSubCategoryReq(accessoryId, data)
       : await createAccessoryReq(formData);
-console.log(res)
+
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["sub-categories"] });
       queryClient.invalidateQueries({ queryKey: ["single-subcategory"] });
       toast.success(res?.message);
-      !subCategoryId && setIsResetForm(true);
+      !accessoryId && setIsResetForm(true);
     } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "subCategoryError") {
+      if (res?.errorMessages[0]?.path == "accessoryError") {
         toast.error(res?.errorMessages[0]?.message);
       }
       setValidationErrors(res?.errorMessages);
@@ -119,12 +126,7 @@ console.log(res)
     setIsLoading(false);
   };
 
-  const isSubCategoryLoading = false;
-  console.log(
-    selectCategoryId,
-    activeSubCategoriesOptions,
-    allActiveSubCategories
-  );
+ 
   return (
     <Modal
       isOpen={useDisclosure.isOpen}
@@ -132,29 +134,30 @@ console.log(res)
       isDismissable={false}
       size="4xl"
       classNames={{ closeButton: "bg-violet-100 hover:bg-red-200" }}
+      scrollBehavior="inside"
     >
       <ModalContent>
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              {isSubCategoryLoading ? (
+              {isAccessoryLoading && isSubCatLoading? (
                 <Skeleton className="w-2/5 rounded-lg">
                   <div className="h-3 w-2/5 rounded-lg bg-default-200"></div>
                 </Skeleton>
-              ) : subCategoryId ? (
+              ) : accessoryId ? (
                 "Update Accessory"
               ) : (
                 "Create Accessory"
               )}
             </ModalHeader>
-            {isSubCategoryLoading ? (
+            {isAccessoryLoading ? (
               <JULoading className="h-[300px]" />
             ) : (
               <JUForm
                 onSubmit={handleCreateUpdate}
                 validation={accessoryValidation}
                 errors={validationErrors}
-                defaultValues={{ codeTitle: generateCodeTitle }}
+                defaultValues={defaultValues?defaultValues:{codeTitle: generateCodeTitle }}
                 reset={isResetForm}
               >
                 <ModalBody>
@@ -168,7 +171,7 @@ console.log(res)
                           ? "Loading.."
                           : "Select Category",
                         selectionMode: "single",
-                        isDisabled: isCatLoading,
+                        isDisabled:accessoryId?false: isCatLoading,
                         className: "w-full md:w-[33%]",
                       }}
                       onChange={handleSelectCategory}
@@ -181,7 +184,7 @@ console.log(res)
                         placeholder: isActiveSubCatLoading
                           ? "Loading.."
                           : "Select Sub Category",
-                        isDisabled: isActiveSubCatLoading,
+                        isDisabled: !!(!activeSubCategoriesOptions),
                         className: "w-full md:w-[33%]",
                       }}
                       onChange={handleSelectSubCategory}
@@ -212,7 +215,8 @@ console.log(res)
                         label: "Code Title",
                         type: "text",
                         className: "w-full md:w-[33%] ",
-                        classNames: { input: "uppercase p-0 mb-[2px] f" },
+                        isDisabled: !!(!generateCodeTitle),
+                        classNames: { input: "uppercase p-0 mb-[2px] " },
                         startContent: (
                           <div className="pointer-events-none w-36 ">
                             {generateCodeTitle}
@@ -239,7 +243,7 @@ console.log(res)
                 </ModalBody>
                 <ModalFooter>
                   <Button type="submit" color="primary" isLoading={isLoading}>
-                    {subCategoryId ? "Update" : "Submit"}
+                    {accessoryId ? "Update" : "Submit"}
                   </Button>
                 </ModalFooter>
               </JUForm>
