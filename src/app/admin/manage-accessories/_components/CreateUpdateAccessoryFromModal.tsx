@@ -4,6 +4,7 @@ import JUInput from "@/src/components/form/JUInput";
 import JUSelect from "@/src/components/form/JUSelect";
 import JUTextEditor from "@/src/components/form/JUTextEditor";
 import JULoading from "@/src/components/ui/JULoading";
+import PreviewImage from "@/src/components/ui/PreviewImage";
 import { returnableOptions } from "@/src/constents";
 import { getSingleAccessory } from "@/src/hooks/Accessory";
 import { getAllCategories } from "@/src/hooks/Category";
@@ -12,7 +13,7 @@ import {
   getAllSubCategories,
   getSingleSubCategory,
 } from "@/src/hooks/Sub Category";
-import { createAccessoryReq } from "@/src/services/Accessory";
+import { createAccessoryReq, updateAccessoryReq } from "@/src/services/Accessory";
 import {
   createSubCategoryReq,
   updateSubCategoryReq,
@@ -32,7 +33,7 @@ import {
 import { Skeleton } from "@nextui-org/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { describe } from "node:test";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -45,11 +46,11 @@ export default function CreateUpdateAccessoryFromModal({
   accessoryId,
 }: IProps) {
   const queryClient = useQueryClient();
-  const [selectCategoryId, setSelectCategoryId] = useState<string | null>(accessoryId?accessoryId:null);
+  const [selectCategoryId, setSelectCategoryId] = useState<string | null>(null);
   const [selectSubCategoryId, setSelectSubCategoryId] = useState<string | null>(
     null
   );
- 
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
@@ -65,7 +66,7 @@ export default function CreateUpdateAccessoryFromModal({
     getAllActiveSubCatgoriesByCategory(selectCategoryId!);
   const { data: singleSubCategory, isLoading: isSubCatLoading } =
     getSingleSubCategory(selectSubCategoryId!);
-console.log(selectCategoryId,allActiveSubCategories,"k")
+
   const activeCategoriesOptions = useMemo(() => {
     return allActiveCategories?.data?.map((category) => ({
       label: category.name,
@@ -83,17 +84,22 @@ console.log(selectCategoryId,allActiveSubCategories,"k")
     return singleSubCategory ? `CSE-${code}-` : "";
   }, [selectSubCategoryId, isSubCatLoading]);
 
-  const {data:accessory,isLoading:isAccessoryLoading}=getSingleAccessory(accessoryId!)
+  const { data: accessory, isLoading: isAccessoryLoading } = getSingleAccessory(
+    accessoryId!
+  );
   const defaultValues = useMemo(() => {
     if (!accessoryId) return {};
     return {
       name: accessory?.name || "",
-      category:accessory?.category,
-      subCategory:accessory?.subCategory,
-      isItReturnable:accessory?.isItReturnable,
-      describtion:accessory?.description
+      category: accessory?.category,
+      subCategory: accessory?.subCategory,
+      codeTitle:accessory?.codeDetails.codeTitle.split("-")[2],
+      quantity:accessory?.quantityDetails.totalQuantity,
+      isItReturnable: accessory?.isItReturnable,
+      describtion: accessory?.description,
     };
-  }, [ accessory]);
+  }, [accessory, allActiveSubCategories]);
+
   const handleSelectCategory = (value: string) => {
     setSelectCategoryId(value);
   };
@@ -101,21 +107,26 @@ console.log(selectCategoryId,allActiveSubCategories,"k")
     setSelectSubCategoryId(value);
   };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
- 
     setIsLoading(true);
-    const formData=new FormData()
-    formData.append("file",data.image)
-    delete data["image"]
-    formData.append("data",JSON.stringify(data))
+    console.log(data)
+    const formData = new FormData();
+    data?.image?.length>0 && formData.append("file", data?.image[0]);
+    delete data["image"];
+    formData.append("data", JSON.stringify(data));
+    const updateData={
+      accessoryId,
+      data:formData
+    }
     const res = accessoryId
-      ? await updateSubCategoryReq(accessoryId, data)
+      ? await updateAccessoryReq(updateData)
       : await createAccessoryReq(formData);
-
+console.log(res)
     if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["sub-categories"] });
-      queryClient.invalidateQueries({ queryKey: ["single-subcategory"] });
+      queryClient.invalidateQueries({ queryKey: ["accessories"] });
+      queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
       toast.success(res?.message);
       !accessoryId && setIsResetForm(true);
+      accessoryId && useDisclosure.onClose()
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "accessoryError") {
         toast.error(res?.errorMessages[0]?.message);
@@ -126,7 +137,6 @@ console.log(selectCategoryId,allActiveSubCategories,"k")
     setIsLoading(false);
   };
 
- 
   return (
     <Modal
       isOpen={useDisclosure.isOpen}
@@ -140,7 +150,7 @@ console.log(selectCategoryId,allActiveSubCategories,"k")
         {(onClose) => (
           <>
             <ModalHeader className="flex flex-col gap-1">
-              {isAccessoryLoading && isSubCatLoading? (
+              {isAccessoryLoading ? (
                 <Skeleton className="w-2/5 rounded-lg">
                   <div className="h-3 w-2/5 rounded-lg bg-default-200"></div>
                 </Skeleton>
@@ -157,7 +167,11 @@ console.log(selectCategoryId,allActiveSubCategories,"k")
                 onSubmit={handleCreateUpdate}
                 validation={accessoryValidation}
                 errors={validationErrors}
-                defaultValues={defaultValues?defaultValues:{codeTitle: generateCodeTitle }}
+                defaultValues={
+                  defaultValues
+                    ? defaultValues
+                    : { codeTitle: generateCodeTitle }
+                }
                 reset={isResetForm}
               >
                 <ModalBody>
@@ -171,7 +185,7 @@ console.log(selectCategoryId,allActiveSubCategories,"k")
                           ? "Loading.."
                           : "Select Category",
                         selectionMode: "single",
-                        isDisabled:accessoryId?false: isCatLoading,
+                        isDisabled: accessoryId ? false : isCatLoading,
                         className: "w-full md:w-[33%]",
                       }}
                       onChange={handleSelectCategory}
@@ -184,7 +198,7 @@ console.log(selectCategoryId,allActiveSubCategories,"k")
                         placeholder: isActiveSubCatLoading
                           ? "Loading.."
                           : "Select Sub Category",
-                        isDisabled: !!(!activeSubCategoriesOptions),
+                        isDisabled: !!!activeSubCategoriesOptions,
                         className: "w-full md:w-[33%]",
                       }}
                       onChange={handleSelectSubCategory}
@@ -209,36 +223,46 @@ console.log(selectCategoryId,allActiveSubCategories,"k")
                         className: "w-full md:w-[66%]",
                       }}
                     />
-                    <JUInput
-                      name="codeTitle"
-                      inputProps={{
-                        label: "Code Title",
-                        type: "text",
-                        className: "w-full md:w-[33%] ",
-                        isDisabled: !!(!generateCodeTitle),
-                        classNames: { input: "uppercase p-0 mb-[2px] " },
-                        startContent: (
-                          <div className="pointer-events-none w-36 ">
-                            {generateCodeTitle}
-                          </div>
-                        ),
-                      }}
-                    />
+                    {!accessory?.isApproved && (
+                      <JUInput
+                        name="codeTitle"
+                        inputProps={{
+                          label: "Code Title",
+                          type: "text",
+                          className: "w-full md:w-[33%] ",
+                          isDisabled: !!!generateCodeTitle,
+                          classNames: { input: "uppercase p-0 mb-[2px] " },
+                          startContent: (
+                            <div className="pointer-events-none w-36 ">
+                              {generateCodeTitle}
+                            </div>
+                          ),
+                        }}
+                      />
+                    )}
                   </div>
                   <div className="flex flex-col md:flex-row gap-5">
                     <div className="w-full md:w-[66%]">
-                      <JUFileInput name="image" />
+                      <JUFileInput
+                        name="image"
+                        onPreview={(previews) => setPreviewUrls(previews)}
+      
+                      />
                     </div>
-                    <JUInput
-                      name="quantity"
-                      inputProps={{
-                        label: "Quantity",
-                        type: "number",
-                        className: "w-full md:w-[33%]",
-                      }}
-                      registerOptions={{ valueAsNumber: true }}
-                    />
+                    {!accessory?.isApproved && (
+                      <JUInput
+                        name="quantity"
+                        inputProps={{
+                          label: "Quantity",
+                          type: "number",
+
+                          className: "w-full md:w-[33%]",
+                        }}
+                        registerOptions={{ valueAsNumber: true }}
+                      />
+                    )}
                   </div>
+                  {previewUrls?.length>0 && <PreviewImage previews={previewUrls} />}
                   <JUTextEditor name="description" label="Description" />
                 </ModalBody>
                 <ModalFooter>

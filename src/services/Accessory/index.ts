@@ -50,6 +50,16 @@ export const createAccessoryReq = async (payload: FieldValues) => {
       return error?.response?.data;
     }
   };
+  export const updateAccessoryReq = async (payload: FieldValues) => {
+    try {
+      const res = await axiosInstance.patch(
+        `/accessories/update-accessory/${payload.accessoryId}`,payload.data
+      );
+      return res.data;
+    } catch (error: any) {
+      return error?.response?.data;
+    }
+  };
   export const updateStockQuantity = async (payload: FieldValues) => {
     try {
       const res = await axiosInstance.patch(`/accessories/update-quantity/${payload._id}`, {quantity:payload.quantity});

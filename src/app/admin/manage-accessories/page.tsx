@@ -14,7 +14,7 @@ import { useDisclosure } from "@nextui-org/modal";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CreateUpdateAccessoryFromModal from "./_components/CreateUpdateAccessoryFromModal";
 import {
   Table,
@@ -63,7 +63,11 @@ export default function ManageAccessories() {
     query: queryParams,
   });
   const loadingState = isLoading ? "loading" : "idle";
-
+  useEffect(() => {
+    if (!modalForm.isOpen) {
+      setAccessoryId(null);
+    }
+  }, [modalForm.isOpen]);
   const handleActiveOrInactive = async (
     accessoryId: string,
     isActive: boolean
