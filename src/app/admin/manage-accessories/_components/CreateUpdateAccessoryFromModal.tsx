@@ -13,14 +13,13 @@ import {
   getAllSubCategories,
   getSingleSubCategory,
 } from "@/src/hooks/Sub Category";
-import { createAccessoryReq, updateAccessoryReq } from "@/src/services/Accessory";
 import {
-  createSubCategoryReq,
-  updateSubCategoryReq,
-} from "@/src/services/Sub Category";
+  createAccessoryReq,
+  updateAccessoryReq,
+} from "@/src/services/Accessory";
+
 import { TErrorMessage } from "@/src/types";
 import { accessoryValidation } from "@/src/validations/accessory.validation";
-import { subCategoryValidation } from "@/src/validations/subCategory.validation";
 import { Button } from "@nextui-org/button";
 import {
   Modal,
@@ -32,8 +31,7 @@ import {
 } from "@nextui-org/modal";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { describe } from "node:test";
-import { useEffect, useMemo, useState } from "react";
+import {  useMemo, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -93,8 +91,7 @@ export default function CreateUpdateAccessoryFromModal({
       name: accessory?.name || "",
       category: accessory?.category,
       subCategory: accessory?.subCategory,
-      codeTitle:accessory?.codeDetails.codeTitle.split("-")[2],
-      quantity:accessory?.quantityDetails.totalQuantity,
+      codeTitle: accessory?.codeDetails.codeTitle.split("-")[2],
       isItReturnable: accessory?.isItReturnable,
       describtion: accessory?.description,
     };
@@ -108,25 +105,25 @@ export default function CreateUpdateAccessoryFromModal({
   };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-    console.log(data)
+    console.log(data);
     const formData = new FormData();
-    data?.image?.length>0 && formData.append("file", data?.image[0]);
+    data?.image?.length > 0 && formData.append("file", data?.image[0]);
     delete data["image"];
     formData.append("data", JSON.stringify(data));
-    const updateData={
+    const updateData = {
       accessoryId,
-      data:formData
-    }
+      data: formData,
+    };
     const res = accessoryId
       ? await updateAccessoryReq(updateData)
       : await createAccessoryReq(formData);
-console.log(res)
+    console.log(res);
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
       queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
       toast.success(res?.message);
       !accessoryId && setIsResetForm(true);
-      accessoryId && useDisclosure.onClose()
+      accessoryId && useDisclosure.onClose();
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "accessoryError") {
         toast.error(res?.errorMessages[0]?.message);
@@ -223,7 +220,7 @@ console.log(res)
                         className: "w-full md:w-[66%]",
                       }}
                     />
-                    {!accessory?.isApproved && (
+                    {!accessory?.approvalDetails.isApproved && (
                       <JUInput
                         name="codeTitle"
                         inputProps={{
@@ -246,10 +243,9 @@ console.log(res)
                       <JUFileInput
                         name="image"
                         onPreview={(previews) => setPreviewUrls(previews)}
-      
                       />
                     </div>
-                    {!accessory?.isApproved && (
+                    {!accessory?.approvalDetails.isApproved && (
                       <JUInput
                         name="quantity"
                         inputProps={{
@@ -262,7 +258,9 @@ console.log(res)
                       />
                     )}
                   </div>
-                  {previewUrls?.length>0 && <PreviewImage previews={previewUrls} />}
+                  {previewUrls?.length > 0 && (
+                    <PreviewImage previews={previewUrls} />
+                  )}
                   <JUTextEditor name="description" label="Description" />
                 </ModalBody>
                 <ModalFooter>

@@ -40,18 +40,20 @@ import { updateAccessoryActiveStatus, updateAccessoryApprovedStatus, updateStock
 import { toast } from "sonner";
 import { updateStockQuantityValidation } from "@/src/validations/accessory.validation";
 import UpdateStockQuantityModal from "./_components/UpdateStockQuantityModal";
+import StockModal from "./_components/StockModal";
 
 export default function ManageAccessories() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
   const searchTerm = searchParams.get("search");
   const modalForm = useDisclosure();
-  const modalQuantity = useDisclosure();
+  const modalStock = useDisclosure();
   const modalDetails = useDisclosure();
   const queryClient = useQueryClient();
   const [page, setPage] = useState<number>(1);
 
   const [accessoryId, setAccessoryId] = useState<string | null>(null);
+  const [stockId, setStockId] = useState<string | null>(null);
   const queryParams = useMemo(() => {
     const params: TQuery[] = [{ name: "page", value: page }];
     if (searchTerm) {
@@ -220,7 +222,7 @@ export default function ManageAccessories() {
                       variant="light"
                       color="primary"
                       onPress={() => {
-                        setAccessoryId(item._id), modalQuantity.onOpen();
+                        setStockId(item._id), modalStock.onOpen();
                       }}
                     >
                       <MoreIcon />
@@ -238,7 +240,7 @@ export default function ManageAccessories() {
                     {item?.isActive ? "Active" : "Inactive"}
                   </Chip>
 
-                  {item?.isApproved && (
+                  {item?.approvalDetails.isApproved && (
                     <Popover placement="bottom" showArrow={true}>
                       <PopoverTrigger>
                         <Button
@@ -291,13 +293,13 @@ export default function ManageAccessories() {
                 {" "}
                 <div className="flex items-center gap-2">
                   <Chip
-                    color={item?.isApproved ? "success" : "danger"}
+                    color={item?.approvalDetails.isApproved? "success" : "danger"}
                     variant="flat"
                     size="sm"
                   >
-                    {item?.isApproved ? "Approved" : "Pending"}
+                    {item?.approvalDetails.isApproved ? "Approved" : "Pending"}
                   </Chip>
-                  {!item?.isApproved && (
+                  {!item?.approvalDetails.isApproved && (
                     <Popover placement="bottom" showArrow={true}>
                       <PopoverTrigger>
                         <Button
@@ -317,7 +319,7 @@ export default function ManageAccessories() {
                           disallowEmptySelection
                           selectionMode="single"
                           selectedKeys={[
-                            item?.isApproved ? "Approved" : "Pending",
+                            item?.approvalDetails.isApproved ? "Approved" : "Pending",
                           ]}
                           color="primary"
                         >
@@ -369,10 +371,7 @@ export default function ManageAccessories() {
         </TableBody>
       </Table>
       <CreateUpdateAccessoryFromModal accessoryId={accessoryId!} useDisclosure={modalForm} />
-      <UpdateStockQuantityModal
-        accessoryId={accessoryId!}
-        useDisclosure={modalQuantity}
-      />
+      <StockModal useDisclosure={modalStock} accessoryId={stockId!}/>
     </div>
   );
 }

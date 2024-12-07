@@ -85,29 +85,47 @@ export type TSubCategory = {
   isApproved: boolean;
 };
 export type TAccessory = {
-  _id:string;
-  name: string; 
-  category: TCategory; 
-  subCategory: TSubCategory;  
-  image?: string; 
+  _id: string;
+  name: string;
+  category: TCategory;
+  subCategory: TSubCategory;
+  image?: string;
   quantityDetails: {
-    totalQuantity: number; 
-    currentQuantity: number; 
-    distributedQuantity?: number; 
-    orderQuantity?: number; 
+    totalQuantity: number;
+    currentQuantity: number;
+    distributedQuantity?: number;
+    orderQuantity?: number;
   };
-  codeDetails:{
-    codeTitle: string; 
-    totalCodes:string[];
-    currentCodes:string[];
-    distributedCodes?:string[];
-    orderCodes?:string[];
-  },
-  
-  description?: string; 
-  isItReturnable?: boolean; 
-  status?: 'Available' |  'Out of Stock';
-  isActive:boolean;
-  isApproved:boolean;
-  isDeleted:boolean;
+  codeDetails: {
+    codeTitle: string;
+    totalCodes: string[];
+    currentCodes: string[];
+    distributedCodes?: string[];
+    orderCodes?: string[];
+  };
+
+  description?: string;
+  isItReturnable?: boolean;
+  status?: "Available" | "Out of Stock";
+  isActive: boolean;
+  approvalDetails: {
+    isApproved: boolean;
+    approvedBy: string;
+    approvedDate: string;
+  };
+  isDeleted: boolean;
 };
+export type TStock={
+  _id:string,
+  accessory:TAccessory,
+  quantity:number,
+  accessoryCodes:string[],
+  approvalDetails:{
+      isApproved:boolean,
+      approvedBy:TUser,
+      approvedDate:string
+  },
+  description:string,
+  createdAt:Date,
+  updatedAt:Date
+}
