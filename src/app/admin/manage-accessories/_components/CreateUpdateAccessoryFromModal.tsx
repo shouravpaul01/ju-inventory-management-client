@@ -91,7 +91,7 @@ export default function CreateUpdateAccessoryFromModal({
       name: accessory?.name || "",
       category: accessory?.category,
       subCategory: accessory?.subCategory,
-      codeTitle: accessory?.codeDetails.codeTitle.split("-")[2],
+      codeTitle: accessory?.codeTitle.split("-")[2],
       isItReturnable: accessory?.isItReturnable,
       describtion: accessory?.description,
     };
@@ -105,7 +105,7 @@ export default function CreateUpdateAccessoryFromModal({
   };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-    console.log(data);
+  
     const formData = new FormData();
     data?.image?.length > 0 && formData.append("file", data?.image[0]);
     delete data["image"];
@@ -117,7 +117,6 @@ export default function CreateUpdateAccessoryFromModal({
     const res = accessoryId
       ? await updateAccessoryReq(updateData)
       : await createAccessoryReq(formData);
-    console.log(res);
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
       queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
@@ -245,18 +244,7 @@ export default function CreateUpdateAccessoryFromModal({
                         onPreview={(previews) => setPreviewUrls(previews)}
                       />
                     </div>
-                    {!accessory?.approvalDetails.isApproved && (
-                      <JUInput
-                        name="quantity"
-                        inputProps={{
-                          label: "Quantity",
-                          type: "number",
-
-                          className: "w-full md:w-[33%]",
-                        }}
-                        registerOptions={{ valueAsNumber: true }}
-                      />
-                    )}
+                   
                   </div>
                   {previewUrls?.length > 0 && (
                     <PreviewImage previews={previewUrls} />

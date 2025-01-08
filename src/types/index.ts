@@ -84,48 +84,59 @@ export type TSubCategory = {
   isActive: boolean;
   isApproved: boolean;
 };
-export type TAccessory = {
-  _id: string;
-  name: string;
-  category: TCategory;
-  subCategory: TSubCategory;
-  image?: string;
-  quantityDetails: {
-    totalQuantity: number;
-    currentQuantity: number;
-    distributedQuantity?: number;
-    orderQuantity?: number;
-  };
-  codeDetails: {
-    codeTitle: string;
-    totalCodes: string[];
-    currentCodes: string[];
-    distributedCodes?: string[];
-    orderCodes?: string[];
-  };
-
-  description?: string;
-  isItReturnable?: boolean;
-  status?: "Available" | "Out of Stock";
-  isActive: boolean;
-  approvalDetails: {
-    isApproved: boolean;
-    approvedBy: string;
-    approvedDate: string;
-  };
-  isDeleted: boolean;
+export type TApprovalDetails = {
+  isApproved: boolean;
+  approvedBy?:  string; 
+  approvedDate?: Date;
 };
-export type TStock={
-  _id:string,
-  accessory:TAccessory,
-  quantity:number,
-  accessoryCodes:string[],
-  approvalDetails:{
-      isApproved:boolean,
-      approvedBy:TUser,
-      approvedDate:string
-  },
-  description:string,
-  createdAt:Date,
-  updatedAt:Date
-}
+
+export type TAccessory = {
+  _id?:  string;
+  name: string;
+  category:  TCategory; 
+  subCategory:  TSubCategory;
+  image?: string;
+  codeTitle: string;
+  description?: string;
+  isItReturnable: boolean;
+  stock:  TStock; 
+  status: "Available" | "Low Stock" | "Out of Stock";
+  isActive: boolean;
+  approvalDetails: TApprovalDetails;
+  isDeleted: boolean;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+export type TStockDetail = {
+  _id?:  string;
+  quantity: number;
+  accessoryCodes: string[];
+  isActive:boolean,
+  isDeleted:boolean,
+  approvalDetails: TApprovalDetails;
+  description?: string;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+export type TQuantityDetails = {
+  totalQuantity: number;
+  currentQuantity: number;
+  distributedQuantity: number;
+  orderQuantity: number;
+};
+
+export type TCodeDetails = {
+  totalCodes: string[];
+  currentCodes: string[];
+  distributedCodes: string[];
+  orderCodes: string[];
+};
+
+export type TStock = {
+  _id?:  string;
+  quantityDetails: TQuantityDetails;
+  codeDetails: TCodeDetails;
+  details: TStockDetail[];
+
+};

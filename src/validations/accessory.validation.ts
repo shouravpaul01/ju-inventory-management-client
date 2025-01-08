@@ -14,10 +14,10 @@ export const accessoryValidation = z.object({
       /^[a-zA-Z0-9]+$/,
       "Code title can only contain alphanumeric characters."
     ).toUpperCase(),
-  quantity: z.number({
-    required_error: "Quantity is required.",
-    invalid_type_error: "Quantity is required.",
-  }).positive("Quantity must be a positive number."),
+  // quantity: z.number({
+  //   required_error: "Quantity is required.",
+  //   invalid_type_error: "Quantity is required.",
+  // }).positive("Quantity must be a positive number."),
   description: z.string().optional(),
 });
 export const updateStockQuantityValidation = z.object({

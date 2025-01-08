@@ -33,13 +33,9 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import { TQuery } from "@/src/types";
 import { User } from "@nextui-org/user";
-import JUForm from "@/src/components/form/JUForm";
-import { FieldValues, SubmitHandler } from "react-hook-form";
-import JUInput from "@/src/components/form/JUInput";
+
 import { updateAccessoryActiveStatus, updateAccessoryApprovedStatus, updateStockQuantity } from "@/src/services/Accessory";
 import { toast } from "sonner";
-import { updateStockQuantityValidation } from "@/src/validations/accessory.validation";
-import UpdateStockQuantityModal from "./_components/UpdateStockQuantityModal";
 import StockModal from "./_components/StockModal";
 
 export default function ManageAccessories() {
@@ -176,7 +172,7 @@ export default function ManageAccessories() {
                     <div>
                       <p>Cat: {item.category.name}</p>
                       <p>Sub-Cat: {item.subCategory.name}</p>
-                      <p>Code Title: {item.codeDetails.codeTitle}</p>
+                      <p>Code Title: {item.codeTitle}</p>
                     </div>
                   }
                   name={item?.name}
@@ -188,25 +184,25 @@ export default function ManageAccessories() {
                     <p>
                       Total Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
-                        {item.quantityDetails.totalQuantity}
+                        {item.stock.quantityDetails.totalQuantity}
                       </Chip>
                     </p>
                     <p>
                       Current Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
-                        {item.quantityDetails.currentQuantity}
+                        {item.stock.quantityDetails.currentQuantity}
                       </Chip>
                     </p>
                     <p>
                       Distributed Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
-                        {item.quantityDetails.distributedQuantity}
+                        {item.stock.quantityDetails.distributedQuantity}
                       </Chip>
                     </p>
                     <p>
                       Order Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
-                        {item.quantityDetails.orderQuantity}
+                        {item.stock.quantityDetails.orderQuantity}
                       </Chip>
                     </p>
                   </div>
@@ -221,8 +217,9 @@ export default function ManageAccessories() {
                       size="sm"
                       variant="light"
                       color="primary"
+                      isDisabled={!item.approvalDetails.isApproved}
                       onPress={() => {
-                        setStockId(item._id), modalStock.onOpen();
+                        setStockId(item.stock._id!), modalStock.onOpen();
                       }}
                     >
                       <MoreIcon />
@@ -270,7 +267,7 @@ export default function ManageAccessories() {
                           <ListboxItem
                             key="Active"
                             onPress={() =>
-                              handleActiveOrInactive(item._id, true)
+                              handleActiveOrInactive(item._id!, true)
                             }
                           >
                             Active
@@ -278,7 +275,7 @@ export default function ManageAccessories() {
                           <ListboxItem
                             key="Inactive"
                             onPress={() =>
-                              handleActiveOrInactive(item._id, false)
+                              handleActiveOrInactive(item._id!, false)
                             }
                           >
                             Inactive
@@ -325,7 +322,7 @@ export default function ManageAccessories() {
                         >
                           <ListboxItem
                             key="Unblock"
-                            onPress={() => handleApproved(item._id)}
+                            onPress={() => handleApproved(item._id!)}
                           >
                             Approved
                           </ListboxItem>
@@ -344,7 +341,7 @@ export default function ManageAccessories() {
                       variant="flat"
                       size="sm"
                       onPress={() => {
-                        setAccessoryId(item._id), modalDetails.onOpen();
+                        setAccessoryId(item._id!), modalDetails.onOpen();
                       }}
                     >
                       <InfoIcon />
@@ -357,8 +354,9 @@ export default function ManageAccessories() {
                       color="primary"
                       variant="flat"
                       size="sm"
+                      isDisabled={item.approvalDetails.isApproved}
                       onPress={() => {
-                        setAccessoryId(item._id), modalForm.onOpen();
+                        setAccessoryId(item._id!), modalForm.onOpen();
                       }}
                     >
                       <EditIcon />
@@ -371,7 +369,7 @@ export default function ManageAccessories() {
         </TableBody>
       </Table>
       <CreateUpdateAccessoryFromModal accessoryId={accessoryId!} useDisclosure={modalForm} />
-      <StockModal useDisclosure={modalStock} accessoryId={stockId!}/>
+      <StockModal modalStocks={modalStock} stockId={stockId!}/>
     </div>
   );
 }

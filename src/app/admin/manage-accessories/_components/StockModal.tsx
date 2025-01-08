@@ -1,4 +1,5 @@
 import {
+  AddIcon,
   EditIcon,
   ImageIcon,
   InfoIcon,
@@ -12,8 +13,10 @@ import { Chip } from "@nextui-org/chip";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import {
   Modal,
+  ModalBody,
   ModalContent,
   ModalHeader,
+  useDisclosure,
   UseDisclosureProps,
 } from "@nextui-org/modal";
 import { Pagination } from "@nextui-org/pagination";
@@ -32,31 +35,49 @@ import { User } from "@nextui-org/user";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useMemo, useState } from "react";
+import UpdateStock from "./UpdateStockModal";
+import UpdateStockModal from "./UpdateStockModal";
+import { toast } from "sonner";
+import { updateStockApprovedStatus } from "@/src/services/Stock";
 
 interface IProps {
-  useDisclosure: UseDisclosureProps | any;
-  accessoryId?: string;
+  modalStocks: UseDisclosureProps | any;
+  stockId?: string;
 }
-export default function StockModal({ useDisclosure, accessoryId }: IProps) {
+export default function StockModal({ modalStocks, stockId }: IProps) {
   const queryClient = useQueryClient();
+  const modalUpdateStock = useDisclosure();
   const [page, setPage] = useState<number>(1);
   const queryParams = useMemo(() => {
     const params: TQuery[] = [{ name: "page", value: page }];
-    if (accessoryId) {
-      params.push({ name: "accessory", value: accessoryId });
+    if (stockId) {
+      params.push({ name: "_id", value: stockId });
     }
     return params;
-  }, [page]);
+  }, [page,stockId]);
   const { data, isLoading } = getAllStocks({
     query: queryParams,
   });
   const loadingState = isLoading ? "loading" : "idle";
-  console.log(data, accessoryId);
+  const handleApproved = async (stockId: string,stockDetailsId:string) => {
+    console.log(stockId)
+    const res = await updateStockApprovedStatus(stockId,stockDetailsId);
+    console.log(res,'data')
+    if (res?.success) {
+      queryClient.invalidateQueries({ queryKey: ["accessories"] });
+      queryClient.invalidateQueries({ queryKey: ["stocks"] });
+      toast.success(res?.message);
+    } else if (!res?.success && res?.errorMessages?.length > 0) {
+      if (res?.errorMessages[0]?.path == "stockError") {
+        toast.error(res?.errorMessages[0]?.message);
+      }
+    }
+  };
   return (
-    <div>
+    <>
       <Modal
-        isOpen={useDisclosure.isOpen}
-        onOpenChange={useDisclosure.onOpenChange}
+        isOpen={modalStocks.isOpen}
+        onOpenChange={modalStocks.onOpenChange}
         isDismissable={false}
         size="4xl"
         classNames={{ closeButton: "bg-violet-100 hover:bg-red-200" }}
@@ -74,23 +95,19 @@ export default function StockModal({ useDisclosure, accessoryId }: IProps) {
                   "Stock Details"
                 )}
               </ModalHeader>
-              {isLoading ? (
+              <ModalBody>
+              <div>
+                <div>
+                  <Button color="primary" size="sm" startContent={<AddIcon/>} onPress={()=>modalUpdateStock.onOpen()}>Add</Button>
+                </div>
+              </div>
+               {isLoading ? (
                 <JULoading className="h-[300px]" />
               ) : (
                 <Table
                   aria-label="Example table with client side pagination"
                   shadow="none"
-                  bottomContent={
-                    <div className=" w-full ">
-                      <Pagination
-                        showControls
-                        color="primary"
-                        page={page}
-                        total={data?.totalPages || 0}
-                        onChange={(page) => setPage(page)}
-                      />
-                    </div>
-                  }
+                  
                   classNames={{
                     wrapper: "min-h-[222px] ",
                   }}
@@ -103,7 +120,7 @@ export default function StockModal({ useDisclosure, accessoryId }: IProps) {
                     <TableColumn key="action">Action</TableColumn>
                   </TableHeader>
                   <TableBody
-                    items={data?.data ?? []}
+                    items={data?.details ?? []}
                     loadingContent={<JULoading className="h-auto" />}
                     loadingState={loadingState}
                     emptyContent={<p>Data not found.</p>}
@@ -121,7 +138,7 @@ export default function StockModal({ useDisclosure, accessoryId }: IProps) {
                         <TableCell>
                           <Tooltip content={<div className="max-w-xs flex flex-wrap gap-3">
                             {
-                                item.accessoryCodes.map((code,index)=><Chip key={index} color="success" variant="flat" size="sm">
+                                item.accessoryCodes.map((code,index)=><Chip isDisabled={!item.approvalDetails.isApproved} key={index} color="success" variant="flat" size="sm">
                                 {code}
                               </Chip>)
                             }
@@ -171,7 +188,7 @@ export default function StockModal({ useDisclosure, accessoryId }: IProps) {
                                     ]}
                                     color="primary"
                                   >
-                                    <ListboxItem key="Unblock">
+                                    <ListboxItem key="Unblock"   onPress={() => handleApproved(stockId!,item._id!)}>
                                       Approved
                                     </ListboxItem>
                                   </Listbox>
@@ -217,11 +234,15 @@ export default function StockModal({ useDisclosure, accessoryId }: IProps) {
                     )}
                   </TableBody>
                 </Table>
-              )}
+              )} 
+              </ModalBody>
+              
+              
             </>
           )}
         </ModalContent>
       </Modal>
-    </div>
+<UpdateStockModal useDisclosure={modalUpdateStock} stockId={stockId}/>
+    </>
   );
 }
