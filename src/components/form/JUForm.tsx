@@ -25,7 +25,7 @@ export default function JUForm({
   errors,
 }: IProps) {
   const formConfig: IFormConfig = {};
-
+console.log(defaultValues,"juform")
   if (defaultValues) {
     formConfig["defaultValues"] = defaultValues;
   }

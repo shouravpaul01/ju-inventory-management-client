@@ -69,7 +69,7 @@ export default function CreateUpdateCategoryFromModal({
 
     setIsLoading(false);
   };
-  console.log(validationErrors);
+
   return (
     <Modal
       isOpen={useDisclosure.isOpen}

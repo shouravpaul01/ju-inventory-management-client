@@ -111,6 +111,7 @@ export type TStockDetail = {
   _id?:  string;
   quantity: number;
   accessoryCodes: string[];
+  images:string[],
   isActive:boolean,
   isDeleted:boolean,
   approvalDetails: TApprovalDetails;

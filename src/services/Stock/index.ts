@@ -1,6 +1,6 @@
 "use server";
 import axiosInstance from "@/src/lib/AxiosInstence";
-import { TQuery, TStock } from "@/src/types";
+import { TErrorMessage, TQuery, TStock, TStockDetail } from "@/src/types";
 import { FieldValues } from "react-hook-form";
 
 export const createStock=async(payload:FieldValues)=>{
@@ -36,6 +36,36 @@ export const getAllStocksReq = async ({
       try {
         const res = await axiosInstance.patch(
           `/stocks/update-approved-status?stockId=${stockId}&stockDetailsId=${stockDetailsId}`
+        );
+        return res.data;
+      } catch (error: any) {
+        return error?.response?.data;
+      }
+    };
+    export const getSingleStockReq = async (
+      stockId: string,stockDetailsId: string
+    ): Promise<{
+      success: string;
+      message: string;
+      data: TStockDetail;
+      errorMessages?: TErrorMessage[];
+    }> => {
+      try {
+        const res = await axiosInstance.get(
+          `/stocks/single-stock?stockId=${stockId}&stockDetailsId=${stockDetailsId}`
+        );
+        return res.data;
+      } catch (error: any) {
+        return error?.response?.data;
+      }
+    };
+    export const updateStockReq = async (
+      payload:FieldValues
+    ) => {
+      try {
+        const res = await axiosInstance.patch(
+          `/stocks/update-stock?stockId=${payload.stockId}&stockDetailsId=${payload.stockDetailsId}`,
+          payload.data
         );
         return res.data;
       } catch (error: any) {

@@ -34,7 +34,7 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { User } from "@nextui-org/user";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import UpdateStock from "./UpdateStockModal";
 import UpdateStockModal from "./UpdateStockModal";
 import { toast } from "sonner";
@@ -48,21 +48,27 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
   const queryClient = useQueryClient();
   const modalUpdateStock = useDisclosure();
   const [page, setPage] = useState<number>(1);
+  const [stockDetailsId, setStockDetailsId] = useState<string | null>(null);
+    useEffect(() => {
+      if (!modalUpdateStock.isOpen) {
+      setStockDetailsId(null)
+      }
+    }, [modalUpdateStock.isOpen]);
   const queryParams = useMemo(() => {
-    const params: TQuery[] = [{ name: "page", value: page }];
+    const params: TQuery[] = [];
     if (stockId) {
       params.push({ name: "_id", value: stockId });
     }
     return params;
-  }, [page,stockId]);
+  }, [page, stockId]);
   const { data, isLoading } = getAllStocks({
     query: queryParams,
   });
   const loadingState = isLoading ? "loading" : "idle";
-  const handleApproved = async (stockId: string,stockDetailsId:string) => {
-    console.log(stockId)
-    const res = await updateStockApprovedStatus(stockId,stockDetailsId);
-    console.log(res,'data')
+  const handleApproved = async (stockId: string, stockDetailsId: string) => {
+    console.log(stockId);
+    const res = await updateStockApprovedStatus(stockId, stockDetailsId);
+    console.log(res, "data");
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
       queryClient.invalidateQueries({ queryKey: ["stocks"] });
@@ -96,153 +102,182 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                 )}
               </ModalHeader>
               <ModalBody>
-              <div>
                 <div>
-                  <Button color="primary" size="sm" startContent={<AddIcon/>} onPress={()=>modalUpdateStock.onOpen()}>Add</Button>
+                  <div>
+                    <Button
+                      color="primary"
+                      size="sm"
+                      startContent={<AddIcon />}
+                      onPress={() => modalUpdateStock.onOpen()}
+                    >
+                      Add
+                    </Button>
+                  </div>
                 </div>
-              </div>
-               {isLoading ? (
-                <JULoading className="h-[300px]" />
-              ) : (
-                <Table
-                  aria-label="Example table with client side pagination"
-                  shadow="none"
-                  
-                  classNames={{
-                    wrapper: "min-h-[222px] ",
-                  }}
-                >
-                  <TableHeader>
-                    <TableColumn key="name">Stock Date</TableColumn>
-                    <TableColumn key="approval">Quantity</TableColumn>
-                    <TableColumn key="approval">Codes</TableColumn>
-                    <TableColumn key="approval">Approval</TableColumn>
-                    <TableColumn key="action">Action</TableColumn>
-                  </TableHeader>
-                  <TableBody
-                    items={data?.details ?? []}
-                    loadingContent={<JULoading className="h-auto" />}
-                    loadingState={loadingState}
-                    emptyContent={<p>Data not found.</p>}
+                {isLoading ? (
+                  <JULoading className="h-[300px]" />
+                ) : (
+                  <Table
+                    aria-label="Example table with client side pagination"
+                    shadow="none"
+                    classNames={{
+                      wrapper: "min-h-[222px] ",
+                    }}
                   >
-                    {(item) => (
-                      <TableRow key={item._id}>
-                        <TableCell>
-                       { dayjs(item.createdAt).format('MMM D, YYYY')}
-                        </TableCell>
-                        <TableCell>
-                          <Chip color="success" variant="flat" size="sm">
-                            {item.quantity}
-                          </Chip>
-                        </TableCell>
-                        <TableCell>
-                          <Tooltip content={<div className="max-w-xs flex flex-wrap gap-3">
-                            {
-                                item.accessoryCodes.map((code,index)=><Chip isDisabled={!item.approvalDetails.isApproved} key={index} color="success" variant="flat" size="sm">
-                                {code}
-                              </Chip>)
-                            }
-                          </div>} showArrow={true}>
-                            <Button color="primary" variant="flat" size="sm" radius="full">Codes</Button>
-                          </Tooltip>
-                        </TableCell>
-                        <TableCell>
-                          {" "}
-                          <div className="flex items-center gap-2">
-                            <Chip
-                              color={
-                                item?.approvalDetails.isApproved
-                                  ? "success"
-                                  : "danger"
-                              }
-                              variant="flat"
-                              size="sm"
-                            >
-                              {item?.approvalDetails.isApproved
-                                ? "Approved"
-                                : "Pending"}
+                    <TableHeader>
+                      <TableColumn key="name">Stock Date</TableColumn>
+                      <TableColumn key="approval">Quantity</TableColumn>
+                      <TableColumn key="approval">Codes</TableColumn>
+                      <TableColumn key="approval">Approval</TableColumn>
+                      <TableColumn key="action">Action</TableColumn>
+                    </TableHeader>
+                    <TableBody
+                      items={data?.details ?? []}
+                      loadingContent={<JULoading className="h-auto" />}
+                      loadingState={loadingState}
+                      emptyContent={<p>Data not found.</p>}
+                    >
+                      {(item) => (
+                        <TableRow key={item._id}>
+                          <TableCell>
+                            {dayjs(item.createdAt).format("MMM D, YYYY")}
+                          </TableCell>
+                          <TableCell>
+                            <Chip color="success" variant="flat" size="sm">
+                              {item.quantity}
                             </Chip>
-                            {!item?.approvalDetails.isApproved && (
-                              <Popover placement="bottom" showArrow={true}>
-                                <PopoverTrigger>
-                                  <Button
-                                    isIconOnly
-                                    size="sm"
-                                    variant="light"
-                                    color="primary"
-                                  >
-                                    {" "}
-                                    <MoreIcon />
-                                  </Button>
-                                </PopoverTrigger>
-                                <PopoverContent>
-                                  <Listbox
-                                    aria-label="Single selection example"
-                                    variant="solid"
-                                    disallowEmptySelection
-                                    selectionMode="single"
-                                    selectedKeys={[
-                                      item?.approvalDetails.isApproved
-                                        ? "Approved"
-                                        : "Pending",
-                                    ]}
-                                    color="primary"
-                                  >
-                                    <ListboxItem key="Unblock"   onPress={() => handleApproved(stockId!,item._id!)}>
-                                      Approved
-                                    </ListboxItem>
-                                  </Listbox>
-                                </PopoverContent>
-                              </Popover>
-                            )}
-                          </div>
-                        </TableCell>
-                        <TableCell>
-                          <div className="relative flex items-center gap-2">
+                          </TableCell>
+                          <TableCell>
                             <Tooltip
-                              color="primary"
-                              content="Details"
-                              showArrow
+                              content={
+                                <div className="max-w-xs flex flex-wrap gap-3">
+                                  {item.accessoryCodes.map((code, index) => (
+                                    <Chip
+                                      key={index}
+                                      color="success"
+                                      variant="flat"
+                                      size="sm"
+                                    >
+                                      {code}
+                                    </Chip>
+                                  ))}
+                                </div>
+                              }
+                              showArrow={true}
                             >
                               <Button
-                                isIconOnly
                                 color="primary"
                                 variant="flat"
                                 size="sm"
+                                radius="full"
+                                isDisabled={!item.approvalDetails.isApproved}
                               >
-                                <InfoIcon />
+                                Codes
                               </Button>
                             </Tooltip>
+                          </TableCell>
+                          <TableCell>
+                            {" "}
+                            <div className="flex items-center gap-2">
+                              <Chip
+                                color={
+                                  item?.approvalDetails.isApproved
+                                    ? "success"
+                                    : "danger"
+                                }
+                                variant="flat"
+                                size="sm"
+                              >
+                                {item?.approvalDetails.isApproved
+                                  ? "Approved"
+                                  : "Pending"}
+                              </Chip>
+                              {!item?.approvalDetails.isApproved && (
+                                <Popover placement="bottom" showArrow={true}>
+                                  <PopoverTrigger>
+                                    <Button
+                                      isIconOnly
+                                      size="sm"
+                                      variant="light"
+                                      color="primary"
+                                    >
+                                      {" "}
+                                      <MoreIcon />
+                                    </Button>
+                                  </PopoverTrigger>
+                                  <PopoverContent>
+                                    <Listbox
+                                      aria-label="Single selection example"
+                                      variant="solid"
+                                      disallowEmptySelection
+                                      selectionMode="single"
+                                      selectedKeys={[
+                                        item?.approvalDetails.isApproved
+                                          ? "Approved"
+                                          : "Pending",
+                                      ]}
+                                      color="primary"
+                                    >
+                                      <ListboxItem
+                                        key="Unblock"
+                                        onPress={() =>
+                                          handleApproved(stockId!, item._id!)
+                                        }
+                                      >
+                                        Approved
+                                      </ListboxItem>
+                                    </Listbox>
+                                  </PopoverContent>
+                                </Popover>
+                              )}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <div className="relative flex items-center gap-2">
+                              <Tooltip
+                                color="primary"
+                                content="Details"
+                                showArrow
+                              >
+                                <Button
+                                  isIconOnly
+                                  color="primary"
+                                  variant="flat"
+                                  size="sm"
+                                >
+                                  <InfoIcon />
+                                </Button>
+                              </Tooltip>
 
-                            <Tooltip
-                              color="primary"
-                              content="Edit user"
-                              showArrow
-                            >
-                              <Button
-                                isIconOnly
+                              <Tooltip
                                 color="primary"
-                                variant="flat"
-                                size="sm"
+                                content="Edit user"
+                                showArrow
                               >
-                                <EditIcon />
-                              </Button>
-                            </Tooltip>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              )} 
+                                <Button
+                                  isIconOnly
+                                  color="primary"
+                                  variant="flat"
+                                  size="sm"
+                                     isDisabled={item.approvalDetails.isApproved}
+                                     onPress={() =>{ setStockDetailsId(item._id!),modalUpdateStock.onOpen()}}
+                                >
+                                  <EditIcon />
+                                </Button>
+                              </Tooltip>
+                            </div>
+                          </TableCell>
+                        </TableRow>
+                      )}
+                    </TableBody>
+                  </Table>
+                )}
               </ModalBody>
-              
-              
             </>
           )}
         </ModalContent>
       </Modal>
-<UpdateStockModal useDisclosure={modalUpdateStock} stockId={stockId}/>
+      <UpdateStockModal useDisclosure={modalUpdateStock} stockId={stockId} stockDetailsId={stockDetailsId!}/>
     </>
   );
 }
