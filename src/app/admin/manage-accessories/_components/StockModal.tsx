@@ -19,6 +19,7 @@ import {
   useDisclosure,
   UseDisclosureProps,
 } from "@nextui-org/modal";
+import { DateRangePicker } from "@nextui-org/date-picker";
 import { Pagination } from "@nextui-org/pagination";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import { Skeleton } from "@nextui-org/skeleton";
@@ -39,6 +40,11 @@ import UpdateStock from "./UpdateStockModal";
 import UpdateStockModal from "./UpdateStockModal";
 import { toast } from "sonner";
 import { updateStockApprovedStatus } from "@/src/services/Stock";
+import { parseDate, getLocalTimeZone } from "@internationalized/date";
+import { Select, SelectItem } from "@nextui-org/select";
+import { approvalFilterOptions } from "@/src/constents";
+import { Card, CardBody, CardHeader } from "@nextui-org/card";
+import { Divider } from "@nextui-org/divider";
 
 interface IProps {
   modalStocks: UseDisclosureProps | any;
@@ -49,11 +55,17 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
   const modalUpdateStock = useDisclosure();
   const [page, setPage] = useState<number>(1);
   const [stockDetailsId, setStockDetailsId] = useState<string | null>(null);
-    useEffect(() => {
-      if (!modalUpdateStock.isOpen) {
-      setStockDetailsId(null)
-      }
-    }, [modalUpdateStock.isOpen]);
+  const [dateRange, setDateRange] = useState({
+    start: parseDate("2025-04-01"),
+    end: parseDate("2025-04-08"),
+  });
+  const [isApproved, setIsApproved] = useState(new Set([]));
+
+  useEffect(() => {
+    if (!modalUpdateStock.isOpen) {
+      setStockDetailsId(null);
+    }
+  }, [modalUpdateStock.isOpen]);
   const queryParams = useMemo(() => {
     const params: TQuery[] = [];
     if (stockId) {
@@ -103,15 +115,221 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
               </ModalHeader>
               <ModalBody>
                 <div>
-                  <div>
+                  <Card className="" shadow="none">
+                    <CardHeader>
+                      <p className="font-bold text-lg">Quantity</p>
+                    </CardHeader>
+                    <Divider />
+                    <CardBody>
+                      <div className="flex flex-wrap gap-5">
+                        <p>
+                          Total Qty:{" "}
+                          <Chip radius="sm" size="sm" className="ms-2">
+                            {data?.quantityDetails.totalQuantity}
+                          </Chip>
+                        </p>
+                        <p>
+                          Current Qty:{" "}
+                          <Chip radius="sm" size="sm" className="ms-2">
+                            {data?.quantityDetails.currentQuantity}
+                          </Chip>
+                        </p>
+                        <p>
+                          Distributed Qty:{" "}
+                          <Chip radius="sm" size="sm" className="ms-2">
+                            {data?.quantityDetails.distributedQuantity}
+                          </Chip>
+                        </p>
+                        <p>
+                          Order Qty:{" "}
+                          <Chip radius="sm" size="sm" className="ms-2">
+                            {data?.quantityDetails.orderQuantity}
+                          </Chip>
+                        </p>
+                      </div>
+                    </CardBody>
+                  </Card>
+                  <Card className="" shadow="none">
+                    <CardHeader>
+                      <p className="font-bold text-md text-slate-600">
+                        Accessory Codes
+                      </p>
+                    </CardHeader>
+                    <Divider />
+                    <CardBody>
+                      <div className="flex flex-wrap gap-5">
+                        <Tooltip
+                          content={
+                            <div className="max-w-xs flex flex-wrap gap-3">
+                              {data?.codeDetails?.totalCodes?.map(
+                                (code, index) => (
+                                  <Chip
+                                    key={index}
+                                    color="success"
+                                    variant="flat"
+                                    size="sm"
+                                  >
+                                    {code}
+                                  </Chip>
+                                )
+                              )}
+                            </div>
+                          }
+                          showArrow={true}
+                        >
+                          <Button
+                            color="primary"
+                            variant="flat"
+                            size="sm"
+                            radius="full"
+                            endContent={
+                              <span className="font-extrabold">
+                                {data?.codeDetails?.totalCodes?.length}
+                              </span>
+                            }
+                          >
+                            Total Codes:
+                          </Button>
+                        </Tooltip>
+                        <Tooltip
+                          content={
+                            <div className="max-w-xs flex flex-wrap gap-3">
+                              {data?.codeDetails?.currentCodes?.map(
+                                (code, index) => (
+                                  <Chip
+                                    key={index}
+                                    color="success"
+                                    variant="flat"
+                                    size="sm"
+                                  >
+                                    {code}
+                                  </Chip>
+                                )
+                              )}
+                            </div>
+                          }
+                          showArrow={true}
+                        >
+                          <Button
+                            color="primary"
+                            variant="flat"
+                            size="sm"
+                            radius="full"
+                            endContent={
+                              <span className="font-extrabold">
+                                {data?.codeDetails?.currentCodes?.length}
+                              </span>
+                            }
+                          >
+                            Current Codes:
+                          </Button>
+                        </Tooltip>
+                        <Tooltip
+                          content={
+                            <div className="max-w-xs flex flex-wrap gap-3">
+                              {data?.codeDetails?.distributedCodes?.map(
+                                (code, index) => (
+                                  <Chip
+                                    key={index}
+                                    color="success"
+                                    variant="flat"
+                                    size="sm"
+                                  >
+                                    {code}
+                                  </Chip>
+                                )
+                              )}
+                            </div>
+                          }
+                          showArrow={true}
+                        >
+                          <Button
+                            color="primary"
+                            variant="flat"
+                            size="sm"
+                            radius="full"
+                            endContent={
+                              <span className="font-extrabold">
+                                {data?.codeDetails?.distributedCodes?.length}
+                              </span>
+                            }
+                          >
+                            Distributed Codes:
+                          </Button>
+                        </Tooltip>
+                        <Tooltip
+                          content={
+                            <div className="max-w-xs flex flex-wrap gap-3">
+                              {data?.codeDetails?.orderCodes?.map(
+                                (code, index) => (
+                                  <Chip
+                                    key={index}
+                                    color="success"
+                                    variant="flat"
+                                    size="sm"
+                                  >
+                                    {code}
+                                  </Chip>
+                                )
+                              )}
+                            </div>
+                          }
+                          showArrow={true}
+                        >
+                          <Button
+                            color="primary"
+                            variant="flat"
+                            size="sm"
+                            radius="full"
+                            endContent={
+                              <span className="font-extrabold">
+                                {data?.codeDetails?.orderCodes?.length}
+                              </span>
+                            }
+                          >
+                            Ordered Codes:
+                          </Button>
+                        </Tooltip>
+                      </div>
+                    </CardBody>
+                  </Card>
+                </div>
+                <div className="flex flex-col md:flex-row  items-center gap-2">
+                  <div className="w-full md:w-1/2">
                     <Button
+                      className=""
                       color="primary"
-                      size="sm"
-                      startContent={<AddIcon />}
+                      size="md"
+                      startContent={<AddIcon className="fill-white" />}
                       onPress={() => modalUpdateStock.onOpen()}
                     >
                       Add
                     </Button>
+                  </div>
+                  <div className="w-full md:w-1/2 flex flex-col md:flex-row gap-2">
+                    <DateRangePicker
+                      className="max-w-xs "
+                      label="Filter By Date"
+                      pageBehavior="single"
+                      visibleMonths={2}
+                      value={dateRange}
+                      onChange={() => setDateRange}
+                      autoFocus={true}
+                    />
+                    <Select
+                      className="max-w-xs"
+                      label="Filter By Approval"
+                      placeholder="Select Option"
+                      selectedKeys={isApproved}
+                      variant="bordered"
+                      onSelectionChange={() => setIsApproved}
+                    >
+                      {approvalFilterOptions.map((option) => (
+                        <SelectItem key={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
                   </div>
                 </div>
                 {isLoading ? (
@@ -251,7 +469,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
 
                               <Tooltip
                                 color="primary"
-                                content="Edit user"
+                                content="Edit Stock"
                                 showArrow
                               >
                                 <Button
@@ -259,8 +477,11 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                                   color="primary"
                                   variant="flat"
                                   size="sm"
-                                     isDisabled={item.approvalDetails.isApproved}
-                                     onPress={() =>{ setStockDetailsId(item._id!),modalUpdateStock.onOpen()}}
+                                  isDisabled={item.approvalDetails.isApproved}
+                                  onPress={() => {
+                                    setStockDetailsId(item._id!),
+                                      modalUpdateStock.onOpen();
+                                  }}
                                 >
                                   <EditIcon />
                                 </Button>
@@ -277,7 +498,11 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
           )}
         </ModalContent>
       </Modal>
-      <UpdateStockModal useDisclosure={modalUpdateStock} stockId={stockId} stockDetailsId={stockDetailsId!}/>
+      <UpdateStockModal
+        useDisclosure={modalUpdateStock}
+        stockId={stockId}
+        stockDetailsId={stockDetailsId!}
+      />
     </>
   );
 }

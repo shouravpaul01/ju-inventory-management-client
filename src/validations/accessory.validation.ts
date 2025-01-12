@@ -4,7 +4,12 @@ export const accessoryValidation = z.object({
   category: z.string().nonempty("Category is required."),
   subCategory: z.string().nonempty("Sub Category is required."),
   image: z.any().optional(),
-  isItReturnable: z.string().nonempty("Returnable is required."),
+  isItReturnable: z
+    .boolean({
+      required_error: "Returnable is required.",
+      invalid_type_error: "Returnable is required.",
+    }),
+    
   name: z.string().nonempty("Name is required."),
   codeTitle: z
     .string()
@@ -13,17 +18,17 @@ export const accessoryValidation = z.object({
     .regex(
       /^[a-zA-Z0-9]+$/,
       "Code title can only contain alphanumeric characters."
-    ).toUpperCase(),
-  // quantity: z.number({
-  //   required_error: "Quantity is required.",
-  //   invalid_type_error: "Quantity is required.",
-  // }).positive("Quantity must be a positive number."),
+    )
+    .toUpperCase(),
+
   description: z.string().optional(),
 });
 export const updateStockQuantityValidation = z.object({
   _id: z.string().nonempty("Category is required."),
-  quantity: z.number({
-    required_error: "Quantity is required.",
-    invalid_type_error: "Quantity is required.",
-  }).positive("Quantity must be a positive number."),
+  quantity: z
+    .number({
+      required_error: "Quantity is required.",
+      invalid_type_error: "Quantity is required.",
+    })
+    .positive("Quantity must be a positive number."),
 });

@@ -18,3 +18,7 @@ export const designationOptions = [
   export const returnableOptions = [
     { value: "true", label: "Yes" },
     { value: "false", label: "No" }]
+    export const approvalFilterOptions = [
+      { value: "", label: "All" },
+      { value: "true", label: "Approved" },
+      { value: "false", label: "Pending" }]

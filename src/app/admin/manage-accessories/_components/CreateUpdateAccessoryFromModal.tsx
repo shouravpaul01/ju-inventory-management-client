@@ -105,9 +105,9 @@ export default function CreateUpdateAccessoryFromModal({
   };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-  
+  console.log(data.image)
     const formData = new FormData();
-    data?.image?.length > 0 && formData.append("file", data?.image[0]);
+    data?.image && formData.append("file", data?.image);
     delete data["image"];
     formData.append("data", JSON.stringify(data));
     const updateData = {
@@ -117,6 +117,7 @@ export default function CreateUpdateAccessoryFromModal({
     const res = accessoryId
       ? await updateAccessoryReq(updateData)
       : await createAccessoryReq(formData);
+      console.log(res,"res")
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
       queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
@@ -138,7 +139,7 @@ export default function CreateUpdateAccessoryFromModal({
       isOpen={useDisclosure.isOpen}
       onOpenChange={useDisclosure.onOpenChange}
       isDismissable={false}
-      size="4xl"
+      size="5xl"
       classNames={{ closeButton: "bg-violet-100 hover:bg-red-200" }}
       scrollBehavior="inside"
     >
