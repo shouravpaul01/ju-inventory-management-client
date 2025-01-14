@@ -105,7 +105,7 @@ export default function CreateUpdateAccessoryFromModal({
   };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-  console.log(data.image)
+  
     const formData = new FormData();
     data?.image && formData.append("file", data?.image);
     delete data["image"];

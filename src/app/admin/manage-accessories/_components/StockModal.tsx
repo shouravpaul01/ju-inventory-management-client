@@ -4,6 +4,7 @@ import {
   ImageIcon,
   InfoIcon,
   MoreIcon,
+  XmarkIcon,
 } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
 import { getAllStocks } from "@/src/hooks/Stock";
@@ -40,26 +41,27 @@ import UpdateStock from "./UpdateStockModal";
 import UpdateStockModal from "./UpdateStockModal";
 import { toast } from "sonner";
 import { updateStockApprovedStatus } from "@/src/services/Stock";
-import { parseDate, getLocalTimeZone } from "@internationalized/date";
+
 import { Select, SelectItem } from "@nextui-org/select";
-import { approvalFilterOptions } from "@/src/constents";
+import { approvalFilterOptions, limitOptions } from "@/src/constents";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
+import { Spinner } from "@nextui-org/spinner";
 
 interface IProps {
   modalStocks: UseDisclosureProps | any;
   stockId?: string;
 }
+
 export default function StockModal({ modalStocks, stockId }: IProps) {
   const queryClient = useQueryClient();
   const modalUpdateStock = useDisclosure();
-  const [page, setPage] = useState<number>(1);
+  
   const [stockDetailsId, setStockDetailsId] = useState<string | null>(null);
-  const [dateRange, setDateRange] = useState({
-    start: parseDate("2025-04-01"),
-    end: parseDate("2025-04-08"),
-  });
-  const [isApproved, setIsApproved] = useState(new Set([]));
+  const [dateRange, setDateRange] = useState<any>();
+  const [approvalStatus, setApprovalStatus] = useState("");
+  const [page, setPage] = useState<number>(1);
+  const [limit, setLimit] = useState(2);
 
   useEffect(() => {
     if (!modalUpdateStock.isOpen) {
@@ -71,14 +73,32 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
     if (stockId) {
       params.push({ name: "_id", value: stockId });
     }
+    if (approvalStatus) {
+      params.push({ name: "approvalStatus", value: approvalStatus });
+    }
+    if (dateRange?.start && dateRange?.end) {
+      params.push({
+        name: "startDate",
+        value: dayjs(dateRange?.start as any).format("YYYY-MM-DD"),
+      });
+      params.push({
+        name: "endDate",
+        value: dayjs(dateRange?.end as any).format("YYYY-MM-DD"),
+      });
+    }
+    if (page && limit) {
+      params.push({ name: "limit", value: limit });
+      params.push({ name: "page", value: page });
+    }
     return params;
-  }, [page, stockId]);
+  }, [page,limit, stockId, approvalStatus, dateRange]);
+ 
   const { data, isLoading } = getAllStocks({
     query: queryParams,
   });
   const loadingState = isLoading ? "loading" : "idle";
   const handleApproved = async (stockId: string, stockDetailsId: string) => {
-    console.log(stockId);
+    
     const res = await updateStockApprovedStatus(stockId, stockDetailsId);
     console.log(res, "data");
     if (res?.success) {
@@ -91,6 +111,13 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
       }
     }
   };
+  const handleFilterClear = () => {
+    setPage(1)
+    setLimit(5)
+    setApprovalStatus("");
+    setDateRange(null);
+  };
+ 
   return (
     <>
       <Modal
@@ -125,25 +152,25 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                         <p>
                           Total Qty:{" "}
                           <Chip radius="sm" size="sm" className="ms-2">
-                            {data?.quantityDetails.totalQuantity}
+                            {data?.quantityDetails?.totalQuantity || 0}
                           </Chip>
                         </p>
                         <p>
                           Current Qty:{" "}
                           <Chip radius="sm" size="sm" className="ms-2">
-                            {data?.quantityDetails.currentQuantity}
+                            {data?.quantityDetails?.currentQuantity || 0}
                           </Chip>
                         </p>
                         <p>
                           Distributed Qty:{" "}
                           <Chip radius="sm" size="sm" className="ms-2">
-                            {data?.quantityDetails.distributedQuantity}
+                            {data?.quantityDetails?.distributedQuantity || 0}
                           </Chip>
                         </p>
                         <p>
                           Order Qty:{" "}
                           <Chip radius="sm" size="sm" className="ms-2">
-                            {data?.quantityDetails.orderQuantity}
+                            {data?.quantityDetails?.orderQuantity || 0}
                           </Chip>
                         </p>
                       </div>
@@ -295,7 +322,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                   </Card>
                 </div>
                 <div className="flex flex-col md:flex-row  items-center gap-2">
-                  <div className="w-full md:w-1/2">
+                  <div className="w-full md:w-1/4">
                     <Button
                       className=""
                       color="primary"
@@ -306,23 +333,26 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                       Add
                     </Button>
                   </div>
-                  <div className="w-full md:w-1/2 flex flex-col md:flex-row gap-2">
+                  <div className="w-full md:w-3/4 flex flex-col md:flex-row items-center gap-2">
                     <DateRangePicker
                       className="max-w-xs "
                       label="Filter By Date"
+                      variant="bordered"
+                      showMonthAndYearPickers 
                       pageBehavior="single"
-                      visibleMonths={2}
-                      value={dateRange}
-                      onChange={() => setDateRange}
-                      autoFocus={true}
+                     
+                      value={dateRange!}
+                      onChange={(date: any) => setDateRange(date)}
                     />
                     <Select
                       className="max-w-xs"
                       label="Filter By Approval"
                       placeholder="Select Option"
-                      selectedKeys={isApproved}
                       variant="bordered"
-                      onSelectionChange={() => setIsApproved}
+                      selectedKeys={[approvalStatus]}
+                      onChange={(option: any) =>
+                        setApprovalStatus(option.target.value)
+                      }
                     >
                       {approvalFilterOptions.map((option) => (
                         <SelectItem key={option.value}>
@@ -330,6 +360,33 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                         </SelectItem>
                       ))}
                     </Select>
+                    <Select
+                      className="max-w-20"
+                      label="Limit"
+                      placeholder="Select Limit"
+                      variant="bordered"
+                      selectedKeys={[limit]}
+                      onChange={(option: any) =>
+                        setLimit(option.target.value)
+                      }
+                    >
+                      {limitOptions.map((option) => (
+                        <SelectItem key={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                    <Tooltip content="Clear Filter" showArrow={true} color="foreground">
+                    <Button
+                      className="size-6"
+                      radius="full"
+                      isIconOnly
+                      onPress={() => handleFilterClear()}
+                    >
+                      <XmarkIcon />
+                    </Button>
+                    </Tooltip>
+                    
                   </div>
                 </div>
                 {isLoading ? (
@@ -341,6 +398,14 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                     classNames={{
                       wrapper: "min-h-[222px] ",
                     }}
+                    bottomContent={
+                      <div className="flex w-full justify-center">
+                      <Button isDisabled={isLoading} variant="flat" onPress={()=>setPage(prev=>prev+1)}>
+                        {isLoading && <Spinner color="white" size="sm" />}
+                        Load More
+                      </Button>
+                    </div>
+                    }
                   >
                     <TableHeader>
                       <TableColumn key="name">Stock Date</TableColumn>
