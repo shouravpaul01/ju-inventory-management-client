@@ -61,7 +61,7 @@ export default function UpdateStockModal({
     
     
   }, [stockDetailsId,stock]);
-  console.log(stock,defaultValues, "stock");
+
   const handleUpdateStock: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
     const formData = new FormData();

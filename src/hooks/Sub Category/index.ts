@@ -35,5 +35,6 @@ export const getAllActiveSubCatgoriesByCategory = (categoryId: string) => {
       return res?.data;
     },
     enabled: !!categoryId,
+    
   });
 };

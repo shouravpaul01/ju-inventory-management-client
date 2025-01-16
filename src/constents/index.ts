@@ -25,7 +25,7 @@ export const approvalFilterOptions = [
   { value: "false", label: "Pending" },
 ];
 export const limitOptions = [
-  { value: 2, label: "2" },
+  
   { value: 5, label: "5" },
   { value: 10, label: "10 "},
   { value: 20, label: "20" }

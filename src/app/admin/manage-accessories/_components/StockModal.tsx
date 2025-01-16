@@ -61,7 +61,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
   const [dateRange, setDateRange] = useState<any>();
   const [approvalStatus, setApprovalStatus] = useState("");
   const [page, setPage] = useState<number>(1);
-  const [limit, setLimit] = useState(2);
+  const [limit, setLimit] = useState(5);
 
   useEffect(() => {
     if (!modalUpdateStock.isOpen) {
@@ -376,7 +376,8 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                         </SelectItem>
                       ))}
                     </Select>
-                    <Tooltip content="Clear Filter" showArrow={true} color="foreground">
+                  {
+                    (!!dateRange || !!approvalStatus ) &&   <Tooltip content="Clear Filter" showArrow={true} color="foreground">
                     <Button
                       className="size-6"
                       radius="full"
@@ -387,6 +388,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                     </Button>
                     </Tooltip>
                     
+                  }
                   </div>
                 </div>
                 {isLoading ? (

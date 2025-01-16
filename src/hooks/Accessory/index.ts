@@ -20,5 +20,6 @@ export const getAllAccessories = ({ query }: { query: TQuery[] }) => {
         return res?.data;
       },
       enabled: !!accessoryId,
+      staleTime: 0,
     });
   };

@@ -64,6 +64,8 @@ export default function ManageAccessories() {
   useEffect(() => {
     if (!modalForm.isOpen) {
       setAccessoryId(null);
+      // queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
+      // queryClient.invalidateQueries({ queryKey: ["allActive-subcategories"] });
     }
   }, [modalForm.isOpen]);
   const handleActiveOrInactive = async (

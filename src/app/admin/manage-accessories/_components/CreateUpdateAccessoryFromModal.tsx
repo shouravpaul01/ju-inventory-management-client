@@ -31,7 +31,7 @@ import {
 } from "@nextui-org/modal";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import {  useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 
@@ -62,8 +62,9 @@ export default function CreateUpdateAccessoryFromModal({
     });
   const { data: allActiveSubCategories, isLoading: isActiveSubCatLoading } =
     getAllActiveSubCatgoriesByCategory(selectCategoryId!);
-  const { data: singleSubCategory, isLoading: isSubCatLoading } =
-    getSingleSubCategory(selectSubCategoryId!);
+  const { data: singleSubCategory,isLoading:isSingleCategoryLoading } = getSingleSubCategory(
+    selectSubCategoryId!
+  );
 
   const activeCategoriesOptions = useMemo(() => {
     return allActiveCategories?.data?.map((category) => ({
@@ -78,26 +79,39 @@ export default function CreateUpdateAccessoryFromModal({
     }));
   }, [allActiveSubCategories]);
   const generateCodeTitle = useMemo(() => {
+      if (!selectSubCategoryId) return "";
     const code = singleSubCategory?.name?.substring(0, 4).toUpperCase();
-    return singleSubCategory ? `CSE-${code}-` : "";
-  }, [selectSubCategoryId, isSubCatLoading]);
+    return singleSubCategory?`CSE-${code}-`:"Loading..." 
+  }, [selectSubCategoryId,isSingleCategoryLoading]);
 
   const { data: accessory, isLoading: isAccessoryLoading } = getSingleAccessory(
     accessoryId!
   );
+
   const defaultValues = useMemo(() => {
     if (!accessoryId) return {};
+
     return {
       name: accessory?.name || "",
       category: accessory?.category,
       subCategory: accessory?.subCategory,
+
       codeTitle: accessory?.codeTitle.split("-")[2],
       isItReturnable: accessory?.isItReturnable,
       describtion: accessory?.description,
     };
-  }, [accessory, allActiveSubCategories]);
-
+  }, [accessory]);
+  useEffect(() => {
+    if (!useDisclosure.isOpen) {
+      setSelectCategoryId(null);
+      setSelectSubCategoryId(null);
+    }
+  }, [!useDisclosure.isOpen]);
   const handleSelectCategory = (value: string) => {
+    if (!value) {
+      setSelectSubCategoryId(null);
+    }
+    
     setSelectCategoryId(value);
   };
   const handleSelectSubCategory = (value: string) => {
@@ -105,7 +119,7 @@ export default function CreateUpdateAccessoryFromModal({
   };
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-  
+
     const formData = new FormData();
     data?.image && formData.append("file", data?.image);
     delete data["image"];
@@ -117,7 +131,7 @@ export default function CreateUpdateAccessoryFromModal({
     const res = accessoryId
       ? await updateAccessoryReq(updateData)
       : await createAccessoryReq(formData);
-      console.log(res,"res")
+   
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
       queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
@@ -157,7 +171,7 @@ export default function CreateUpdateAccessoryFromModal({
                 "Create Accessory"
               )}
             </ModalHeader>
-            {isAccessoryLoading ? (
+            {accessoryId && (isAccessoryLoading || isActiveSubCatLoading) ? (
               <JULoading className="h-[300px]" />
             ) : (
               <JUForm
@@ -195,7 +209,7 @@ export default function CreateUpdateAccessoryFromModal({
                         placeholder: isActiveSubCatLoading
                           ? "Loading.."
                           : "Select Sub Category",
-                        isDisabled: !!!activeSubCategoriesOptions,
+
                         className: "w-full md:w-[33%]",
                       }}
                       onChange={handleSelectSubCategory}
@@ -227,11 +241,16 @@ export default function CreateUpdateAccessoryFromModal({
                           label: "Code Title",
                           type: "text",
                           className: "w-full md:w-[33%] ",
-                          isDisabled: !!!generateCodeTitle,
+                          isDisabled:accessory?false:!generateCodeTitle,
                           classNames: { input: "uppercase p-0 mb-[2px] " },
                           startContent: (
                             <div className="pointer-events-none w-36 ">
-                              {generateCodeTitle}
+                              {accessory
+                                  ? accessory?.codeTitle
+                                      ?.split("-")
+                                      .slice(0, 2)
+                                      .join("-") + '-':generateCodeTitle
+                                }
                             </div>
                           ),
                         }}
@@ -245,7 +264,6 @@ export default function CreateUpdateAccessoryFromModal({
                         onPreview={(previews) => setPreviewUrls(previews)}
                       />
                     </div>
-                   
                   </div>
                   {previewUrls?.length > 0 && (
                     <PreviewImage previews={previewUrls} />
