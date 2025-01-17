@@ -50,17 +50,14 @@ export default function UpdateStockModal({
   );
   const defaultValues = useMemo(() => {
     if (!stockDetailsId) return {};
-    if (stock?.images?.length!>0) {
-      setPreviewUrls(stock?.images!)
+    if (stock?.images?.length! > 0) {
+      setPreviewUrls(stock?.images!);
     }
     return {
       quantity: stock?.quantity,
       description: stock?.description,
-      
     };
-    
-    
-  }, [stockDetailsId,stock]);
+  }, [stockDetailsId, stock]);
 
   const handleUpdateStock: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
@@ -71,17 +68,19 @@ export default function UpdateStockModal({
 
     delete data["images"];
     formData.append("data", JSON.stringify(data));
-    const updateData={
+    const updateData = {
       stockId,
       stockDetailsId,
-      data:formData
-    }
-    const res = stockDetailsId?await updateStockReq(updateData):await createStock({ stockId, data: formData });
-   
+      data: formData,
+    };
+    const res = stockDetailsId
+      ? await updateStockReq(updateData)
+      : await createStock({ stockId, data: formData });
+
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
       queryClient.invalidateQueries({ queryKey: ["stocks"] });
-     
+
       toast.success(res?.message);
       // !accessoryId && setIsResetForm(true);
       useDisclosure.onClose();
@@ -107,58 +106,57 @@ export default function UpdateStockModal({
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                {
-                  isStockLoading ? <Skeleton className="w-2/5 rounded-lg">
-                  <div className="h-3 w-2/5 rounded-lg bg-default-200"></div>
-                </Skeleton>:stockDetailsId ? (
-                "Update Stock"
-              ) : (
-                "Create Stock"
-              )
-                }
+                {isStockLoading ? (
+                  <Skeleton className="w-2/5 rounded-lg">
+                    <div className="h-3 w-2/5 rounded-lg bg-default-200"></div>
+                  </Skeleton>
+                ) : stockDetailsId ? (
+                  "Update Stock"
+                ) : (
+                  "Create Stock"
+                )}
               </ModalHeader>
-              {
-                isStockLoading ? (
-                              <JULoading className="h-[300px]" />
-                            ) :   <JUForm
-                            onSubmit={handleUpdateStock}
-                            validation={updateStockQuantityValidation}
-                            errors={validationErrors}
-                            reset={isResetForm}
-                            defaultValues={defaultValues}
-                          >
-                            <ModalBody>
-                              <JUInput
-                                name="quantity"
-                                inputProps={{
-                                  label: "Quantity",
-                                  type: "number",
-                                  className: "w-full md:w-[40%]",
-                                }}
-                                registerOptions={{ valueAsNumber: true }}
-                              />
-                              <div className="flex flex-col md:flex-row gap-5">
-                                <div className="w-full md:w-[66%]">
-                                  <JUFileInput
-                                    name="images"
-                                    onPreview={(previews) => setPreviewUrls(previews)}
-                                    multiple
-                                  />
-                                </div>
-                              </div>
-                              {previewUrls?.length > 0 && (
-                                <PreviewImage previews={previewUrls} />
-                              )}
-                              <JUTextEditor name="description" label="Description" />
-                            </ModalBody>
-                            <ModalFooter>
-                              <Button type="submit" color="primary" isLoading={isLoading}>
-                                Update
-                              </Button>
-                            </ModalFooter>
-                          </JUForm>
-              }
-            
+              {isStockLoading ? (
+                <JULoading className="h-[300px]" />
+              ) : (
+                <JUForm
+                  onSubmit={handleUpdateStock}
+                  validation={updateStockQuantityValidation}
+                  errors={validationErrors}
+                  reset={isResetForm}
+                  defaultValues={defaultValues}
+                >
+                  <ModalBody>
+                    <JUInput
+                      name="quantity"
+                      inputProps={{
+                        label: "Quantity",
+                        type: "number",
+                        className: "w-full md:w-[40%]",
+                      }}
+                      registerOptions={{ valueAsNumber: true }}
+                    />
+                    <div className="flex flex-col md:flex-row gap-5">
+                      <div className="w-full md:w-[66%]">
+                        <JUFileInput
+                          name="images"
+                          onPreview={(previews) => setPreviewUrls(previews)}
+                          multiple
+                        />
+                      </div>
+                    </div>
+                    {previewUrls?.length > 0 && (
+                      <PreviewImage previews={previewUrls} />
+                    )}
+                    <JUTextEditor name="description" label="Description" />
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button type="submit" color="primary" isLoading={isLoading}>
+                      {stockDetailsId ? "Update" : "Submit"}
+                    </Button>
+                  </ModalFooter>
+                </JUForm>
+              )}
             </>
           )}
         </ModalContent>

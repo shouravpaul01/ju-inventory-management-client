@@ -96,7 +96,7 @@ export const Navbar = () => {
         justify="end"
       >
         <NavbarItem>
-          <Link className="text-white" href="#">
+          <Link className="text-white" href="/">
             Home
           </Link>
         </NavbarItem>

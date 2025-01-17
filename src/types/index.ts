@@ -74,7 +74,7 @@ export type TCategory = {
   name: string;
   description?: string;
   isActive: boolean;
-  isApproved: boolean;
+  approvalDetails: TApprovalDetails;
 };
 export type TSubCategory = {
   _id: string;
@@ -82,24 +82,24 @@ export type TSubCategory = {
   category: TCategory;
   description?: string;
   isActive: boolean;
-  isApproved: boolean;
+  approvalDetails: TApprovalDetails;
 };
 export type TApprovalDetails = {
   isApproved: boolean;
-  approvedBy?:  string; 
+  approvedBy?: string;
   approvedDate?: Date;
 };
 
 export type TAccessory = {
-  _id?:  string;
+  _id?: string;
   name: string;
-  category:  TCategory; 
-  subCategory:  TSubCategory;
+  category: TCategory;
+  subCategory: TSubCategory;
   image?: string;
   codeTitle: string;
   description?: string;
   isItReturnable: boolean;
-  stock:  TStock; 
+  stock: TStock;
   status: "Available" | "Low Stock" | "Out of Stock";
   isActive: boolean;
   approvalDetails: TApprovalDetails;
@@ -108,12 +108,12 @@ export type TAccessory = {
   updatedAt?: Date;
 };
 export type TStockDetail = {
-  _id?:  string;
+  _id?: string;
   quantity: number;
   accessoryCodes: string[];
-  images:string[],
-  isActive:boolean,
-  isDeleted:boolean,
+  images: string[];
+  isActive: boolean;
+  isDeleted: boolean;
   approvalDetails: TApprovalDetails;
   description?: string;
   createdAt?: Date;
@@ -135,9 +135,8 @@ export type TCodeDetails = {
 };
 
 export type TStock = {
-  _id?:  string;
+  _id?: string;
   quantityDetails: TQuantityDetails;
   codeDetails: TCodeDetails;
   details: TStockDetail[];
-
 };

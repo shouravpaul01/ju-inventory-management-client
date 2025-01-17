@@ -350,7 +350,7 @@ export default function ManageAccessories() {
                     </Button>
                   </Tooltip>
 
-                  <Tooltip color="primary" content="Edit user" showArrow>
+                  <Tooltip color="primary" content="Edit" showArrow>
                     <Button
                       isIconOnly
                       color="primary"

@@ -132,7 +132,7 @@ export default function ManageSubCategories() {
                     {item?.isActive ? "Active" : "Inactive"}
                   </Chip>
 
-                  {item?.isApproved && (
+                  {item?.approvalDetails?.isApproved && (
                     <Popover placement="bottom" showArrow={true}>
                       <PopoverTrigger>
                         <Button
@@ -185,13 +185,13 @@ export default function ManageSubCategories() {
                 {" "}
                 <div className="flex items-center gap-2">
                   <Chip
-                    color={item?.isApproved ? "success" : "danger"}
+                    color={item?.approvalDetails?.isApproved ? "success" : "danger"}
                     variant="flat"
                     size="sm"
                   >
-                    {item?.isApproved ? "Approved" : "Pending"}
+                    {item?.approvalDetails?.isApproved ? "Approved" : "Pending"}
                   </Chip>
-                  {!item?.isApproved && (
+                  {!item?.approvalDetails?.isApproved && (
                     <Popover placement="bottom" showArrow={true}>
                       <PopoverTrigger>
                         <Button
@@ -211,7 +211,7 @@ export default function ManageSubCategories() {
                           disallowEmptySelection
                           selectionMode="single"
                           selectedKeys={[
-                            item?.isApproved ? "Approved" : "Pending",
+                            item?.approvalDetails?.isApproved ? "Approved" : "Pending",
                           ]}
                           color="primary"
                         >
