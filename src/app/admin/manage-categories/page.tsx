@@ -1,8 +1,6 @@
 "use client";
 import {
   AddIcon,
-  CategoryIcon,
-  DeleteIcon,
   EditIcon,
   InfoIcon,
   MoreIcon,

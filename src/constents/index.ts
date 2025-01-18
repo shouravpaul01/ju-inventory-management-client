@@ -16,8 +16,8 @@ export const designationOptions = [
   { value: "programCoordinator", label: "Program Coordinator" },
 ];
 export const returnableOptions = [
-  { value: "true", label: "Yes" },
-  { value: "false", label: "No" },
+  { value: "true", label: "Returnable" },
+  { value: "false", label: "Non-returnable" },
 ];
 export const approvalFilterOptions = [
   { value: "", label: "All" },

@@ -1,6 +1,7 @@
 import { axiosInstance } from "@/src/lib/AxiosInstence";
 import {
   getAllCategoriesReq,
+  getCategoriesWithSubCategoriesReq,
   getSingleCategotyReq,
 } from "@/src/services/Category";
 import { TCategory, TErrorMessage, TQuery } from "@/src/types";
@@ -24,5 +25,14 @@ export const getSingleCategory = (categoryId: string) => {
       return res?.data;
     },
     enabled: !!categoryId,
+  });
+};
+export const getCategoriesWithSubCategories = () => {
+  return useQuery({
+    queryKey: ["categories-with-subCategories"],
+    queryFn: async () => {
+      const res = await getCategoriesWithSubCategoriesReq();
+      return res?.data;
+    },
   });
 };

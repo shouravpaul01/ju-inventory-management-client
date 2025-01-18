@@ -1,6 +1,6 @@
 "use server";
 import { axiosInstance } from "@/src/lib/AxiosInstence";
-import { TCategory, TErrorMessage, TQuery } from "@/src/types";
+import { TCategory, TErrorMessage, TQuery, TSubCategory } from "@/src/types";
 import { FieldValues } from "react-hook-form";
 
 export const createCategoryReq = async (payload: FieldValues) => {
@@ -82,6 +82,21 @@ export const updateCategoryApprovedStatus = async (categoryId: string) => {
   try {
     const res = await axiosInstance.patch(
       `/categories/update-approved-status/${categoryId}`
+    );
+    return res.data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};
+export const getCategoriesWithSubCategoriesReq = async (): Promise<{
+  success: string;
+  message: string;
+  data: (TCategory & { subCategories: TSubCategory[] })[]; 
+  errorMessages?: TErrorMessage[];
+}> => {
+  try {
+    const res = await axiosInstance.get(
+      `/categories/categories-with-subcategories`
     );
     return res.data;
   } catch (error: any) {
