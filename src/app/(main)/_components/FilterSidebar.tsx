@@ -23,7 +23,7 @@ export default function FilterSidebar() {
   useEffect(() => {
     const queryCategories = searchParams.get("categories");
     const querySubCategories = searchParams.get("subCategories");
-    const queryReturnable = searchParams.get("returnableOption");
+    const queryReturnable = searchParams.get("isItReturnable");
 
     if (queryCategories) setSelectedCategories(queryCategories.split(","));
     if (querySubCategories) setSelectedSubCategories(querySubCategories.split(","));
@@ -32,7 +32,7 @@ export default function FilterSidebar() {
 
   // Update the query string
   const updateQuery = (
-    returnableOption: string,
+    isItReturnable: string,
     categories: string[],
     subCategories: string[],
     
@@ -41,7 +41,7 @@ export default function FilterSidebar() {
 
     if (categories.length > 0) params.set("categories", categories.join(","));
     if (subCategories.length > 0) params.set("subCategories", subCategories.join(","));
-    if (returnableOption.length > 0) params.set("returnableOption", returnableOption);
+    if (isItReturnable.length > 0) params.set("isItReturnable", isItReturnable);
 
     router.push(`?${params.toString()}`);
   };

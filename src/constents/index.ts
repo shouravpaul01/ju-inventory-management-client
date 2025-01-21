@@ -1,3 +1,4 @@
+export const blankImage="/blank-image.png"
 export const designationOptions = [
   { value: "professor", label: "Professor" },
   { value: "associateProfessor", label: "Associate Professor" },
