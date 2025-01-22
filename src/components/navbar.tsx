@@ -29,9 +29,12 @@ import { Badge } from "@nextui-org/badge";
 import SearchInput from "./ui/SearchInput";
 import { useUser } from "../context/user.provider";
 import { logoutUser } from "../services/Auth";
+import { useCart } from "../hooks/cart";
+
 
 export const Navbar = () => {
   const { user, setIsLoading } = useUser();
+ const {cart} =useCart()
   return (
     <NextUINavbar
       position="sticky"
@@ -107,12 +110,14 @@ export const Navbar = () => {
         </NavbarItem>
         <NavbarItem>
           <Badge
-            content="99+"
+            content={cart?.length || 0}
             shape="circle"
-            color="warning"
+            color="danger"
             showOutline={false}
           >
             <Button
+              href="/cart"
+              as={Link}
               radius="full"
               isIconOnly
               aria-label="more than 99 notifications"

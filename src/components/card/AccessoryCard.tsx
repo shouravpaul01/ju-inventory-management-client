@@ -1,4 +1,4 @@
-import { TAccessory } from "@/src/types";
+import { TAccessory, TAccessoryCartItem } from "@/src/types";
 import { Image } from "@heroui/image";
 import { Button } from "@nextui-org/button";
 import { Card, CardBody, CardFooter } from "@nextui-org/card";
@@ -10,11 +10,17 @@ import { blankImage } from "@/src/constents";
 import { Divider } from "@nextui-org/divider";
 import { Chip } from "@nextui-org/chip";
 import { Badge } from "@nextui-org/badge";
+import { useCart } from "@/src/hooks/cart";
+
 
 interface Iprops {
   accessory: TAccessory;
 }
 export default function AccessoryCard({ accessory }: Iprops) {
+  const { addToCart } = useCart();
+  const handleAddToCart = (accessory: TAccessoryCartItem) => {
+    addToCart(accessory);
+  };
   return (
     <Badge
       color="success"
@@ -54,6 +60,15 @@ export default function AccessoryCard({ accessory }: Iprops) {
             size="sm"
             className="w-full font-semibold hover:text-white bg-primary bg-opacity-25 hover:bg-primary hover:fill-white hover:shadow"
             startContent={<LocalMallIcon className="size-[22px]" />}
+            onPress={() =>
+              handleAddToCart({
+                _id: accessory?._id!,
+                name: accessory?.name,
+                image:accessory?.image,
+                currentQuantity:
+                  accessory?.stock.quantityDetails.currentQuantity,
+              })
+            }
           >
             Add
           </Button>

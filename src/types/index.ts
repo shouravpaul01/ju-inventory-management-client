@@ -140,3 +140,10 @@ export type TStock = {
   codeDetails: TCodeDetails;
   details: TStockDetail[];
 };
+export type TAccessoryCartItem = {
+  _id: string; 
+  name: string; 
+  image: string | undefined;
+  currentQuantity: number;
+  quantity?:number
+};
