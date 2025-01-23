@@ -10,6 +10,7 @@ export const getAllAccessories = ({ query }: { query: TQuery[] }) => {
         const res = await getAllAccessoriesReq({ query });
         return res?.data;
       },
+      
     });
   };
   export const getSingleAccessory = (accessoryId: string) => {

@@ -145,5 +145,6 @@ export type TAccessoryCartItem = {
   name: string; 
   image: string | undefined;
   currentQuantity: number;
-  quantity?:number
+  quantity?:number,
+  isSelected?:boolean
 };

@@ -25,7 +25,7 @@ export const useCart = () => {
 
   const { mutate: addToCart } = useMutation({
     mutationFn: (newItem: TAccessoryCartItem) => {
-        const isAlreadyInCart = cart.some((item) => item._id === newItem._id);
+      const isAlreadyInCart = cart.some((item) => item._id === newItem._id);
 
       if (isAlreadyInCart) {
         toast.warning("This accessory is already in the cart!");
@@ -35,8 +35,8 @@ export const useCart = () => {
       const updatedCart = [...cart, newItem];
       return updateCart(updatedCart);
     },
-    onSuccess: (updatedCart) => {
-      queryClient.setQueryData(["cart"], updatedCart);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 
@@ -45,10 +45,23 @@ export const useCart = () => {
       const updatedCart = cart?.filter((item) => item._id !== id);
       return updateCart(updatedCart);
     },
-    onSuccess: (updatedCart) => {
-      queryClient.setQueryData(["cart"], updatedCart);
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+  });
+  const { mutate: updateSelection } = useMutation({
+    mutationFn: ({ id, isSelected }: { id: string; isSelected: boolean }) => {
+      const updatedCart = cart.map((item) =>
+        item._id === id ? { ...item, isSelected } : item
+      );
+      return updateCart(updatedCart);
+    },
+    
+    onSuccess: () => {
+      
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
 
-  return { cart, addToCart, removeFromCart, refetch };
+  return { cart,updateCart, addToCart, removeFromCart, updateSelection, refetch };
 };

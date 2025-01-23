@@ -51,7 +51,7 @@ export default function ManageAccessories() {
   const [accessoryId, setAccessoryId] = useState<string | null>(null);
   const [stockId, setStockId] = useState<string | null>(null);
   const queryParams = useMemo(() => {
-    const params: TQuery[] = [{ name: "page", value: page }];
+    const params: TQuery[] = [];
     if (searchTerm) {
       params.push({ name: "search", value: searchTerm });
     }
@@ -60,6 +60,7 @@ export default function ManageAccessories() {
   const { data, isLoading } = getAllAccessories({
     query: queryParams,
   });
+  console.log(data,"accessories")
   const loadingState = isLoading ? "loading" : "idle";
   useEffect(() => {
     if (!modalForm.isOpen) {
