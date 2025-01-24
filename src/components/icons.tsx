@@ -220,10 +220,15 @@ export const LocalMallIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960"  height={size || height}
-  
-    width={size || width}
-    {...props} ><path d="M200-80q-33 0-56.5-23.5T120-160v-480q0-33 23.5-56.5T200-720h80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720h80q33 0 56.5 23.5T840-640v480q0 33-23.5 56.5T760-80H200Zm0-80h560v-480H200v480Zm280-240q83 0 141.5-58.5T680-600h-80q0 50-35 85t-85 35q-50 0-85-35t-35-85h-80q0 83 58.5 141.5T480-400ZM360-720h240q0-50-35-85t-85-35q-50 0-85 35t-35 85ZM200-160v-480 480Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+    >
+      <path d="M200-80q-33 0-56.5-23.5T120-160v-480q0-33 23.5-56.5T200-720h80q0-83 58.5-141.5T480-920q83 0 141.5 58.5T680-720h80q33 0 56.5 23.5T840-640v480q0 33-23.5 56.5T760-80H200Zm0-80h560v-480H200v480Zm280-240q83 0 141.5-58.5T680-600h-80q0 50-35 85t-85 35q-50 0-85-35t-35-85h-80q0 83 58.5 141.5T480-400ZM360-720h240q0-50-35-85t-85-35q-50 0-85 35t-35 85ZM200-160v-480 480Z" />
+    </svg>
   );
 };
 export const InfoIcon: React.FC<IconSvgProps> = ({
@@ -233,10 +238,16 @@ export const InfoIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M440-280h80v-240h-80v240Zm40-320q17 0 28.5-11.5T520-640q0-17-11.5-28.5T480-680q-17 0-28.5 11.5T440-640q0 17 11.5 28.5T480-600Zm0 520q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
+    </svg>
   );
 };
 
@@ -247,10 +258,16 @@ export const LogoutIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h280v80H200v560h280v80H200Zm440-160-55-58 102-102H360v-80h327L585-622l55-58 200 200-200 200Z" />
+    </svg>
   );
 };
 export const HomeIcon: React.FC<IconSvgProps> = ({
@@ -260,10 +277,16 @@ export const HomeIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960"  height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M240-200h120v-240h240v240h120v-360L480-740 240-560v360Zm-80 80v-480l320-240 320 240v480H520v-240h-80v240H160Zm320-350Z" />
+    </svg>
   );
 };
 export const GroupUserIcon: React.FC<IconSvgProps> = ({
@@ -273,10 +296,16 @@ export const GroupUserIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm720 0v-120q0-44-24.5-84.5T666-434q51 6 96 20.5t84 35.5q36 20 55 44.5t19 53.5v120H760ZM360-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm400-160q0 66-47 113t-113 47q-11 0-28-2.5t-28-5.5q27-32 41.5-71t14.5-81q0-42-14.5-81T544-792q14-5 28-6.5t28-1.5q66 0 113 47t47 113ZM120-240h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0 320Zm0-400Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm720 0v-120q0-44-24.5-84.5T666-434q51 6 96 20.5t84 35.5q36 20 55 44.5t19 53.5v120H760ZM360-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47Zm400-160q0 66-47 113t-113 47q-11 0-28-2.5t-28-5.5q27-32 41.5-71t14.5-81q0-42-14.5-81T544-792q14-5 28-6.5t28-1.5q66 0 113 47t47 113ZM120-240h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0 320Zm0-400Z" />
+    </svg>
   );
 };
 export const CategoryIcon: React.FC<IconSvgProps> = ({
@@ -286,10 +315,16 @@ export const CategoryIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="m260-520 220-360 220 360H260ZM700-80q-75 0-127.5-52.5T520-260q0-75 52.5-127.5T700-440q75 0 127.5 52.5T880-260q0 75-52.5 127.5T700-80Zm-580-20v-320h320v320H120Zm580-60q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm-500-20h160v-160H200v160Zm202-420h156l-78-126-78 126Zm78 0ZM360-340Zm340 80Z" />
+    </svg>
   );
 };
 
@@ -300,10 +335,16 @@ export const ReturnedIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960"  height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M480.24-315.7 644.3-480l-59.58-59.59-61.85 60.09v-164.8h-85.5v164.8l-61.85-60.09L315.93-480l164.31 164.3ZM202.87-111.87q-37.54 0-64.27-26.73-26.73-26.73-26.73-64.27v-554.26q0-37.54 26.73-64.27 26.73-26.73 64.27-26.73h160.11q14.67-36.48 46.37-58.24 31.69-21.76 70.65-21.76 38.96 0 70.65 21.76 31.7 21.76 46.37 58.24h160.11q37.54 0 64.27 26.73 26.73 26.73 26.73 64.27v554.26q0 37.54-26.73 64.27-26.73 26.73-64.27 26.73H202.87Zm0-91h554.26v-554.26H202.87v554.26ZM480-788.09q13.83 0 22.87-9.04 9.04-9.04 9.04-22.87 0-13.83-9.04-22.87-9.04-9.04-22.87-9.04-13.83 0-22.87 9.04-9.04 9.04-9.04 22.87 0 13.83 9.04 22.87 9.04 9.04 22.87 9.04ZM202.87-202.87v-554.26 554.26Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M480.24-315.7 644.3-480l-59.58-59.59-61.85 60.09v-164.8h-85.5v164.8l-61.85-60.09L315.93-480l164.31 164.3ZM202.87-111.87q-37.54 0-64.27-26.73-26.73-26.73-26.73-64.27v-554.26q0-37.54 26.73-64.27 26.73-26.73 64.27-26.73h160.11q14.67-36.48 46.37-58.24 31.69-21.76 70.65-21.76 38.96 0 70.65 21.76 31.7 21.76 46.37 58.24h160.11q37.54 0 64.27 26.73 26.73 26.73 26.73 64.27v554.26q0 37.54-26.73 64.27-26.73 26.73-64.27 26.73H202.87Zm0-91h554.26v-554.26H202.87v554.26ZM480-788.09q13.83 0 22.87-9.04 9.04-9.04 9.04-22.87 0-13.83-9.04-22.87-9.04-9.04-22.87-9.04-13.83 0-22.87 9.04-9.04 9.04-9.04 22.87 0 13.83 9.04 22.87 9.04 9.04 22.87 9.04ZM202.87-202.87v-554.26 554.26Z" />
+    </svg>
   );
 };
 export const PersonAddIcon: React.FC<IconSvgProps> = ({
@@ -313,10 +354,16 @@ export const PersonAddIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M720-400v-120H600v-80h120v-120h80v120h120v80H800v120h-80Zm-360-80q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm80-80h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0-80Zm0 400Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M720-400v-120H600v-80h120v-120h80v120h120v80H800v120h-80Zm-360-80q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM40-160v-112q0-34 17.5-62.5T104-378q62-31 126-46.5T360-440q66 0 130 15.5T616-378q29 15 46.5 43.5T680-272v112H40Zm80-80h480v-32q0-11-5.5-20T580-306q-54-27-109-40.5T360-360q-56 0-111 13.5T140-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T440-640q0-33-23.5-56.5T360-720q-33 0-56.5 23.5T280-640q0 33 23.5 56.5T360-560Zm0-80Zm0 400Z" />
+    </svg>
   );
 };
 export const MoreIcon: React.FC<IconSvgProps> = ({
@@ -326,10 +373,16 @@ export const MoreIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960"  height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M480-160q-33 0-56.5-23.5T400-240q0-33 23.5-56.5T480-320q33 0 56.5 23.5T560-240q0 33-23.5 56.5T480-160Zm0-240q-33 0-56.5-23.5T400-480q0-33 23.5-56.5T480-560q33 0 56.5 23.5T560-480q0 33-23.5 56.5T480-400Zm0-240q-33 0-56.5-23.5T400-720q0-33 23.5-56.5T480-800q33 0 56.5 23.5T560-720q0 33-23.5 56.5T480-640Z" />
+    </svg>
   );
 };
 export const DeleteIcon: React.FC<IconSvgProps> = ({
@@ -339,10 +392,16 @@ export const DeleteIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960"  height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520ZM360-280h80v-360h-80v360Zm160 0h80v-360h-80v360ZM280-720v520-520Z" />
+    </svg>
   );
 };
 export const EditIcon: React.FC<IconSvgProps> = ({
@@ -352,10 +411,16 @@ export const EditIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props}  fill="#666666"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h357l-80 80H200v560h560v-278l80-80v358q0 33-23.5 56.5T760-120H200Zm280-360ZM360-360v-170l367-367q12-12 27-18t30-6q16 0 30.5 6t26.5 18l56 57q11 12 17 26.5t6 29.5q0 15-5.5 29.5T897-728L530-360H360Zm481-424-56-56 56 56ZM440-440h56l232-232-28-28-29-28-231 231v57Zm260-260-29-28 29 28 28 28-28-28Z" />
+    </svg>
   );
 };
 
@@ -366,10 +431,16 @@ export const RestoreIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M440-320h80v-166l64 62 56-56-160-160-160 160 56 56 64-62v166ZM280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M440-320h80v-166l64 62 56-56-160-160-160 160 56 56 64-62v166ZM280-120q-33 0-56.5-23.5T200-200v-520h-40v-80h200v-40h240v40h200v80h-40v520q0 33-23.5 56.5T680-120H280Zm400-600H280v520h400v-520Zm-400 0v520-520Z" />
+    </svg>
   );
 };
 export const LoginIcon: React.FC<IconSvgProps> = ({
@@ -379,10 +450,16 @@ export const LoginIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M480-120v-80h280v-560H480v-80h280q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H480Zm-80-160-55-58 102-102H120v-80h327L345-622l55-58 200 200-200 200Z" />
+    </svg>
   );
 };
 export const EyeSlashFilledIcon: React.FC<IconSvgProps> = ({
@@ -392,10 +469,16 @@ export const EyeSlashFilledIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-  
-    width={size || width}
-    {...props} fill="#666666"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" />
+    </svg>
   );
 };
 export const EyeFilledIcon: React.FC<IconSvgProps> = ({
@@ -405,9 +488,16 @@ export const EyeFilledIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-    width={size || width}
-    {...props} fill="#666666"><path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="m644-428-58-58q9-47-27-88t-93-32l-58-58q17-8 34.5-12t37.5-4q75 0 127.5 52.5T660-500q0 20-4 37.5T644-428Zm128 126-58-56q38-29 67.5-63.5T832-500q-50-101-143.5-160.5T480-720q-29 0-57 4t-55 12l-62-62q41-17 84-25.5t90-8.5q151 0 269 83.5T920-500q-23 59-60.5 109.5T772-302Zm20 246L624-222q-35 11-70.5 16.5T480-200q-151 0-269-83.5T40-500q21-53 53-98.5t73-81.5L56-792l56-56 736 736-56 56ZM222-624q-29 26-53 57t-41 67q50 101 143.5 160.5T480-280q20 0 39-2.5t39-5.5l-36-38q-11 3-21 4.5t-21 1.5q-75 0-127.5-52.5T300-500q0-11 1.5-21t4.5-21l-84-82Zm319 93Zm-151 75Z" />
+    </svg>
   );
 };
 export const XmarkIcon: React.FC<IconSvgProps> = ({
@@ -417,9 +507,16 @@ export const XmarkIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-    width={size || width}
-    {...props} fill="#666666"><path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+    </svg>
   );
 };
 export const TimerIcon: React.FC<IconSvgProps> = ({
@@ -429,9 +526,16 @@ export const TimerIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-    width={size || width}
-    {...props} fill="#666666"><path d="M360-840v-80h240v80H360Zm80 440h80v-240h-80v240Zm40 320q-74 0-139.5-28.5T226-186q-49-49-77.5-114.5T120-440q0-74 28.5-139.5T226-694q49-49 114.5-77.5T480-800q62 0 119 20t107 58l56-56 56 56-56 56q38 50 58 107t20 119q0 74-28.5 139.5T734-186q-49 49-114.5 77.5T480-80Zm0-80q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Zm0-280Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M360-840v-80h240v80H360Zm80 440h80v-240h-80v240Zm40 320q-74 0-139.5-28.5T226-186q-49-49-77.5-114.5T120-440q0-74 28.5-139.5T226-694q49-49 114.5-77.5T480-800q62 0 119 20t107 58l56-56 56 56-56 56q38 50 58 107t20 119q0 74-28.5 139.5T734-186q-49 49-114.5 77.5T480-80Zm0-80q116 0 198-82t82-198q0-116-82-198t-198-82q-116 0-198 82t-82 198q0 116 82 198t198 82Zm0-280Z" />
+    </svg>
   );
 };
 export const AddIcon: React.FC<IconSvgProps> = ({
@@ -441,9 +545,16 @@ export const AddIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-    width={size || width}
-    {...props} fill="#666666"><path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160ZM200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm0-560v560-560Z" />
+    </svg>
   );
 };
 export const HubIcon: React.FC<IconSvgProps> = ({
@@ -453,9 +564,16 @@ export const HubIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960"  height={size || height}
-    width={size || width}
-    {...props} fill="#666666"><path d="M240-40q-50 0-85-35t-35-85q0-50 35-85t85-35q14 0 26 3t23 8l57-71q-28-31-39-70t-5-78l-81-27q-17 25-43 40t-58 15q-50 0-85-35T0-580q0-50 35-85t85-35q50 0 85 35t35 85v8l81 28q20-36 53.5-61t75.5-32v-87q-39-11-64.5-42.5T360-840q0-50 35-85t85-35q50 0 85 35t35 85q0 42-26 73.5T510-724v87q42 7 75.5 32t53.5 61l81-28v-8q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-32 0-58.5-15T739-515l-81 27q6 39-5 77.5T614-340l57 70q11-5 23-7.5t26-2.5q50 0 85 35t35 85q0 50-35 85t-85 35q-50 0-85-35t-35-85q0-20 6.5-38.5T624-232l-57-71q-41 23-87.5 23T392-303l-56 71q11 15 17.5 33.5T360-160q0 50-35 85t-85 35ZM120-540q17 0 28.5-11.5T160-580q0-17-11.5-28.5T120-620q-17 0-28.5 11.5T80-580q0 17 11.5 28.5T120-540Zm120 420q17 0 28.5-11.5T280-160q0-17-11.5-28.5T240-200q-17 0-28.5 11.5T200-160q0 17 11.5 28.5T240-120Zm240-680q17 0 28.5-11.5T520-840q0-17-11.5-28.5T480-880q-17 0-28.5 11.5T440-840q0 17 11.5 28.5T480-800Zm0 440q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm240 240q17 0 28.5-11.5T760-160q0-17-11.5-28.5T720-200q-17 0-28.5 11.5T680-160q0 17 11.5 28.5T720-120Zm120-420q17 0 28.5-11.5T880-580q0-17-11.5-28.5T840-620q-17 0-28.5 11.5T800-580q0 17 11.5 28.5T840-540ZM480-840ZM120-580Zm360 120Zm360-120ZM240-160Zm480 0Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M240-40q-50 0-85-35t-35-85q0-50 35-85t85-35q14 0 26 3t23 8l57-71q-28-31-39-70t-5-78l-81-27q-17 25-43 40t-58 15q-50 0-85-35T0-580q0-50 35-85t85-35q50 0 85 35t35 85v8l81 28q20-36 53.5-61t75.5-32v-87q-39-11-64.5-42.5T360-840q0-50 35-85t85-35q50 0 85 35t35 85q0 42-26 73.5T510-724v87q42 7 75.5 32t53.5 61l81-28v-8q0-50 35-85t85-35q50 0 85 35t35 85q0 50-35 85t-85 35q-32 0-58.5-15T739-515l-81 27q6 39-5 77.5T614-340l57 70q11-5 23-7.5t26-2.5q50 0 85 35t35 85q0 50-35 85t-85 35q-50 0-85-35t-35-85q0-20 6.5-38.5T624-232l-57-71q-41 23-87.5 23T392-303l-56 71q11 15 17.5 33.5T360-160q0 50-35 85t-85 35ZM120-540q17 0 28.5-11.5T160-580q0-17-11.5-28.5T120-620q-17 0-28.5 11.5T80-580q0 17 11.5 28.5T120-540Zm120 420q17 0 28.5-11.5T280-160q0-17-11.5-28.5T240-200q-17 0-28.5 11.5T200-160q0 17 11.5 28.5T240-120Zm240-680q17 0 28.5-11.5T520-840q0-17-11.5-28.5T480-880q-17 0-28.5 11.5T440-840q0 17 11.5 28.5T480-800Zm0 440q42 0 71-29t29-71q0-42-29-71t-71-29q-42 0-71 29t-29 71q0 42 29 71t71 29Zm240 240q17 0 28.5-11.5T760-160q0-17-11.5-28.5T720-200q-17 0-28.5 11.5T680-160q0 17 11.5 28.5T720-120Zm120-420q17 0 28.5-11.5T880-580q0-17-11.5-28.5T840-620q-17 0-28.5 11.5T800-580q0 17 11.5 28.5T840-540ZM480-840ZM120-580Zm360 120Zm360-120ZM240-160Zm480 0Z" />
+    </svg>
   );
 };
 export const WidgetIcon: React.FC<IconSvgProps> = ({
@@ -465,11 +583,18 @@ export const WidgetIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-    width={size || width}
-    {...props}  fill="#666666"><path d="M80-80v-240h240v240H80Zm280 0v-240h240v240H360Zm280 0v-240h240v240H640ZM80-360v-240h240v240H80Zm280 0v-240h240v240H360Zm280 0v-240h240v240H640ZM80-640v-240h520v240H80Zm560 0v-240h240v240H640ZM240-240Zm200 0h80-80Zm280 0ZM240-440v-80 80Zm240-40Zm240 40v-80 80Zm0-280ZM160-160h80v-80h-80v80Zm280 0h80v-80h-80v80Zm280 0h80v-80h-80v80ZM160-440h80v-80h-80v80Zm280 0h80v-80h-80v80Zm280 0h80v-80h-80v80Zm0-280h80v-80h-80v80Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M80-80v-240h240v240H80Zm280 0v-240h240v240H360Zm280 0v-240h240v240H640ZM80-360v-240h240v240H80Zm280 0v-240h240v240H360Zm280 0v-240h240v240H640ZM80-640v-240h520v240H80Zm560 0v-240h240v240H640ZM240-240Zm200 0h80-80Zm280 0ZM240-440v-80 80Zm240-40Zm240 40v-80 80Zm0-280ZM160-160h80v-80h-80v80Zm280 0h80v-80h-80v80Zm280 0h80v-80h-80v80ZM160-440h80v-80h-80v80Zm280 0h80v-80h-80v80Zm280 0h80v-80h-80v80Zm0-280h80v-80h-80v80Z" />
+    </svg>
   );
-};     
+};
 export const ImageIcon: React.FC<IconSvgProps> = ({
   size = 24,
   width,
@@ -477,8 +602,73 @@ export const ImageIcon: React.FC<IconSvgProps> = ({
   ...props
 }) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg"  viewBox="0 -960 960 960" height={size || height}
-    width={size || width}
-    {...props}  fill="#666666"><path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z"/></svg>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M200-120q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h560q33 0 56.5 23.5T840-760v560q0 33-23.5 56.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480 450-320l-90-120-120 160Zm-40 80v-560 560Z" />
+    </svg>
   );
-}; 
+};
+export const PlusIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
+    </svg>
+  );
+};
+export const MinusIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M200-440v-80h560v80H200Z" />
+    </svg>
+  );
+};
+export const ArrowRightAltIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+     
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="m560-240-56-58 142-142H160v-80h486L504-662l56-58 240 240-240 240Z" />
+    </svg>
+  );
+};

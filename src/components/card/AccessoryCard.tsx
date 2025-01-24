@@ -65,6 +65,8 @@ export default function AccessoryCard({ accessory }: Iprops) {
                 _id: accessory?._id!,
                 name: accessory?.name,
                 image:accessory?.image,
+                isItReturnable:accessory?.isItReturnable,
+                quantity:1,
                 currentQuantity:
                   accessory?.stock.quantityDetails.currentQuantity,
               })

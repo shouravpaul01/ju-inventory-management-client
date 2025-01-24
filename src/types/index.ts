@@ -144,6 +144,7 @@ export type TAccessoryCartItem = {
   _id: string; 
   name: string; 
   image: string | undefined;
+  isItReturnable:boolean;
   currentQuantity: number;
   quantity?:number,
   isSelected?:boolean

@@ -47,6 +47,7 @@ export const useCart = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
+      toast.success("Accessory item successfully deleted from cart.")
     },
   });
   const { mutate: updateSelection } = useMutation({
