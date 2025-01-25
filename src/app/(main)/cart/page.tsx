@@ -2,6 +2,7 @@
 import { ArrowRightAltIcon, XmarkIcon } from "@/src/components/icons";
 import PlusMinusNumberInput from "@/src/components/ui/PlusMinusNumberInput";
 import { useCart } from "@/src/hooks/cart";
+import { createOrderReq } from "@/src/services/order";
 import { TAccessoryCartItem } from "@/src/types";
 import { Checkbox } from "@heroui/checkbox";
 import { Button } from "@nextui-org/button";
@@ -16,11 +17,13 @@ import {
 } from "@nextui-org/table";
 import { User } from "@nextui-org/user";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 
 export default function CartPage() {
   const queryClient = useQueryClient();
   const { cart, updateSelection, removeFromCart } = useCart();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const selectedItems = useMemo(
     () => cart.filter((item) => item.isSelected).map((item) => item._id),
@@ -29,7 +32,7 @@ export default function CartPage() {
 
   const handleSelectedItem = (id: string) => {
     const isSelected = selectedItems.includes(id);
-    console.log(id, isSelected, selectedItems, "key");
+
     updateSelection({ id, isSelected: !isSelected });
   };
 
@@ -54,8 +57,26 @@ export default function CartPage() {
 
     queryClient.setQueryData(["cart"], updatedCart);
   };
-  console.log(cart, "cart");
-  console.log(selectedItems, "cart");
+  const handleConfirmOrder = async (cartItems: TAccessoryCartItem[]) => {
+    setIsLoading(true);
+   
+    const orderItems = cartItems?.map((item) => ({
+      accessory: item._id,
+      quantity: item.quantity,
+    }));
+    console.log(cartItems,orderItems, "cartIt");
+    const res = await createOrderReq(orderItems);
+    console.log(res,"res")
+    if (res?.success) {
+      toast.success(res?.message);
+    } else if (!res?.success && res?.errorMessages?.length > 0) {
+      if (res?.errorMessages[0]?.path == "categoryError") {
+        toast.error(res?.errorMessages[0]?.message);
+      }
+    }
+    setIsLoading(false);
+  };
+
   return (
     <div className="my-11">
       <Table
@@ -143,12 +164,14 @@ export default function CartPage() {
         <Button
           size="sm"
           color="primary"
+          isLoading={isLoading}
           isDisabled={selectedItems.length === 0}
           startContent={
-            <span>
-              <ArrowRightAltIcon className="fill-white" />
-            </span>
+          
+           !isLoading &&   <ArrowRightAltIcon className="fill-white" />
+           
           }
+          onPress={() => handleConfirmOrder(cart)}
         >
           Proceed To Order
         </Button>
