@@ -8,7 +8,7 @@ import {
 } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
 import { getAllStocks } from "@/src/hooks/Stock";
-import { TQuery } from "@/src/types";
+import { TCodeDetails, TQuantityDetails, TQuery } from "@/src/types";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { Listbox, ListboxItem } from "@nextui-org/listbox";
@@ -47,22 +47,31 @@ import { approvalFilterOptions, limitOptions } from "@/src/constents";
 import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
 import { Spinner } from "@nextui-org/spinner";
+import { getSingleAccessory } from "@/src/hooks/Accessory";
 
 interface IProps {
   modalStocks: UseDisclosureProps | any;
   stockId?: string;
+  accessoryId: string;
 }
 
-export default function StockModal({ modalStocks, stockId }: IProps) {
+export default function StockModal({
+  modalStocks,
+  stockId,
+  accessoryId,
+}: IProps) {
   const queryClient = useQueryClient();
   const modalUpdateStock = useDisclosure();
-  
+
   const [stockDetailsId, setStockDetailsId] = useState<string | null>(null);
   const [dateRange, setDateRange] = useState<any>();
   const [approvalStatus, setApprovalStatus] = useState("");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState(5);
-
+  const { data: accessory, isLoading: isAccessoryLoading } = getSingleAccessory(
+    accessoryId!
+  );
+  console.log(accessory, accessoryId, "accessorie");
   useEffect(() => {
     if (!modalUpdateStock.isOpen) {
       setStockDetailsId(null);
@@ -91,18 +100,17 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
       params.push({ name: "page", value: page });
     }
     return params;
-  }, [page,limit, stockId, approvalStatus, dateRange]);
- 
+  }, [page, limit, stockId, approvalStatus, dateRange]);
+
   const { data, isLoading } = getAllStocks({
     query: queryParams,
   });
   const loadingState = isLoading ? "loading" : "idle";
   const handleApproved = async (stockId: string, stockDetailsId: string) => {
-    
     const res = await updateStockApprovedStatus(stockId, stockDetailsId);
-    console.log(res, "data");
+  
     if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["accessories"] });
+      queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
       queryClient.invalidateQueries({ queryKey: ["stocks"] });
       toast.success(res?.message);
     } else if (!res?.success && res?.errorMessages?.length > 0) {
@@ -112,12 +120,12 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
     }
   };
   const handleFilterClear = () => {
-    setPage(1)
-    setLimit(5)
+    setPage(1);
+    setLimit(5);
     setApprovalStatus("");
     setDateRange(null);
   };
- 
+
   return (
     <>
       <Modal
@@ -149,30 +157,56 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                     <Divider />
                     <CardBody>
                       <div className="flex flex-wrap gap-5">
-                        <p>
-                          Total Qty:{" "}
-                          <Chip radius="sm" size="sm" className="ms-2">
-                            {data?.quantityDetails?.totalQuantity || 0}
-                          </Chip>
-                        </p>
-                        <p>
-                          Current Qty:{" "}
-                          <Chip radius="sm" size="sm" className="ms-2">
-                            {data?.quantityDetails?.currentQuantity || 0}
-                          </Chip>
-                        </p>
-                        <p>
-                          Distributed Qty:{" "}
-                          <Chip radius="sm" size="sm" className="ms-2">
-                            {data?.quantityDetails?.distributedQuantity || 0}
-                          </Chip>
-                        </p>
-                        <p>
-                          Order Qty:{" "}
-                          <Chip radius="sm" size="sm" className="ms-2">
-                            {data?.quantityDetails?.orderQuantity || 0}
-                          </Chip>
-                        </p>
+                        {isAccessoryLoading ? (
+                          <Skeleton className="w-2/5 rounded-lg">
+                            <div className="h-3  rounded-lg bg-default-200"></div>
+                          </Skeleton>
+                        ) : (
+                          <p>
+                            Total Qty:{" "}
+                            <Chip radius="sm" size="sm" className="ms-2">
+                              {accessory?.quantityDetails?.totalQuantity || 0}
+                            </Chip>
+                          </p>
+                        )}
+
+                        {isAccessoryLoading ? (
+                          <Skeleton className="w-2/5 rounded-lg">
+                            <div className="h-3  rounded-lg bg-default-200"></div>
+                          </Skeleton>
+                        ) : (
+                          <p>
+                            Current Qty:{" "}
+                            <Chip radius="sm" size="sm" className="ms-2">
+                              {accessory?.quantityDetails?.currentQuantity || 0}
+                            </Chip>
+                          </p>
+                        )}
+                        {isAccessoryLoading ? (
+                          <Skeleton className="w-2/5 rounded-lg">
+                            <div className="h-3  rounded-lg bg-default-200"></div>
+                          </Skeleton>
+                        ) : (
+                          <p>
+                            Distributed Qty:{" "}
+                            <Chip radius="sm" size="sm" className="ms-2">
+                              {accessory?.quantityDetails
+                                ?.distributedQuantity || 0}
+                            </Chip>
+                          </p>
+                        )}
+                        {isAccessoryLoading ? (
+                          <Skeleton className="w-2/5 rounded-lg">
+                            <div className="h-3  rounded-lg bg-default-200"></div>
+                          </Skeleton>
+                        ) : (
+                          <p>
+                            Order Qty:{" "}
+                            <Chip radius="sm" size="sm" className="ms-2">
+                              {accessory?.quantityDetails?.orderQuantity || 0}
+                            </Chip>
+                          </p>
+                        )}
                       </div>
                     </CardBody>
                   </Card>
@@ -188,7 +222,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                         <Tooltip
                           content={
                             <div className="max-w-xs flex flex-wrap gap-3">
-                              {data?.codeDetails?.totalCodes?.map(
+                              {accessory?.codeDetails?.totalCodes?.map(
                                 (code, index) => (
                                   <Chip
                                     key={index}
@@ -211,7 +245,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                             radius="full"
                             endContent={
                               <span className="font-extrabold">
-                                {data?.codeDetails?.totalCodes?.length}
+                                {accessory?.codeDetails?.totalCodes?.length}
                               </span>
                             }
                           >
@@ -221,7 +255,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                         <Tooltip
                           content={
                             <div className="max-w-xs flex flex-wrap gap-3">
-                              {data?.codeDetails?.currentCodes?.map(
+                              {accessory?.codeDetails?.currentCodes?.map(
                                 (code, index) => (
                                   <Chip
                                     key={index}
@@ -244,7 +278,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                             radius="full"
                             endContent={
                               <span className="font-extrabold">
-                                {data?.codeDetails?.currentCodes?.length}
+                                {accessory?.codeDetails?.currentCodes?.length}
                               </span>
                             }
                           >
@@ -254,7 +288,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                         <Tooltip
                           content={
                             <div className="max-w-xs flex flex-wrap gap-3">
-                              {data?.codeDetails?.distributedCodes?.map(
+                              {accessory?.codeDetails?.distributedCodes?.map(
                                 (code, index) => (
                                   <Chip
                                     key={index}
@@ -277,7 +311,10 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                             radius="full"
                             endContent={
                               <span className="font-extrabold">
-                                {data?.codeDetails?.distributedCodes?.length}
+                                {
+                                  accessory?.codeDetails?.distributedCodes
+                                    ?.length
+                                }
                               </span>
                             }
                           >
@@ -287,7 +324,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                         <Tooltip
                           content={
                             <div className="max-w-xs flex flex-wrap gap-3">
-                              {data?.codeDetails?.orderCodes?.map(
+                              {accessory?.codeDetails?.orderCodes?.map(
                                 (code, index) => (
                                   <Chip
                                     key={index}
@@ -310,7 +347,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                             radius="full"
                             endContent={
                               <span className="font-extrabold">
-                                {data?.codeDetails?.orderCodes?.length}
+                                {accessory?.codeDetails?.orderCodes?.length}
                               </span>
                             }
                           >
@@ -338,9 +375,8 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                       className="max-w-xs "
                       label="Filter By Date"
                       variant="bordered"
-                      showMonthAndYearPickers 
+                      showMonthAndYearPickers
                       pageBehavior="single"
-                     
                       value={dateRange!}
                       onChange={(date: any) => setDateRange(date)}
                     />
@@ -366,9 +402,7 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                       placeholder="Select Limit"
                       variant="bordered"
                       selectedKeys={[limit]}
-                      onChange={(option: any) =>
-                        setLimit(option.target.value)
-                      }
+                      onChange={(option: any) => setLimit(option.target.value)}
                     >
                       {limitOptions.map((option) => (
                         <SelectItem key={option.value}>
@@ -376,19 +410,22 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                         </SelectItem>
                       ))}
                     </Select>
-                  {
-                    (!!dateRange || !!approvalStatus ) &&   <Tooltip content="Clear Filter" showArrow={true} color="foreground">
-                    <Button
-                      className="size-6"
-                      radius="full"
-                      isIconOnly
-                      onPress={() => handleFilterClear()}
-                    >
-                      <XmarkIcon />
-                    </Button>
-                    </Tooltip>
-                    
-                  }
+                    {(!!dateRange || !!approvalStatus) && (
+                      <Tooltip
+                        content="Clear Filter"
+                        showArrow={true}
+                        color="foreground"
+                      >
+                        <Button
+                          className="size-6"
+                          radius="full"
+                          isIconOnly
+                          onPress={() => handleFilterClear()}
+                        >
+                          <XmarkIcon />
+                        </Button>
+                      </Tooltip>
+                    )}
                   </div>
                 </div>
                 {isLoading ? (
@@ -402,11 +439,15 @@ export default function StockModal({ modalStocks, stockId }: IProps) {
                     }}
                     bottomContent={
                       <div className="flex w-full justify-center">
-                      <Button isDisabled={isLoading} variant="flat" onPress={()=>setPage(prev=>prev+1)}>
-                        {isLoading && <Spinner color="white" size="sm" />}
-                        Load More
-                      </Button>
-                    </div>
+                        <Button
+                          isDisabled={isLoading}
+                          variant="flat"
+                          onPress={() => setPage((prev) => prev + 1)}
+                        >
+                          {isLoading && <Spinner color="white" size="sm" />}
+                          Load More
+                        </Button>
+                      </div>
                     }
                   >
                     <TableHeader>

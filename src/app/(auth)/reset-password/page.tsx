@@ -1,17 +1,19 @@
 "use client";
 import JUForm from "@/src/components/form/JUForm";
 import JUPasswordInput from "@/src/components/form/JUPasswordInput";
-import {  getResetPasswordToken, getVerificationTokenToken, resetPasswordReq } from "@/src/services/Auth";
+import {  getResetPasswordToken,  resetPasswordReq } from "@/src/services/Auth";
 import { resetPasswordValidation } from "@/src/validations/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function page() {
   const router=useRouter()
+  const methods = useForm({ resolver: zodResolver(resetPasswordValidation) });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const handleResetPassword: SubmitHandler<FieldValues> = async (data) => {
@@ -58,7 +60,7 @@ export default function page() {
         </Chip>
       )}
       </div>
-      <JUForm onSubmit={handleResetPassword} validation={resetPasswordValidation}>
+      <JUForm onSubmit={handleResetPassword} methods={methods}>
         <div className="space-y-2">
           <JUPasswordInput
             name="password"

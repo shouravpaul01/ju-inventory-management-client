@@ -89,7 +89,19 @@ export type TApprovalDetails = {
   approvedBy?: string;
   approvedDate?: Date;
 };
+export type TQuantityDetails = {
+  totalQuantity: number;
+  currentQuantity: number;
+  distributedQuantity: number;
+  orderQuantity: number;
+};
 
+export type TCodeDetails = {
+  totalCodes: string[];
+  currentCodes: string[];
+  distributedCodes: string[];
+  orderCodes: string[];
+};
 export type TAccessory = {
   _id?: string;
   name: string;
@@ -99,6 +111,8 @@ export type TAccessory = {
   codeTitle: string;
   description?: string;
   isItReturnable: boolean;
+  quantityDetails: TQuantityDetails;
+  codeDetails: TCodeDetails;
   stock: TStock;
   status: "Available" | "Low Stock" | "Out of Stock";
   isActive: boolean;
@@ -120,24 +134,11 @@ export type TStockDetail = {
   updatedAt?: Date;
 };
 
-export type TQuantityDetails = {
-  totalQuantity: number;
-  currentQuantity: number;
-  distributedQuantity: number;
-  orderQuantity: number;
-};
 
-export type TCodeDetails = {
-  totalCodes: string[];
-  currentCodes: string[];
-  distributedCodes: string[];
-  orderCodes: string[];
-};
 
 export type TStock = {
   _id?: string;
-  quantityDetails: TQuantityDetails;
-  codeDetails: TCodeDetails;
+  
   details: TStockDetail[];
 };
 export type TAccessoryCartItem = {

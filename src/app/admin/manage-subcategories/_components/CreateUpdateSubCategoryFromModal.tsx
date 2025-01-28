@@ -10,6 +10,7 @@ import {
 } from "@/src/services/Sub Category";
 import { TErrorMessage } from "@/src/types";
 import { subCategoryValidation } from "@/src/validations/subCategory.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import {
   Modal,
@@ -21,8 +22,8 @@ import {
 } from "@nextui-org/modal";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { useEffect, useMemo, useState } from "react";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface IProps {
@@ -34,19 +35,24 @@ export default function CreateUpdateSubCategoryFromModal({
   subCategoryId,
 }: IProps) {
   const queryClient = useQueryClient();
+  const methods = useForm({ resolver: zodResolver(subCategoryValidation) });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-
-  const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
-  const [isResetForm, setIsResetForm] = useState<boolean>(false);
+  const { data: subCategory, isLoading: isSubCategoryLoading } =
+    getSingleSubCategory(subCategoryId!);
+  useEffect(() => {
+    if (subCategoryId) {
+      methods.reset({
+        category: subCategory?.category,
+        name: subCategory?.name,
+      });
+    }
+  }, [subCategoryId, subCategory]);
   const { data: allActiveCategories } = getAllCategories({
     query: [
       { name: "isActive", value: true },
-      { name: "isApproved", value: true },
+      { name: "approvalDetails.isApproved", value: true },
     ],
   });
-  const { data: subCategory, isLoading: isSubCategoryLoading } = getSingleSubCategory(
-    subCategoryId!
-  );
 
   const activeCategoriesOptions = useMemo(() => {
     return allActiveCategories?.data?.map((category) => ({
@@ -58,7 +64,7 @@ export default function CreateUpdateSubCategoryFromModal({
     if (!subCategoryId) return {};
     return {
       name: subCategory?.name || "",
-      category:subCategory?.category._id
+      category: subCategory?.category._id,
     };
   }, [subCategoryId, subCategory]);
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
@@ -71,12 +77,16 @@ export default function CreateUpdateSubCategoryFromModal({
       queryClient.invalidateQueries({ queryKey: ["sub-categories"] });
       queryClient.invalidateQueries({ queryKey: ["single-subcategory"] });
       toast.success(res?.message);
-      !subCategoryId && setIsResetForm(true);
+      !subCategoryId && methods.reset();
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "subCategoryError") {
         toast.error(res?.errorMessages[0]?.message);
+        return;
       }
-      setValidationErrors(res?.errorMessages);
+
+      res?.errorMessages?.forEach((err: TErrorMessage) => {
+        methods.setError(err.path, { type: "server", message: err.message });
+      });
     }
 
     setIsLoading(false);
@@ -106,20 +116,14 @@ export default function CreateUpdateSubCategoryFromModal({
             {isSubCategoryLoading ? (
               <JULoading className="h-[300px]" />
             ) : (
-              <JUForm
-                onSubmit={handleCreateUpdate}
-                validation={subCategoryValidation}
-                errors={validationErrors}
-                reset={isResetForm}
-                defaultValues={defaultValues}
-              >
+              <JUForm onSubmit={handleCreateUpdate} methods={methods}>
                 <ModalBody>
                   <div className="flex flex-col md:flex-row gap-5">
                     <JUSelect
                       name="category"
                       options={activeCategoriesOptions!}
                       selectProps={{
-                        label:"Category",
+                        label: "Category",
                         placeholder: "Select Category",
                         className: "w-full md:w-[40%]",
                       }}

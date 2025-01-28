@@ -8,6 +8,7 @@ import { getSingleStock } from "@/src/hooks/Stock";
 import { createStock, updateStockReq } from "@/src/services/Stock";
 import { TErrorMessage } from "@/src/types";
 import { updateStockQuantityValidation } from "@/src/validations/stock.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import {
   Modal,
@@ -21,7 +22,7 @@ import { Skeleton } from "@nextui-org/skeleton";
 import { image } from "@nextui-org/theme";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface IProps {
@@ -35,12 +36,15 @@ export default function UpdateStockModal({
   stockDetailsId,
 }: IProps) {
   const queryClient = useQueryClient();
+  const methods = useForm({
+    resolver: zodResolver(updateStockQuantityValidation),
+  });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-  const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
-  const [isResetForm, setIsResetForm] = useState<boolean>(false);
+
   useEffect(() => {
     if (!useDisclosure.isOpen) {
+      methods.reset()
       setPreviewUrls([]);
     }
   }, [useDisclosure.isOpen]);
@@ -48,17 +52,17 @@ export default function UpdateStockModal({
     stockId!,
     stockDetailsId!
   );
-  const defaultValues = useMemo(() => {
-    if (!stockDetailsId) return {};
-    if (stock?.images?.length! > 0) {
-      setPreviewUrls(stock?.images!);
-    }
-    return {
-      quantity: stock?.quantity,
-      description: stock?.description,
-    };
-  }, [stockDetailsId, stock]);
+  console.log(stock,"stock")
 
+  useEffect(() => {
+    if (stockDetailsId) {
+      methods.reset({
+        quantity: stock?.quantity,
+        description: stock?.description,
+      });
+      stock?.images?.length! > 0 && setPreviewUrls(stock?.images!);
+    }
+  }, [stockDetailsId, stock]);
   const handleUpdateStock: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
     const formData = new FormData();
@@ -82,13 +86,16 @@ export default function UpdateStockModal({
       queryClient.invalidateQueries({ queryKey: ["stocks"] });
 
       toast.success(res?.message);
-      // !accessoryId && setIsResetForm(true);
+
       useDisclosure.onClose();
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "accessoryError") {
         toast.error(res?.errorMessages[0]?.message);
+        return;
       }
-      setValidationErrors(res?.errorMessages);
+      res?.errorMessages?.forEach((err: TErrorMessage) => {
+        methods.setError(err.path, { type: "server", message: err.message });
+      });
     }
     setIsLoading(false);
   };
@@ -119,13 +126,7 @@ export default function UpdateStockModal({
               {isStockLoading ? (
                 <JULoading className="h-[300px]" />
               ) : (
-                <JUForm
-                  onSubmit={handleUpdateStock}
-                  validation={updateStockQuantityValidation}
-                  errors={validationErrors}
-                  reset={isResetForm}
-                  defaultValues={defaultValues}
-                >
+                <JUForm onSubmit={handleUpdateStock} methods={methods}>
                   <ModalBody>
                     <JUInput
                       name="quantity"

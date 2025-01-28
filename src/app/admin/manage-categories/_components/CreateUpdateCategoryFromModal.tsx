@@ -1,16 +1,11 @@
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
-import JUSelect from "@/src/components/form/JUSelect";
 import JULoading from "@/src/components/ui/JULoading";
-import { designationOptions } from "@/src/constents";
 import { getSingleCategory } from "@/src/hooks/Category";
-import { getSingleUser } from "@/src/hooks/User";
 import { createCategoryReq, updateCategoryReq } from "@/src/services/Category";
-import { createFacultyReq } from "@/src/services/Faculty";
-import { updateUserReq } from "@/src/services/User";
 import { TErrorMessage } from "@/src/types";
 import { categoryValidation } from "@/src/validations/category.validation";
-import { facultyValidation } from "@/src/validations/faculty.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import {
   Modal,
@@ -22,8 +17,8 @@ import {
 } from "@nextui-org/modal";
 import { Skeleton } from "@nextui-org/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { useEffect,  useState } from "react";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface IProps {
@@ -35,21 +30,19 @@ export default function CreateUpdateCategoryFromModal({
   categoryId,
 }: IProps) {
   const queryClient = useQueryClient();
+  const methods = useForm({ resolver: zodResolver(categoryValidation) });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
-  const [isResetForm, setIsResetForm] = useState<boolean>(false);
-  const { data: category, isLoading: isCategoryLoading } =
-    getSingleCategory(categoryId!);
 
-  const defaultValues = useMemo(() => {
-    if (!categoryId) return {};
-    return {
-      name: category?.name || "",
-    };
+  const { data: category, isLoading: isCategoryLoading } = getSingleCategory(
+    categoryId!
+  );
+
+  useEffect(() => {
+    if (categoryId) {
+      methods.reset({ name: category?.name });
+    }
   }, [categoryId, category]);
-  const handleCreateUpdate: SubmitHandler<FieldValues> = async (
-    data
-  ) => {
+  const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
     const res = categoryId
       ? await updateCategoryReq(categoryId, data)
@@ -59,12 +52,16 @@ export default function CreateUpdateCategoryFromModal({
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       queryClient.invalidateQueries({ queryKey: ["single-category"] });
       toast.success(res?.message);
-      !categoryId && setIsResetForm(true);
+      !categoryId && methods.reset();
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "categoryError") {
         toast.error(res?.errorMessages[0]?.message);
+        return;
       }
-      setValidationErrors(res?.errorMessages);
+
+      res?.errorMessages?.forEach((err: TErrorMessage) => {
+        methods.setError(err.path, { type: "server", message: err.message });
+      });
     }
 
     setIsLoading(false);
@@ -94,13 +91,7 @@ export default function CreateUpdateCategoryFromModal({
             {isCategoryLoading ? (
               <JULoading className="h-[300px]" />
             ) : (
-              <JUForm
-                onSubmit={handleCreateUpdate}
-                validation={categoryValidation}
-                errors={validationErrors}
-                reset={isResetForm}
-                defaultValues={defaultValues}
-              >
+              <JUForm onSubmit={handleCreateUpdate} methods={methods}>
                 <ModalBody>
                   <JUInput
                     name="name"

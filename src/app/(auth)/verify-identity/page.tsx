@@ -3,7 +3,6 @@
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
 import { TimerIcon } from "@/src/components/icons";
-import { useUser } from "@/src/context/user.provider";
 import { useCountdownOTPTimeout } from "@/src/hooks";
 import {
   cencelVerificationProcces,
@@ -12,26 +11,22 @@ import {
   matchedOTPReq,
   sendOTPReq,
 } from "@/src/services/Auth";
-import { getOTPTimeout } from "@/src/utils/getOTPTimeout";
 import { otpValidation } from "@/src/validations/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { Link } from "@nextui-org/link";
-
 import { useRouter } from "next/navigation";
-
 import React, { useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function ConfirmIdentityPage() {
   const router = useRouter();
+  const methods = useForm({ resolver: zodResolver(otpValidation) });
   const [error, setError] = useState<string>();
   const { formattedTime, timeLeft, isLoading, setIsResendSuccess, reset } =
     useCountdownOTPTimeout();
-  // Resend availability
-  console.log(formattedTime, "ss");
-  // Format time in mm:ss format
 
   const handleVerifyIdentity: SubmitHandler<FieldValues> = async (data) => {
     const { token } = await getVerificationTokenToken();
@@ -70,7 +65,7 @@ export default function ConfirmIdentityPage() {
 
   return (
     <div className="shadow-small w-full md:max-w-md rounded-md p-5">
-      <JUForm onSubmit={handleVerifyIdentity} validation={otpValidation}>
+      <JUForm onSubmit={handleVerifyIdentity} methods={methods}>
         <p className="font-bold text-xl">Verify Identity</p>
         <p className="font-semibold text-gray-400">
           Please check your emails for a message with your code. Your code is 6

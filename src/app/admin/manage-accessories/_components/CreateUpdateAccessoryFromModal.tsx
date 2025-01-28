@@ -20,6 +20,7 @@ import {
 
 import { TErrorMessage } from "@/src/types";
 import { accessoryValidation } from "@/src/validations/accessory.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import {
   Modal,
@@ -32,7 +33,7 @@ import {
 import { Skeleton } from "@nextui-org/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface IProps {
@@ -44,27 +45,25 @@ export default function CreateUpdateAccessoryFromModal({
   accessoryId,
 }: IProps) {
   const queryClient = useQueryClient();
-  const [selectCategoryId, setSelectCategoryId] = useState<string | null>(null);
-  const [selectSubCategoryId, setSelectSubCategoryId] = useState<string | null>(
-    null
-  );
+  const methods = useForm({ resolver: zodResolver(accessoryValidation) });
+
+  const selectCategoryId = methods.watch("category");
+  const selectSubCategoryId = methods.watch("subCategory");
+  const selectedIsItReturnable = methods.watch("isItReturnable");
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
-  const [isResetForm, setIsResetForm] = useState<boolean>(false);
   const { data: allActiveCategories, isLoading: isCatLoading } =
     getAllCategories({
       query: [
         { name: "isActive", value: true },
-        { name: "isApproved", value: true },
+        { name: "approvalDetails.isApproved", value: true },
       ],
     });
   const { data: allActiveSubCategories, isLoading: isActiveSubCatLoading } =
     getAllActiveSubCatgoriesByCategory(selectCategoryId!);
-  const { data: singleSubCategory,isLoading:isSingleCategoryLoading } = getSingleSubCategory(
-    selectSubCategoryId!
-  );
+  const { data: singleSubCategory, isLoading: isSingleCategoryLoading } =
+    getSingleSubCategory(selectSubCategoryId!);
 
   const activeCategoriesOptions = useMemo(() => {
     return allActiveCategories?.data?.map((category) => ({
@@ -79,47 +78,40 @@ export default function CreateUpdateAccessoryFromModal({
     }));
   }, [allActiveSubCategories]);
   const generateCodeTitle = useMemo(() => {
-      if (!selectSubCategoryId) return "";
+    if (!selectSubCategoryId || selectedIsItReturnable == "false") return "";
     const code = singleSubCategory?.name?.substring(0, 4).toUpperCase();
-    return singleSubCategory?`CSE-${code}-`:"Loading..." 
-  }, [selectSubCategoryId,isSingleCategoryLoading]);
+    return singleSubCategory ? `CSE-${code}-` : "Loading...";
+  }, [selectSubCategoryId, isSingleCategoryLoading, selectedIsItReturnable]);
 
   const { data: accessory, isLoading: isAccessoryLoading } = getSingleAccessory(
     accessoryId!
   );
 
-  const defaultValues = useMemo(() => {
-    if (!accessoryId) return {};
-
-    return {
-      name: accessory?.name || "",
-      category: accessory?.category,
-      subCategory: accessory?.subCategory,
-
-      codeTitle: accessory?.codeTitle.split("-")[2],
-      isItReturnable: accessory?.isItReturnable,
-      describtion: accessory?.description,
-    };
-  }, [accessory]);
   useEffect(() => {
     if (!useDisclosure.isOpen) {
-      setSelectCategoryId(null);
-      setSelectSubCategoryId(null);
+      methods.reset();
     }
-  }, [!useDisclosure.isOpen]);
-  const handleSelectCategory = (value: string) => {
-    if (!value) {
-      setSelectSubCategoryId(null);
+    if (selectedIsItReturnable == "false") {
+      methods.clearErrors("codeTitle");
     }
-    
-    setSelectCategoryId(value);
-  };
-  const handleSelectSubCategory = (value: string) => {
-    setSelectSubCategoryId(value);
-  };
+  }, [!useDisclosure.isOpen, selectedIsItReturnable]);
+
+  useEffect(() => {
+    if (accessory) {
+      methods.reset({
+        name: accessory.name,
+        category: accessory.category,
+        subCategory: accessory.subCategory,
+        codeTitle: accessory.codeTitle.split("-")[2],
+        isItReturnable: accessory.isItReturnable,
+        description: accessory.description,
+      });
+      setPreviewUrls([accessory.image!])
+    }
+  }, [accessory]);
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-
+    console.log(data, "data");
     const formData = new FormData();
     data?.image && formData.append("file", data?.image);
     delete data["image"];
@@ -131,18 +123,22 @@ export default function CreateUpdateAccessoryFromModal({
     const res = accessoryId
       ? await updateAccessoryReq(updateData)
       : await createAccessoryReq(formData);
-   
+    console.log(res, "res");
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
       queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
       toast.success(res?.message);
-      !accessoryId && setIsResetForm(true);
+      !accessoryId && (methods.reset(), setPreviewUrls([]));
       accessoryId && useDisclosure.onClose();
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "accessoryError") {
         toast.error(res?.errorMessages[0]?.message);
+        return;
       }
-      setValidationErrors(res?.errorMessages);
+
+      res?.errorMessages?.forEach((err: TErrorMessage) => {
+        methods.setError(err.path, { type: "server", message: err.message });
+      });
     }
 
     setIsLoading(false);
@@ -174,17 +170,7 @@ export default function CreateUpdateAccessoryFromModal({
             {accessoryId && (isAccessoryLoading || isActiveSubCatLoading) ? (
               <JULoading className="h-[300px]" />
             ) : (
-              <JUForm
-                onSubmit={handleCreateUpdate}
-                validation={accessoryValidation}
-                errors={validationErrors}
-                defaultValues={
-                  defaultValues
-                    ? defaultValues
-                    : { codeTitle: generateCodeTitle }
-                }
-                reset={isResetForm}
-              >
+              <JUForm methods={methods} onSubmit={handleCreateUpdate}>
                 <ModalBody>
                   <div className="flex flex-col md:flex-row gap-5">
                     <JUSelect
@@ -199,7 +185,7 @@ export default function CreateUpdateAccessoryFromModal({
                         isDisabled: accessoryId ? false : isCatLoading,
                         className: "w-full md:w-[33%]",
                       }}
-                      onChange={handleSelectCategory}
+                    
                     />
                     <JUSelect
                       name="subCategory"
@@ -212,7 +198,7 @@ export default function CreateUpdateAccessoryFromModal({
 
                         className: "w-full md:w-[33%]",
                       }}
-                      onChange={handleSelectSubCategory}
+                     
                     />
                     <JUSelect
                       name="isItReturnable"
@@ -241,16 +227,16 @@ export default function CreateUpdateAccessoryFromModal({
                           label: "Code Title",
                           type: "text",
                           className: "w-full md:w-[33%] ",
-                          isDisabled:accessory?false:!generateCodeTitle,
+                          isDisabled: selectedIsItReturnable == "false",
                           classNames: { input: "uppercase p-0 mb-[2px] " },
                           startContent: (
                             <div className="pointer-events-none w-36 ">
                               {accessory
-                                  ? accessory?.codeTitle
-                                      ?.split("-")
-                                      .slice(0, 2)
-                                      .join("-") + '-':generateCodeTitle
-                                }
+                                ? accessory?.codeTitle
+                                    ?.split("-")
+                                    .slice(0, 2)
+                                    .join("-") + "-"
+                                : generateCodeTitle}
                             </div>
                           ),
                         }}

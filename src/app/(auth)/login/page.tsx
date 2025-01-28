@@ -6,17 +6,19 @@ import { LoginIcon } from "@/src/components/icons";
 import { loginReq } from "@/src/services/Auth";
 import { TErrorMessage } from "@/src/types";
 import { loginValidation } from "@/src/validations/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { Link } from "@nextui-org/link";
 import Image from "next/image";
 import { useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function LoginPage() {
+  const methods = useForm({ resolver: zodResolver(loginValidation) });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
+
   const [authError, setAuthError] = useState<string>("");
   const handleLogin: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
@@ -28,11 +30,13 @@ export default function LoginPage() {
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "authError") {
         setAuthError(res?.errorMessages[0]?.message);
-        
-    setIsLoading(false);
+
+        setIsLoading(false);
         return;
       }
-      setValidationErrors(res?.errorMessages);
+      res?.errorMessages?.forEach((err: TErrorMessage) => {
+        methods.setError(err.path, { type: "server", message: err.message });
+      });
     }
 
     setIsLoading(false);
@@ -63,28 +67,31 @@ export default function LoginPage() {
       <div className="border border-dashed border-secondary-200 hidden md:block"></div>
       <div className="w-full md:w-1/2">
         <div className=" ps-0 md:ps-3">
-         <div className="mb-3">
-         <h1 className="text-2xl font-semibold  text-center md:text-start">
-            Login{" "}
-          </h1>
-          {authError && <Chip onClose={() => setAuthError('')} variant="flat" color="danger" className="mt-1" classNames={{closeButton:"ms-4"}}>
-        {authError}
-      </Chip>}
-         </div>
-          <JUForm
-            onSubmit={handleLogin}
-            validation={loginValidation}
-            errors={validationErrors}
-          >
+          <div className="mb-3">
+            <h1 className="text-2xl font-semibold  text-center md:text-start">
+              Login{" "}
+            </h1>
+            {authError && (
+              <Chip
+                onClose={() => setAuthError("")}
+                variant="flat"
+                color="danger"
+                className="mt-1"
+                classNames={{ closeButton: "ms-4" }}
+              >
+                {authError}
+              </Chip>
+            )}
+          </div>
+          <JUForm onSubmit={handleLogin} methods={methods}>
             <div className="space-y-2">
               <JUInput
                 name="userId"
-               
                 inputProps={{
                   type: "text",
                   variant: "bordered",
                   label: "User ID",
-                  classNames:{input:"uppercase"}
+                  classNames: { input: "uppercase" },
                 }}
               />
 
@@ -93,7 +100,6 @@ export default function LoginPage() {
                 inputProps={{
                   variant: "bordered",
                   label: "Password",
-                  
                 }}
               />
               <Button
@@ -112,7 +118,12 @@ export default function LoginPage() {
             </div>
           </JUForm>
 
-          <Link href="/find-account" underline="always" showAnchorIcon className="ms-2 mt-2" >
+          <Link
+            href="/find-account"
+            underline="always"
+            showAnchorIcon
+            className="ms-2 mt-2"
+          >
             Forget Password
           </Link>
         </div>

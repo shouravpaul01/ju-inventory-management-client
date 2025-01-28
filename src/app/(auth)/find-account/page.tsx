@@ -8,16 +8,18 @@ import { getSingleUserReq } from "@/src/services/User";
 // import { getSingleUserByEmailReq } from "@/src/services/UserService";
 import { TUser } from "@/src/types";
 import { findAccountValidation } from "@/src/validations/auth.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import { User } from "@nextui-org/user";
 import {  useRouter } from "next/navigation";
 import { useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 
 export default function FindAccountPage() {
   const router = useRouter();
+  const methods = useForm({ resolver: zodResolver(findAccountValidation) });
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>();
   const [user, setUser] = useState<Partial<TUser> | null>();
@@ -61,7 +63,7 @@ export default function FindAccountPage() {
           {error}
         </Chip>
       )}
-      <JUForm onSubmit={handleFindAccount} validation={findAccountValidation}>
+      <JUForm onSubmit={handleFindAccount} methods={methods}>
         <JUInput
           name="userIdorEmail"
           inputProps={{

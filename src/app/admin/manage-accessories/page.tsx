@@ -3,7 +3,6 @@ import {
   AddIcon,
   DeleteIcon,
   EditIcon,
-  GroupUserIcon,
   ImageIcon,
   InfoIcon,
   MoreIcon,
@@ -33,8 +32,7 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import { TQuery } from "@/src/types";
 import { User } from "@nextui-org/user";
-
-import { updateAccessoryActiveStatus, updateAccessoryApprovedStatus, updateStockQuantity } from "@/src/services/Accessory";
+import { updateAccessoryActiveStatus, updateAccessoryApprovedStatus } from "@/src/services/Accessory";
 import { toast } from "sonner";
 import StockModal from "./_components/StockModal";
 
@@ -65,8 +63,7 @@ export default function ManageAccessories() {
   useEffect(() => {
     if (!modalForm.isOpen) {
       setAccessoryId(null);
-      // queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
-      // queryClient.invalidateQueries({ queryKey: ["allActive-subcategories"] });
+      
     }
   }, [modalForm.isOpen]);
   const handleActiveOrInactive = async (
@@ -87,6 +84,7 @@ export default function ManageAccessories() {
     const res = await updateAccessoryApprovedStatus(accessoryId);
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
+  
       toast.success(res?.message);
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "accessoryError") {
@@ -173,12 +171,12 @@ export default function ManageAccessories() {
                   }}
                   description={
                     <div>
-                      <p>Cat: {item.category.name}</p>
-                      <p>Sub-Cat: {item.subCategory.name}</p>
-                      <p>Code Title: {item.codeTitle}</p>
+                      <p>Cat: {item?.category?.name}</p>
+                      <p>Sub-Cat: {item?.subCategory?.name}</p>
+                      <p>Code Title: {item?.codeTitle}</p>
                     </div>
                   }
-                  name={item?.name}
+                  name={<p className="line-clamp-2">{item?.name}</p>}
                 />
               </TableCell>
               <TableCell>
@@ -187,25 +185,25 @@ export default function ManageAccessories() {
                     <p>
                       Total Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
-                        {item.stock.quantityDetails.totalQuantity}
+                        {item.quantityDetails.totalQuantity}
                       </Chip>
                     </p>
                     <p>
                       Current Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
-                        {item.stock.quantityDetails.currentQuantity}
+                        {item.quantityDetails.currentQuantity}
                       </Chip>
                     </p>
                     <p>
                       Distributed Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
-                        {item.stock.quantityDetails.distributedQuantity}
+                        {item.quantityDetails.distributedQuantity}
                       </Chip>
                     </p>
                     <p>
                       Order Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
-                        {item.stock.quantityDetails.orderQuantity}
+                        {item.quantityDetails.orderQuantity}
                       </Chip>
                     </p>
                   </div>
@@ -222,7 +220,7 @@ export default function ManageAccessories() {
                       color="primary"
                       isDisabled={!item.approvalDetails.isApproved}
                       onPress={() => {
-                        setStockId(item.stock._id!), modalStock.onOpen();
+                        setStockId(item.stock._id!),setAccessoryId(item._id!), modalStock.onOpen();
                       }}
                     >
                       <MoreIcon />
@@ -372,7 +370,7 @@ export default function ManageAccessories() {
         </TableBody>
       </Table>
       <CreateUpdateAccessoryFromModal accessoryId={accessoryId!} useDisclosure={modalForm} />
-      <StockModal modalStocks={modalStock} stockId={stockId!}/>
+      <StockModal modalStocks={modalStock} stockId={stockId!} accessoryId={accessoryId!}/>
     </div>
   );
 }
