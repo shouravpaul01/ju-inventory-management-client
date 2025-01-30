@@ -31,3 +31,11 @@ export const limitOptions = [
   { value: 10, label: "10 "},
   { value: 20, label: "20" }
 ];
+export const orderEventOptions = [
+  { value: "", label: "All" },
+  { value: "pending", label: "Pending" },
+  { value: "approved", label: "Approved" },
+  { value: "delivered", label: "Delivered" },
+  { value: "received", label: "Received" },
+  { value: "cancelled", label: "Cancelled" },
+];

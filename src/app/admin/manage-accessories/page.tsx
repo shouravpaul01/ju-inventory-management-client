@@ -32,7 +32,10 @@ import { Tooltip } from "@nextui-org/tooltip";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import { TQuery } from "@/src/types";
 import { User } from "@nextui-org/user";
-import { updateAccessoryActiveStatus, updateAccessoryApprovedStatus } from "@/src/services/Accessory";
+import {
+  updateAccessoryActiveStatus,
+  updateAccessoryApprovedStatus,
+} from "@/src/services/Accessory";
 import { toast } from "sonner";
 import StockModal from "./_components/StockModal";
 
@@ -58,12 +61,11 @@ export default function ManageAccessories() {
   const { data, isLoading } = getAllAccessories({
     query: queryParams,
   });
-  console.log(data,"accessories")
+  console.log(data, "accessories");
   const loadingState = isLoading ? "loading" : "idle";
   useEffect(() => {
     if (!modalForm.isOpen) {
       setAccessoryId(null);
-      
     }
   }, [modalForm.isOpen]);
   const handleActiveOrInactive = async (
@@ -84,7 +86,7 @@ export default function ManageAccessories() {
     const res = await updateAccessoryApprovedStatus(accessoryId);
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
-  
+
       toast.success(res?.message);
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "accessoryError") {
@@ -92,6 +94,7 @@ export default function ManageAccessories() {
       }
     }
   };
+  console.log(stockId, accessoryId, "s");
   return (
     <div>
       <div className="flex border-b pb-2">
@@ -148,7 +151,7 @@ export default function ManageAccessories() {
         }}
       >
         <TableHeader>
-          <TableColumn key="name">NAME</TableColumn>
+          <TableColumn key="name" width={250}>NAME</TableColumn>
           <TableColumn key="quantity">Quantity</TableColumn>
           <TableColumn key="status">Status</TableColumn>
           <TableColumn key="approval">Approval</TableColumn>
@@ -158,7 +161,7 @@ export default function ManageAccessories() {
           items={data?.data ?? []}
           loadingContent={<JULoading className="h-auto" />}
           loadingState={loadingState}
-          emptyContent={<p>Data not found.</p>}
+          emptyContent={<p className="">Data not found.</p>}
         >
           {(item) => (
             <TableRow key={item._id}>
@@ -167,6 +170,8 @@ export default function ManageAccessories() {
                   avatarProps={{
                     radius: "lg",
                     src: item?.image,
+                  
+                  
                     fallback: <ImageIcon />,
                   }}
                   description={
@@ -220,7 +225,9 @@ export default function ManageAccessories() {
                       color="primary"
                       isDisabled={!item.approvalDetails.isApproved}
                       onPress={() => {
-                        setStockId(item.stock._id!),setAccessoryId(item._id!), modalStock.onOpen();
+                        setStockId(item.stock._id!);
+                          setAccessoryId(item._id!);
+                          modalStock.onOpen();
                       }}
                     >
                       <MoreIcon />
@@ -291,7 +298,9 @@ export default function ManageAccessories() {
                 {" "}
                 <div className="flex items-center gap-2">
                   <Chip
-                    color={item?.approvalDetails.isApproved? "success" : "danger"}
+                    color={
+                      item?.approvalDetails.isApproved ? "success" : "danger"
+                    }
                     variant="flat"
                     size="sm"
                   >
@@ -317,7 +326,9 @@ export default function ManageAccessories() {
                           disallowEmptySelection
                           selectionMode="single"
                           selectedKeys={[
-                            item?.approvalDetails.isApproved ? "Approved" : "Pending",
+                            item?.approvalDetails.isApproved
+                              ? "Approved"
+                              : "Pending",
                           ]}
                           color="primary"
                         >
@@ -369,8 +380,15 @@ export default function ManageAccessories() {
           )}
         </TableBody>
       </Table>
-      <CreateUpdateAccessoryFromModal accessoryId={accessoryId!} useDisclosure={modalForm} />
-      <StockModal modalStocks={modalStock} stockId={stockId!} accessoryId={accessoryId!}/>
+      <CreateUpdateAccessoryFromModal
+        accessoryId={accessoryId!}
+        useDisclosure={modalForm}
+      />
+      <StockModal
+        modalStocks={modalStock}
+        stockId={stockId!}
+        accessoryId={accessoryId!}
+      />
     </div>
   );
 }

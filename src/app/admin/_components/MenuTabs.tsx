@@ -81,21 +81,14 @@ export default function MenuTabs() {
           </div>
         }
       />
+      
       <Tab
-        key="Manage Distributed Accessories"
+       key="/admin/manage-orders"
+        href="/admin/manage-orders"
         title={
           <div className="flex items-center space-x-2">
             <CategoryIcon />
-            <span>Manage Distributed Accessories</span>
-          </div>
-        }
-      />
-      <Tab
-        key="Orders"
-        title={
-          <div className="flex items-center space-x-2">
-            <CategoryIcon />
-            <span>Orders</span>
+            <span>Manage Orders</span>
           </div>
         }
       />

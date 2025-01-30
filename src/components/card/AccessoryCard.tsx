@@ -25,7 +25,7 @@ export default function AccessoryCard({ accessory }: Iprops) {
     <Badge
       color="success"
       size="lg"
-      content={accessory?.stock?.quantityDetails?.currentQuantity || 0}
+      content={accessory?.quantityDetails?.currentQuantity || 0}
       classNames={{ badge: "top-1" }}
     >
       <Card shadow="sm">
@@ -51,8 +51,8 @@ export default function AccessoryCard({ accessory }: Iprops) {
               {accessory?.isItReturnable ? "Returnable" : "Non-returnable"}
             </Chip>
           </div>
-          <p className="font-semibold text-gray-800 pt-4 px-3 block">
-            {accessory.name || "No Name Provided"}
+          <p className="font-medium line-clamp-2 text-gray-800 pt-4 px-3 ">
+            {accessory.name}
           </p>
         </CardBody>
         <CardFooter className="text-sm flex justify-between gap-3">
@@ -68,7 +68,7 @@ export default function AccessoryCard({ accessory }: Iprops) {
                 isItReturnable:accessory?.isItReturnable,
                 quantity:1,
                 currentQuantity:
-                  accessory?.stock.quantityDetails.currentQuantity,
+                  accessory?.quantityDetails.currentQuantity,
               })
             }
           >

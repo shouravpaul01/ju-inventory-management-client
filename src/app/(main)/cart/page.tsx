@@ -17,12 +17,13 @@ import {
 } from "@nextui-org/table";
 import { User } from "@nextui-org/user";
 import { useQueryClient } from "@tanstack/react-query";
+import { ifError } from "assert";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
 
 export default function CartPage() {
   const queryClient = useQueryClient();
-  const { cart, updateSelection, removeFromCart } = useCart();
+  const { cart, updateSelection, removeFromCart,removeAllFromCart } = useCart();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const selectedItems = useMemo(
@@ -58,6 +59,9 @@ export default function CartPage() {
     queryClient.setQueryData(["cart"], updatedCart);
   };
   const handleConfirmOrder = async (cartItems: TAccessoryCartItem[]) => {
+    if(cartItems.length<=0){
+      toast.error("Order failed to proceed. Please try again.")
+    }
     setIsLoading(true);
    
     const orderItems = cartItems?.map((item) => ({
@@ -69,14 +73,15 @@ export default function CartPage() {
     console.log(res,"res")
     if (res?.success) {
       toast.success(res?.message);
+      removeAllFromCart()
     } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "categoryError") {
+      if (res?.errorMessages[0]?.path == "orderError") {
         toast.error(res?.errorMessages[0]?.message);
       }
     }
     setIsLoading(false);
   };
-
+console.log(cart)
   return (
     <div className="my-11">
       <Table
@@ -160,29 +165,29 @@ export default function CartPage() {
           )}
         </TableBody>
       </Table>
-      <div className="flex gap-3 justify-end mx-6 my-6">
-        <Button
-          size="sm"
-          color="primary"
-          isLoading={isLoading}
-          isDisabled={selectedItems.length === 0}
-          startContent={
+    {cart.length>0 && <div className="flex gap-3 justify-end mx-6 my-6">
+      <Button
+        size="sm"
+        color="primary"
+        isLoading={isLoading}
+        isDisabled={selectedItems.length === 0}
+        startContent={
+        
+          !isLoading &&   <ArrowRightAltIcon className="fill-white" />
           
-           !isLoading &&   <ArrowRightAltIcon className="fill-white" />
-           
-          }
-          onPress={() => handleConfirmOrder(cart)}
-        >
-          Proceed To Order
-        </Button>
-        <Button
-          size="sm"
-          color="primary"
-          isDisabled={selectedItems.length === 0}
-        >
-          Proceed to Distribution
-        </Button>
-      </div>
+        }
+        onPress={() => handleConfirmOrder(cart)}
+      >
+        Proceed To Order
+      </Button>
+      <Button
+        size="sm"
+        color="primary"
+        isDisabled={selectedItems.length === 0}
+      >
+        Proceed to Distribution
+      </Button>
+    </div>}
     </div>
   );
 }

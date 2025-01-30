@@ -63,6 +63,15 @@ export const useCart = () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
+  const { mutate: removeAllFromCart } = useMutation({
+    mutationFn: () => {
+      return updateCart([]); 
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+  
+    },
+  });
 
-  return { cart,updateCart, addToCart, removeFromCart, updateSelection, refetch };
+  return { cart,updateCart, addToCart, removeFromCart,removeAllFromCart, updateSelection, refetch };
 };
