@@ -150,3 +150,42 @@ export type TAccessoryCartItem = {
   quantity?:number,
   isSelected?:boolean
 };
+
+
+export type TReturnDetails = {
+  orderItem: string;
+  quantity: number;
+  returnedAccessoryCodes: string[];
+  returnedAt: Date;
+  isReturnedOnTime: boolean;
+  returnReceived: string;
+} 
+
+export type TOrderItem = {
+  accessory: string;
+  expectedQuantity: number;
+  providedQuantity: number;
+  providedAccessoryCodes: string[];
+  returnDeadline?: Date;
+  returnedQuantity: number;
+  returnedDetails: TReturnDetails[];
+} 
+
+type TOrderEvent = {
+  event: "pending" | "approved" | "delivered" | "received" | "cancelled";
+  date: Date;
+  user: string;
+  comments?: string;
+} 
+
+export type TOrder = {
+  _id:string;
+  invoiceId: string;
+  orderBy: TUser | string;
+  items: TOrderItem[];
+  orderDate: string;
+  events: TOrderEvent[];
+  comments?: string;
+  createdAt: Date;
+  updatedAt: Date;
+} 
