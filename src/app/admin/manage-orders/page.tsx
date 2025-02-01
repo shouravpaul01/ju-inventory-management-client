@@ -1,5 +1,10 @@
 "use client";
-import { ImageIcon, XmarkIcon } from "@/src/components/icons";
+import {
+  ArrowForwardIcon,
+  ImageIcon,
+  MoreIcon,
+  XmarkIcon,
+} from "@/src/components/icons";
 import { limitOptions, orderEventOptions } from "@/src/constents";
 import { getAllOrders } from "@/src/hooks/order";
 import { TQuery, TUser } from "@/src/types";
@@ -24,6 +29,11 @@ import dayjs from "dayjs";
 import { User } from "@nextui-org/user";
 import UserInfoTooltip from "./_components/UserInfoTooltip";
 import { Badge } from "@nextui-org/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
+import { Listbox, ListboxItem } from "@nextui-org/listbox";
+import { updateEventStatusReq } from "@/src/services/order";
+import { useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
 
 export default function ManageOrdersPage() {
   const searchParams = useSearchParams();
@@ -32,6 +42,7 @@ export default function ManageOrdersPage() {
   const [approvalStatus, setApprovalStatus] = useState("");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState(5);
+   const queryClient = useQueryClient();
   const queryParams = useMemo(() => {
     const params: TQuery[] = [];
     if (searchTerm) {
@@ -43,13 +54,27 @@ export default function ManageOrdersPage() {
     query: queryParams,
   });
   const loadingState = isOrdersLoading ? "loading" : "idle";
+  
   console.log(data, "data");
+  
   const handleFilterClear = () => {
     setPage(1);
     setLimit(5);
     setApprovalStatus("");
     setDateRange(null);
   };
+  const handleEventStatus=async(orderId:string,event:string)=>{
+    const res=await updateEventStatusReq(orderId,event)
+    if (res?.success) {
+      queryClient.invalidateQueries({ queryKey: ["orders"] });
+
+      toast.success(res?.message);
+    } else if (!res?.success && res?.errorMessages?.length > 0) {
+      if (res?.errorMessages[0]?.path == "orderError") {
+        toast.error(res?.errorMessages[0]?.message);
+      }
+    }
+  }
   return (
     <div>
       <div className="flex border-b pb-2">
@@ -125,7 +150,7 @@ export default function ManageOrdersPage() {
             Order ID
           </TableColumn>
           <TableColumn key="quantity">Order Items</TableColumn>
-          <TableColumn key="status">Status</TableColumn>
+          <TableColumn key="status" width={240}>Status</TableColumn>
           <TableColumn key="approval">Approval</TableColumn>
           <TableColumn key="action">Action</TableColumn>
         </TableHeader>
@@ -162,7 +187,11 @@ export default function ManageOrdersPage() {
                     </div>
                   }
                   name={
-                    <Tooltip content={<UserInfoTooltip user={item.orderBy as TUser}/>} showArrow={true} classNames={{content:"py-2"}}>
+                    <Tooltip
+                      content={<UserInfoTooltip user={item.orderBy as TUser} />}
+                      showArrow={true}
+                      classNames={{ content: "py-2" }}
+                    >
                       <div className="flex items-center gap-1">
                         <span> Name:</span>
                         <p className="font-bold">
@@ -174,15 +203,59 @@ export default function ManageOrdersPage() {
                 />
               </TableCell>
               <TableCell>
-              <Badge color="danger" content={item.items?.length || 0} shape="circle" size="md">
-              <Tooltip content="Set Deadline" showArrow={true} >
-             
-                <Button color="primary" size="sm" >Items</Button>
-                
-                </Tooltip>
+                <Badge
+                  color="danger"
+                  content={item.items?.length || 0}
+                  shape="circle"
+                  size="md"
+                >
+                  <Tooltip content="Set Deadline" showArrow={true}>
+                    <Button color="primary" size="sm">
+                      Items
+                    </Button>
+                  </Tooltip>
                 </Badge>
               </TableCell>
-              <TableCell>""</TableCell>
+              <TableCell>
+                <div className="flex flex-wrap items-center gap-1">
+                  {orderEventOptions.slice(1).map((event, index) => (
+                    <div key={index} className="flex  gap-1">
+                      <Chip color={item?.events?.map(element=>element.event).includes(event.value as any)?"success":"danger"} size="sm" >
+                        {event.label}
+                      </Chip>
+                   
+                    </div>))}
+                  
+                  <Popover placement="bottom" showArrow={true}>
+                    <PopoverTrigger>
+                      <Button
+                        isIconOnly
+                        size="sm"
+                        variant="light"
+                        color="primary"
+                      >
+                        {" "}
+                        <MoreIcon />
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <Listbox
+                        aria-label="Single selection example"
+                        variant="solid"
+                        disallowEmptySelection
+                        selectionMode="single"
+                        selectedKeys={item?.events?.map((event) => event.event)}
+                        disabledKeys={item?.events?.map((event) => event.event)}
+                        color="primary"
+                      >
+                        <ListboxItem key="approved" onPress={()=>handleEventStatus(item._id,"approved")}>Approved</ListboxItem>
+                        <ListboxItem key="delivered" onPress={()=>handleEventStatus(item._id,"delivered")}>Delivered</ListboxItem>
+                        <ListboxItem key="Cancelled" onPress={()=>handleEventStatus(item._id,"Cancelled")}>Cancelled</ListboxItem>
+                      </Listbox>
+                    </PopoverContent>
+                  </Popover>
+                </div>
+              </TableCell>
               <TableCell>
                 {" "}
                 {/* <div className="flex items-center gap-2">

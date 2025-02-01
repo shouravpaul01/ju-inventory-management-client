@@ -10,10 +10,11 @@ import { FieldValues } from "react-hook-form";
 
 export const loginReq = async (payload: FieldValues) => {
   try {
+    const cookieStore = await cookies()
     const { data } = await axiosInstance.post("/auth/login", payload);
 
     if (data?.success) {
-      cookies().set("accessToken", data?.data?.accessToken);
+   cookieStore.set("accessToken", data?.data?.accessToken);
     }
     return data;
   } catch (error: any) {
@@ -21,7 +22,8 @@ export const loginReq = async (payload: FieldValues) => {
   }
 };
 export const getCurrentuser = async () => {
-  const accessToken = cookies().get("accessToken")?.value;
+  const cookieStore = await cookies()
+  const accessToken = cookieStore.get("accessToken")?.value;
   let decodedResult: Partial<TCurrentUser> = {};
   if (accessToken) {
     const decoded: TCurrentUser = await jwtDecode(accessToken);
@@ -30,7 +32,8 @@ export const getCurrentuser = async () => {
   return decodedResult;
 };
 export const logoutUser = async () => {
-  return cookies().delete("accessToken");
+  const cookieStore = await cookies()
+  return cookieStore.delete("accessToken");
 };
 export const changePasswordReq = async (bodyData: FieldValues) => {
   try {
@@ -46,9 +49,10 @@ export const changePasswordReq = async (bodyData: FieldValues) => {
 };
 export const sendOTPReq = async (email: string) => {
   try {
+    const cookieStore = await cookies()
     const { data } = await axiosInstance.patch(`/auth/send-otp?email=${email}`);
     if (data?.success) {
-      cookies().set("verificationToken", data?.data?.verificationToken);
+      cookieStore.set("verificationToken", data?.data?.verificationToken);
     }
 
     return data;
@@ -57,12 +61,14 @@ export const sendOTPReq = async (email: string) => {
   }
 };
 export const getVerificationTokenToken = async () => {
-  const token = cookies().get("verificationToken")?.value;
+  const cookieStore = await cookies()
+  const token = cookieStore.get("verificationToken")?.value;
 
   return { token };
 };
 export const getVerificationTokenDecodeData = async () => {
-  const verificationToken = cookies().get("verificationToken")?.value;
+  const cookieStore = await cookies()
+  const verificationToken = cookieStore.get("verificationToken")?.value;
   let decodedResult: Partial<TResetDetails> = {};
   if (verificationToken) {
     const decoded: TResetDetails = await jwtDecode(verificationToken);
@@ -73,10 +79,11 @@ export const getVerificationTokenDecodeData = async () => {
 
 export const matchedOTPReq = async (bodyData: FieldValues) => {
   try {
+    const cookieStore = await cookies()
     const { data } = await axiosInstance.post(`/auth/matched-otp`, bodyData);
     if (data?.success) {
-       cookies().delete("verificationToken");
-       cookies().set("resetPasswordToken", data?.data?.resetPasswordToken);
+       cookieStore.delete("verificationToken");
+       cookieStore.set("resetPasswordToken", data?.data?.resetPasswordToken);
     }
 
     return data;
@@ -85,18 +92,20 @@ export const matchedOTPReq = async (bodyData: FieldValues) => {
   }
 };
 export const getResetPasswordToken = async () => {
-  const token = cookies().get("resetPasswordToken")?.value;
+  const cookieStore = await cookies()
+  const token = cookieStore.get("resetPasswordToken")?.value;
 
   return { token };
 };
 export const resetPasswordReq = async (bodyData: FieldValues) => {
   try {
+    const cookieStore = await cookies()
     const { data } = await axiosInstance.patch(
       `/auth/reset-password`,
       bodyData
     );
     if (data?.success) {
-      cookies().delete("resetPasswordToken");
+      cookieStore.delete("resetPasswordToken");
     }
 
     return data;
@@ -115,7 +124,8 @@ export const deleteOTPReq = async (email:string) => {
     return error?.response?.data;
   }
 };
-export const cencelVerificationProcces =  () => {
-   cookies().delete("verificationToken");
+export const cencelVerificationProcces =  async() => {
+  const cookieStore = await cookies()
+   cookieStore.delete("verificationToken");
   redirect("/login");
 };

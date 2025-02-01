@@ -661,7 +661,6 @@ export const ArrowRightAltIcon: React.FC<IconSvgProps> = ({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-     
       viewBox="0 -960 960 960"
       height={size || height}
       width={size || width}
@@ -669,6 +668,25 @@ export const ArrowRightAltIcon: React.FC<IconSvgProps> = ({
       fill="#666666"
     >
       <path d="m560-240-56-58 142-142H160v-80h486L504-662l56-58 240 240-240 240Z" />
+    </svg>
+  );
+};
+export const ArrowForwardIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#666666"
+    >
+      <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
     </svg>
   );
 };

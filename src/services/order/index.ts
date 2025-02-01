@@ -4,16 +4,13 @@ import { TOrder, TQuery } from "@/src/types";
 import { FieldValues } from "react-hook-form";
 
 export const createOrderReq = async (payload: FieldValues) => {
-    console.log(payload,"pay")
+  console.log(payload, "pay");
   try {
-    const res = await axiosInstance.post(
-      "/orders/create-order",
-      payload
-    );
-    console.log(res,"resu")
+    const res = await axiosInstance.post("/orders/create-order", payload);
+    console.log(res, "resu");
     return res.data;
   } catch (error: any) {
-    console.log(error,"error")
+    console.log(error, "error");
     return error?.response?.data;
   }
 };
@@ -34,6 +31,18 @@ export const getAllOrdersReq = async ({
     const res = await axiosInstance.get(`/orders`, { params });
     return res.data;
   } catch (error: any) {
+    return error?.response?.data;
+  }
+};
+export const updateEventStatusReq = async (orderId: string, event: string) => {
+  try {
+    const res = await axiosInstance.patch(
+      `/orders/update-event/${orderId}?event=${event}`
+    );
+
+    return res.data;
+  } catch (error: any) {
+    console.log(error, "error");
     return error?.response?.data;
   }
 };
