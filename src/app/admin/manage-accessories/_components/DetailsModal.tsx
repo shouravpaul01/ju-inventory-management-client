@@ -71,11 +71,11 @@ export default function DetailsModal({ useDisclosure, subCategoryId }: IProps) {
                 {" "}
                 <span className="font-bold me-1">Approval:</span>{" "}
                 <Chip
-                  color={subCategory?.isApproved ? "success" : "danger"}
+                  color={subCategory?.approvalDetails.isApproved ? "success" : "danger"}
                   variant="flat"
                   size="sm"
                 >
-                  {subCategory?.isApproved ? "Approved" : "Pending"}
+                  {subCategory?.approvalDetails.isApproved ? "Approved" : "Pending"}
                 </Chip>
               </p>
             </ModalBody>

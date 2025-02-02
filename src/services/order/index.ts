@@ -1,6 +1,6 @@
 "use server";
 import axiosInstance from "@/src/lib/AxiosInstence";
-import { TOrder, TQuery } from "@/src/types";
+import { TErrorMessage, TOrder, TQuery } from "@/src/types";
 import { FieldValues } from "react-hook-form";
 
 export const createOrderReq = async (payload: FieldValues) => {
@@ -31,6 +31,23 @@ export const getAllOrdersReq = async ({
     const res = await axiosInstance.get(`/orders`, { params });
     return res.data;
   } catch (error: any) {
+    return error?.response?.data;
+  }
+};
+export const getSingleOrderReq = async (orderId: string):Promise<{
+  success: string;
+  message: string;
+  data: TOrder;
+  errorMessages?: TErrorMessage[];
+}>=> {
+  try {
+    const res = await axiosInstance.get(
+      `/orders/single-order/${orderId}`
+    );
+
+    return res.data;
+  } catch (error: any) {
+    console.log(error, "error");
     return error?.response?.data;
   }
 };

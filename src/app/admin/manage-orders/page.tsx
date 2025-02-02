@@ -34,15 +34,19 @@ import { Listbox, ListboxItem } from "@nextui-org/listbox";
 import { updateEventStatusReq } from "@/src/services/order";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
+import { useDisclosure } from "@nextui-org/modal";
+import OrderItems from "./_components/OrderItems";
 
 export default function ManageOrdersPage() {
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("search");
   const [dateRange, setDateRange] = useState<any>();
   const [approvalStatus, setApprovalStatus] = useState("");
+  const [orderId, setOrderId] = useState("");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState(5);
-   const queryClient = useQueryClient();
+  const queryClient = useQueryClient();
+  const modelOrderItems=useDisclosure()
   const queryParams = useMemo(() => {
     const params: TQuery[] = [];
     if (searchTerm) {
@@ -54,17 +58,17 @@ export default function ManageOrdersPage() {
     query: queryParams,
   });
   const loadingState = isOrdersLoading ? "loading" : "idle";
-  
+
   console.log(data, "data");
-  
+
   const handleFilterClear = () => {
     setPage(1);
     setLimit(5);
     setApprovalStatus("");
     setDateRange(null);
   };
-  const handleEventStatus=async(orderId:string,event:string)=>{
-    const res=await updateEventStatusReq(orderId,event)
+  const handleEventStatus = async (orderId: string, event: string) => {
+    const res = await updateEventStatusReq(orderId, event);
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["orders"] });
 
@@ -74,7 +78,7 @@ export default function ManageOrdersPage() {
         toast.error(res?.errorMessages[0]?.message);
       }
     }
-  }
+  };
   return (
     <div>
       <div className="flex border-b pb-2">
@@ -146,11 +150,13 @@ export default function ManageOrdersPage() {
         }}
       >
         <TableHeader>
-          <TableColumn key="name" width={250}>
+          <TableColumn key="name" width={300}>
             Order ID
           </TableColumn>
           <TableColumn key="quantity">Order Items</TableColumn>
-          <TableColumn key="status" width={240}>Status</TableColumn>
+          <TableColumn key="status" width={240}>
+            Status
+          </TableColumn>
           <TableColumn key="approval">Approval</TableColumn>
           <TableColumn key="action">Action</TableColumn>
         </TableHeader>
@@ -179,9 +185,17 @@ export default function ManageOrdersPage() {
                       </div>
 
                       <div className="flex items-center gap-1">
-                        <span>Date:</span>
+                        <span>Order D:</span>
                         <Chip size="md">
                           {dayjs(item.orderDate).format("MMM D, YYYY h:mm A")}
+                        </Chip>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <span>Expected D:</span>
+                        <Chip size="md">
+                          {dayjs(item?.expectedDeliveryDateTime).format(
+                            "MMM D, YYYY h:mm A"
+                          )}
                         </Chip>
                       </div>
                     </div>
@@ -210,7 +224,7 @@ export default function ManageOrdersPage() {
                   size="md"
                 >
                   <Tooltip content="Set Deadline" showArrow={true}>
-                    <Button color="primary" size="sm">
+                    <Button color="primary" size="sm" onPress={()=>{setOrderId(item._id),modelOrderItems.onOpen()}}>
                       Items
                     </Button>
                   </Tooltip>
@@ -220,12 +234,21 @@ export default function ManageOrdersPage() {
                 <div className="flex flex-wrap items-center gap-1">
                   {orderEventOptions.slice(1).map((event, index) => (
                     <div key={index} className="flex  gap-1">
-                      <Chip color={item?.events?.map(element=>element.event).includes(event.value as any)?"success":"danger"} size="sm" >
+                      <Chip
+                        color={
+                          item?.events
+                            ?.map((element) => element.event)
+                            .includes(event.value as any)
+                            ? "success"
+                            : "danger"
+                        }
+                        size="sm"
+                      >
                         {event.label}
                       </Chip>
-                   
-                    </div>))}
-                  
+                    </div>
+                  ))}
+
                   <Popover placement="bottom" showArrow={true}>
                     <PopoverTrigger>
                       <Button
@@ -248,9 +271,30 @@ export default function ManageOrdersPage() {
                         disabledKeys={item?.events?.map((event) => event.event)}
                         color="primary"
                       >
-                        <ListboxItem key="approved" onPress={()=>handleEventStatus(item._id,"approved")}>Approved</ListboxItem>
-                        <ListboxItem key="delivered" onPress={()=>handleEventStatus(item._id,"delivered")}>Delivered</ListboxItem>
-                        <ListboxItem key="Cancelled" onPress={()=>handleEventStatus(item._id,"Cancelled")}>Cancelled</ListboxItem>
+                        <ListboxItem
+                          key="approved"
+                          onPress={() =>
+                            handleEventStatus(item._id, "approved")
+                          }
+                        >
+                          Approved
+                        </ListboxItem>
+                        <ListboxItem
+                          key="delivered"
+                          onPress={() =>
+                            handleEventStatus(item._id, "delivered")
+                          }
+                        >
+                          Delivered
+                        </ListboxItem>
+                        <ListboxItem
+                          key="Cancelled"
+                          onPress={() =>
+                            handleEventStatus(item._id, "Cancelled")
+                          }
+                        >
+                          Cancelled
+                        </ListboxItem>
                       </Listbox>
                     </PopoverContent>
                   </Popover>
@@ -343,6 +387,7 @@ export default function ManageOrdersPage() {
           )}
         </TableBody>
       </Table>
+      <OrderItems orderId={orderId} useDisclosure={modelOrderItems}/>
     </div>
   );
 }

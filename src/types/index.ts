@@ -162,7 +162,7 @@ export type TReturnDetails = {
 } 
 
 export type TOrderItem = {
-  accessory: string;
+  accessory: TAccessory | string;
   expectedQuantity: number;
   providedQuantity: number;
   providedAccessoryCodes: string[];
@@ -181,9 +181,10 @@ type TOrderEvent = {
 export type TOrder = {
   _id:string;
   invoiceId: string;
-  orderBy: TUser | string;
+  orderBy:TUser | string;
   items: TOrderItem[];
-  orderDate: string;
+  orderDate: Date;
+  expectedDeliveryDateTime:Date;
   events: TOrderEvent[];
   comments?: string;
   createdAt: Date;
