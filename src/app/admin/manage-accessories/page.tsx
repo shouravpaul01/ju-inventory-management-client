@@ -38,6 +38,7 @@ import {
 } from "@/src/services/Accessory";
 import { toast } from "sonner";
 import StockModal from "./_components/StockModal";
+import { Avatar } from "@nextui-org/avatar";
 
 export default function ManageAccessories() {
   const searchParams = useSearchParams();
@@ -94,7 +95,7 @@ export default function ManageAccessories() {
       }
     }
   };
-  console.log(stockId, accessoryId, "s");
+  
   return (
     <div>
       <div className="flex border-b pb-2">
@@ -151,7 +152,9 @@ export default function ManageAccessories() {
         }}
       >
         <TableHeader>
-          <TableColumn key="name" width={250}>NAME</TableColumn>
+          <TableColumn key="name" width={300}>
+            NAME
+          </TableColumn>
           <TableColumn key="quantity">Quantity</TableColumn>
           <TableColumn key="status">Status</TableColumn>
           <TableColumn key="approval">Approval</TableColumn>
@@ -161,28 +164,40 @@ export default function ManageAccessories() {
           items={data?.data ?? []}
           loadingContent={<JULoading className="h-auto" />}
           loadingState={loadingState}
-          emptyContent={<p className="">Data not found.</p>}
+          emptyContent={<p>Data not found.</p>}
         >
           {(item) => (
             <TableRow key={item._id}>
               <TableCell>
-                <User
-                  avatarProps={{
-                    radius: "lg",
-                    src: item?.image,
-                  
-                  
-                    fallback: <ImageIcon />,
-                  }}
-                  description={
-                    <div>
-                      <p>Cat: {item?.category?.name}</p>
-                      <p>Sub-Cat: {item?.subCategory?.name}</p>
-                      <p>Code Title: {item?.codeTitle}</p>
+                <div className="flex items-center gap-2">
+                  <div>
+                    <Avatar
+                      radius="md"
+                      fallback={<ImageIcon />}
+                      className=" size-20 text-large"
+                      src={item?.image}
+                    />
+                  </div>
+                  <div className="space-y-[2px]">
+                    <p className="font-bold line-clamp-1">{item.name}</p>
+                    <div className="flex items-center gap-1 text-slate-600">
+                      <span>Cat:</span>
+                      <p className="font-semibold">{item?.category?.name}</p>
                     </div>
-                  }
-                  name={<p className="line-clamp-2">{item?.name}</p>}
-                />
+
+                    <div className="flex items-center gap-1 text-slate-600">
+                      <span>Sub Cat:</span>
+                      <p className="font-semibold">{item?.subCategory?.name}</p>
+                    </div>
+                    {
+                      item?.codeTitle && <div className="flex items-center gap-1 text-slate-600">
+                      <span>Code Title:</span>
+                      <p className="font-semibold">{item?.codeTitle}</p>
+                    </div>
+                    }
+                    <Chip color={item?.isItReturnable?"success":"warning"} size="sm">{item?.isItReturnable?"Returnable":"Non-returnable"}</Chip>
+                  </div>
+                </div>
               </TableCell>
               <TableCell>
                 <div className="flex items-center gap-2">
@@ -226,8 +241,8 @@ export default function ManageAccessories() {
                       isDisabled={!item.approvalDetails.isApproved}
                       onPress={() => {
                         setStockId(item.stock._id!);
-                          setAccessoryId(item._id!);
-                          modalStock.onOpen();
+                        setAccessoryId(item._id!);
+                        modalStock.onOpen();
                       }}
                     >
                       <MoreIcon />

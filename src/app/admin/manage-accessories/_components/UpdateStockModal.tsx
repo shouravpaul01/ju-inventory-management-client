@@ -149,7 +149,7 @@ export default function UpdateStockModal({
                     {previewUrls?.length > 0 && (
                       <PreviewImage previews={previewUrls} />
                     )}
-                    <JUTextEditor name="description" label="Description" />
+                    {/* <JUTextEditor name="description" label="Description" /> */}
                   </ModalBody>
                   <ModalFooter>
                     <Button type="submit" color="primary" isLoading={isLoading}>

@@ -20,7 +20,7 @@ export default function JUNumberInput({ name, inputProps }: IProps) {
 
   
   const currentValue = watch(name) || 0;
-  console.log(currentValue, "cure");
+
   // Handle increment
   const handleIncrement = () => {
     setValue(name, (currentValue || 0) + 1);

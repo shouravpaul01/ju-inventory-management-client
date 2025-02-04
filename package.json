@@ -10,6 +10,7 @@
 	},
 	"dependencies": {
 		"@heroui/checkbox": "^2.3.8",
+		"@heroui/date-input": "^2.3.9",
 		"@heroui/image": "^2.2.6",
 		"@hookform/resolvers": "^3.9.1",
 		"@internationalized/date": "^3.6.0",
@@ -60,6 +61,7 @@
 		"react-dom": "18.3.1",
 		"react-hook-form": "^7.53.2",
 		"react-quill": "^2.0.0",
+		"react-quill-v2": "^2.0.2",
 		"sonner": "^1.7.0",
 		"sweetalert2": "^11.14.5",
 		"zod": "^3.23.8"

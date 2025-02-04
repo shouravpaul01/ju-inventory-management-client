@@ -47,7 +47,22 @@ export const useCart = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-      toast.success("Accessory item successfully deleted from cart.")
+      toast.success("Accessory item successfully deleted from cart.");
+    },
+  });
+  const { mutate: updateOrderQuantity } = useMutation({
+    mutationFn: ({ id, newQuantity }: { id: string; newQuantity: number }) => {
+      const updatedCart = cart.map((item) =>
+        item._id === id ? { ...item, expectedQuantity: newQuantity } : item
+      );
+    
+      return updateCart(updatedCart);
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["cart"] });
+    },
+    onError: (error: any) => {
+      toast.error(error || "Failed to update order quantity.");
     },
   });
   const { mutate: updateSelection } = useMutation({
@@ -57,21 +72,28 @@ export const useCart = () => {
       );
       return updateCart(updatedCart);
     },
-    
+
     onSuccess: () => {
-      
       queryClient.invalidateQueries({ queryKey: ["cart"] });
     },
   });
   const { mutate: removeAllFromCart } = useMutation({
     mutationFn: () => {
-      return updateCart([]); 
+      return updateCart([]);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["cart"] });
-  
     },
   });
 
-  return { cart,updateCart, addToCart, removeFromCart,removeAllFromCart, updateSelection, refetch };
+  return {
+    cart,
+    updateCart,
+    addToCart,
+    removeFromCart,
+    updateOrderQuantity,
+    removeAllFromCart,
+    updateSelection,
+    refetch,
+  };
 };

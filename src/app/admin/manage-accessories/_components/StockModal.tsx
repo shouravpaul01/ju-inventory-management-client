@@ -7,7 +7,6 @@ import {
   XmarkIcon,
 } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
-import { getAllStocks } from "@/src/hooks/Stock";
 import { TCodeDetails, TQuantityDetails, TQuery } from "@/src/types";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
@@ -21,7 +20,6 @@ import {
   UseDisclosureProps,
 } from "@nextui-org/modal";
 import { DateRangePicker } from "@nextui-org/date-picker";
-import { Pagination } from "@nextui-org/pagination";
 import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
 import { Skeleton } from "@nextui-org/skeleton";
 import {
@@ -48,6 +46,7 @@ import { Card, CardBody, CardHeader } from "@nextui-org/card";
 import { Divider } from "@nextui-org/divider";
 import { Spinner } from "@nextui-org/spinner";
 import { getSingleAccessory } from "@/src/hooks/Accessory";
+import { getAllStocks } from "@/src/hooks/Stock";
 
 interface IProps {
   modalStocks: UseDisclosureProps | any;
@@ -80,6 +79,8 @@ export default function StockModal({
   const queryParams = useMemo(() => {
     const params: TQuery[] = [];
     if (stockId) {
+      params.push({ name: "limit", value: limit });
+      params.push({ name: "page", value: page });
       params.push({ name: "_id", value: stockId });
     }
     if (approvalStatus) {
@@ -95,10 +96,7 @@ export default function StockModal({
         value: dayjs(dateRange?.end as any).format("YYYY-MM-DD"),
       });
     }
-    if (page && limit) {
-      params.push({ name: "limit", value: limit });
-      params.push({ name: "page", value: page });
-    }
+   
     return params;
   }, [page, limit, stockId, approvalStatus, dateRange]);
 
@@ -125,7 +123,7 @@ export default function StockModal({
     setApprovalStatus("");
     setDateRange(null);
   };
-
+console.log(data,"stocklll",queryParams)
   return (
     <>
       <Modal
@@ -452,8 +450,8 @@ export default function StockModal({
                   >
                     <TableHeader>
                       <TableColumn key="name">Stock Date</TableColumn>
-                      <TableColumn key="approval">Quantity</TableColumn>
-                      <TableColumn key="approval">Codes</TableColumn>
+                      <TableColumn key="quantity">Quantity</TableColumn>
+                      <TableColumn key="codes">Codes</TableColumn>
                       <TableColumn key="approval">Approval</TableColumn>
                       <TableColumn key="action">Action</TableColumn>
                     </TableHeader>
@@ -461,7 +459,7 @@ export default function StockModal({
                       items={data?.details ?? []}
                       loadingContent={<JULoading className="h-auto" />}
                       loadingState={loadingState}
-                      emptyContent={<p>Data not found.</p>}
+                      emptyContent={<p className="w-full">Data not found.</p>}
                     >
                       {(item) => (
                         <TableRow key={item._id}>

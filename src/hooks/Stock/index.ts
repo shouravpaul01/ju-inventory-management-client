@@ -7,8 +7,9 @@ export const getAllStocks = ({ query }: { query: TQuery[] }) => {
       queryKey: ["stocks", query],
       queryFn: async () => {
         const res = await getAllStocksReq({ query });
-        return res?.data;
+        return res?.data ;
       },
+      enabled:!!(query.length>0)
     });
   };
   export const getSingleStock = (stockId: string,stockDetailsId: string) => {

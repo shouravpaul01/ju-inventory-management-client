@@ -23,7 +23,7 @@ import { toast } from "sonner";
 
 export default function CartPage() {
   const queryClient = useQueryClient();
-  const { cart, updateSelection, removeFromCart,removeAllFromCart } = useCart();
+  const { cart, updateSelection,updateOrderQuantity, removeFromCart,removeAllFromCart } = useCart();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const selectedItems = useMemo(
@@ -48,15 +48,7 @@ export default function CartPage() {
     queryClient.setQueryData(["cart"], updatedCart);
   };
   const handleQuantityChange = (id: string, newQuantity: number) => {
-    const updatedItem = cart.find((item) => item._id === id);
-
-    if (!updatedItem) return;
-
-    const updatedCart = cart.map((item) =>
-      item._id === id ? { ...item, quantity: newQuantity } : item
-    );
-
-    queryClient.setQueryData(["cart"], updatedCart);
+    updateOrderQuantity({id,newQuantity})
   };
   const handleConfirmOrder = async (cartItems: TAccessoryCartItem[]) => {
     if(cartItems.length<=0){
@@ -66,7 +58,7 @@ export default function CartPage() {
    
     const orderItems = cartItems?.map((item) => ({
       accessory: item._id,
-      quantity: item.quantity,
+      expectedQuantity: item.expectedQuantity,
     }));
     console.log(cartItems,orderItems, "cartIt");
     const res = await createOrderReq(orderItems);
@@ -142,7 +134,7 @@ console.log(cart)
               <TableCell>
                 <div>
                   <PlusMinusNumberInput
-                    quantity={item.quantity!}
+                    quantity={item.expectedQuantity!}
                     onChange={(newQuantity) =>
                       handleQuantityChange(item._id, newQuantity)
                     }

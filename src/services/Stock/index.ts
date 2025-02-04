@@ -27,7 +27,7 @@ export const getAllStocksReq = async ({
     try {
       const res = await axiosInstance.get(`/stocks`, { params });
       console.log(res,"req")
-      return res.data;
+      return res.data || [];
     } catch (error: any) {
       return error?.response?.data;
     }

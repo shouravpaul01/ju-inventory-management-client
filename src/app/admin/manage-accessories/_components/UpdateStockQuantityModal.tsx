@@ -2,6 +2,7 @@ import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
 import { updateStockQuantity } from "@/src/services/Accessory";
 import { updateStockQuantityValidation } from "@/src/validations/accessory.validation";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import {
   Modal,
@@ -12,8 +13,8 @@ import {
   UseDisclosureProps,
 } from "@nextui-org/modal";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import React, { useEffect, useState } from "react";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface IProps {
@@ -25,23 +26,32 @@ export default function UpdateStockQuantityModal({
   accessoryId,
 }: IProps) {
   const queryClient = useQueryClient();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const methods = useForm({
+    resolver: zodResolver(updateStockQuantityValidation),
+  });
+  useEffect(() => {
+    if (accessoryId) {
+      methods.reset({ _id: accessoryId });
+    }
+  }, [accessoryId]);
+  const [isSubmitLoading, setIsSubmitLoading] = useState<boolean>(false);
+
   const handleUpdateStockQuantity: SubmitHandler<FieldValues> = async (
     data
   ) => {
-    setIsLoading(true);
+    setIsSubmitLoading(true);
     const res = await updateStockQuantity(data);
-   
+
     if (res?.success) {
       queryClient.invalidateQueries({ queryKey: ["accessories"] });
       toast.success(res?.message);
-      useDisclosure.onClose()
+      useDisclosure.onClose();
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "accessoryError") {
         toast.error(res?.errorMessages[0]?.message);
       }
     }
-    setIsLoading(false);
+    setIsSubmitLoading(false);
   };
   return (
     <Modal
@@ -58,31 +68,28 @@ export default function UpdateStockQuantityModal({
             <ModalHeader className="flex flex-col gap-1">
               Update Stock
             </ModalHeader>
-            <JUForm
-              onSubmit={handleUpdateStockQuantity}
-              validation={updateStockQuantityValidation}
-              defaultValues={{ _id: accessoryId }}
-            >  <ModalBody>
-              <JUInput
-                name="_id"
-                inputProps={{
-                  type: "text",
-                  className: "w-full hidden",
-                }}
-              />
-              <JUInput
-                name="quantity"
-                inputProps={{
-                  label: "Quantity",
-                  type: "number",
-                  className: "w-full ",
-                }}
-                registerOptions={{ valueAsNumber: true }}
-              />
-
-            </ModalBody>
+            <JUForm methods={methods} onSubmit={handleUpdateStockQuantity}>
+              {" "}
+              <ModalBody>
+                <JUInput
+                  name="_id"
+                  inputProps={{
+                    type: "text",
+                    className: "w-full hidden",
+                  }}
+                />
+                <JUInput
+                  name="quantity"
+                  inputProps={{
+                    label: "Quantity",
+                    type: "number",
+                    className: "w-full ",
+                  }}
+                  registerOptions={{ valueAsNumber: true }}
+                />
+              </ModalBody>
               <ModalFooter>
-                <Button type="submit" color="primary" isLoading={isLoading}>
+                <Button type="submit" color="primary" isLoading={isSubmitLoading}>
                   Stock Update
                 </Button>
               </ModalFooter>

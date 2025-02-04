@@ -147,7 +147,7 @@ export type TAccessoryCartItem = {
   image: string | undefined;
   isItReturnable:boolean;
   currentQuantity: number;
-  quantity?:number,
+  expectedQuantity?:number,
   isSelected?:boolean
 };
 
@@ -170,9 +170,9 @@ export type TOrderItem = {
   returnedQuantity: number;
   returnedDetails: TReturnDetails[];
 } 
-
-type TOrderEvent = {
-  event: "pending" | "approved" | "delivered" | "received" | "cancelled";
+export type TEvents="pending" | "approved" | "delivered" | "received" | "cancelled";
+export type TOrderEvent = {
+  event: TEvents,
   date: Date;
   user: string;
   comments?: string;

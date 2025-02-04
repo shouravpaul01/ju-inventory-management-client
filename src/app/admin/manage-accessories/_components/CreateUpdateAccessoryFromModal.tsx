@@ -1,3 +1,4 @@
+"use client"
 import JUFileInput from "@/src/components/form/JUFileInput";
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
@@ -10,7 +11,6 @@ import { getSingleAccessory } from "@/src/hooks/Accessory";
 import { getAllCategories } from "@/src/hooks/Category";
 import {
   getAllActiveSubCatgoriesByCategory,
-  getAllSubCategories,
   getSingleSubCategory,
 } from "@/src/hooks/Sub Category";
 import {
@@ -230,14 +230,14 @@ export default function CreateUpdateAccessoryFromModal({
                           isDisabled: selectedIsItReturnable == "false",
                           classNames: { input: "uppercase p-0 mb-[2px] " },
                           startContent: (
-                            <div className="pointer-events-none w-36 ">
+                            <span className="pointer-events-none w-36 ">
                               {accessory
                                 ? accessory?.codeTitle
                                     ?.split("-")
                                     .slice(0, 2)
                                     .join("-") + "-"
                                 : generateCodeTitle}
-                            </div>
+                            </span>
                           ),
                         }}
                       />
@@ -254,7 +254,7 @@ export default function CreateUpdateAccessoryFromModal({
                   {previewUrls?.length > 0 && (
                     <PreviewImage previews={previewUrls} />
                   )}
-                  <JUTextEditor name="description" label="Description" />
+                  {/* <JUTextEditor name="description" label="Description" /> */}
                 </ModalBody>
                 <ModalFooter>
                   <Button type="submit" color="primary" isLoading={isLoading}>

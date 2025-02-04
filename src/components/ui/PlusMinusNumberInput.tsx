@@ -1,7 +1,9 @@
 "use client";
 import { Button } from "@nextui-org/button";
-import { AddIcon, MinusIcon, PlusIcon } from "../icons";
+import { MinusIcon, PlusIcon } from "../icons";
 import { toast } from "sonner";
+import React, { useState } from "react";
+import { Input } from "@nextui-org/input";
 
 type QuantityInputProps = {
   quantity: number;
@@ -16,24 +18,62 @@ export default function PlusMinusNumberInput({
   min = 1,
   max = Infinity,
 }: QuantityInputProps) {
-    const handleDecrement = () => {
-        if (quantity > min) {
-          onChange(quantity - 1);
-        } else {
-          toast.info("You have reached the minimum quantity.");
-        }
-      };
-    
-      const handleIncrement = () => {
-        if (quantity < max) {
-          onChange(quantity + 1);
-        } else {
-          toast.info("You have reached the maximum quantity.");
-        }
-      };
+  const [error, setError] = useState("");
+
+  const handleDecrement = () => {
+    if (quantity > min) {
+      onChange(quantity - 1);
+    } else {
+      toast.info(`The minimum quantity is ${min}.`);
+    }
+  };
+
+  const handleIncrement = () => {
+    if (quantity < max) {
+      onChange(quantity + 1);
+    } else {
+      toast.info(`The maximum quantity is ${max}.`);
+    }
+  };
+
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value.replace(/[^0-9]/g, ""); // Allow only numbers
+    const newQuantity = Number(inputValue);
+
+    setError("");
+
+    if (inputValue === "") {
+      setError("Please enter a valid number.");
+      return;
+    }
+
+    if (newQuantity < min) {
+      setError(`Minimum order quantity is ${min}.`);
+      return;
+    }
+
+    if (newQuantity > max) {
+      setError(`Maximum order quantity is ${max}.`);
+      return;
+    }
+
+    onChange(newQuantity);
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "ArrowUp") {
+      handleIncrement();
+    } else if (event.key === "ArrowDown") {
+      handleDecrement();
+    }
+  };
 
   return (
-    <div className="w-28 flex gap-2 p-1 items-center justify-center  border border-gray-200 rounded-md">
+    <div
+      className="w-32 flex  items-center justify-center gap-1 p-1  border border-gray-200 rounded-md"
+      onKeyDown={handleKeyDown}
+      
+    >
       <Button
         size="sm"
         isIconOnly
@@ -43,9 +83,18 @@ export default function PlusMinusNumberInput({
         isDisabled={quantity <= min}
         onPress={handleDecrement}
       >
-        <MinusIcon className="size-5"/>
+        <MinusIcon className="size-5" />
       </Button>
-      <span>{quantity}</span>
+      <Input
+         variant="bordered"
+        size="sm"
+        className="12"
+        type="text"
+        defaultValue={quantity?.toString()}
+        onChange={handleInputChange}
+        errorMessage={error}
+        isInvalid={!!error}
+      />
       <Button
         size="sm"
         isIconOnly
@@ -55,7 +104,7 @@ export default function PlusMinusNumberInput({
         isDisabled={quantity >= max}
         onPress={handleIncrement}
       >
-        <PlusIcon className="size-5"/>
+        <PlusIcon className="size-5" />
       </Button>
     </div>
   );
