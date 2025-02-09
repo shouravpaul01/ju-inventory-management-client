@@ -63,3 +63,15 @@ export const updateEventStatusReq = async (orderId: string, event: string) => {
     return error?.response?.data;
   }
 };
+export const updateOrderItemsReq = async (orderId: string, payload: FieldValues) => {
+  try {
+    const res = await axiosInstance.patch(
+      `/orders/update-order-items/${orderId}`,payload
+    );
+
+    return res.data;
+  } catch (error: any) {
+    console.log(error, "error");
+    return error?.response?.data;
+  }
+};

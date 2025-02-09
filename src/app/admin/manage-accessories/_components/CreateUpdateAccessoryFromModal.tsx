@@ -111,7 +111,7 @@ export default function CreateUpdateAccessoryFromModal({
   }, [accessory]);
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
-    console.log(data, "data");
+  
     const formData = new FormData();
     data?.image && formData.append("file", data?.image);
     delete data["image"];
@@ -133,7 +133,6 @@ export default function CreateUpdateAccessoryFromModal({
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "accessoryError") {
         toast.error(res?.errorMessages[0]?.message);
-        return;
       }
 
       res?.errorMessages?.forEach((err: TErrorMessage) => {

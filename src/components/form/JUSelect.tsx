@@ -8,9 +8,14 @@ interface IProps {
   name: string;
   selectProps?: SelectProps | {};
   options: TSelectOption[];
-  onChange?:(value: string) => void;
+  onChange?: (value: string) => void;
 }
-export default function JUSelect({ name, selectProps, options,onChange }: IProps) {
+export default function JUSelect({
+  name,
+  selectProps,
+  options,
+  onChange,
+}: IProps) {
   const {
     register,
     setValue,
@@ -19,15 +24,20 @@ export default function JUSelect({ name, selectProps, options,onChange }: IProps
     formState: { errors },
   } = useFormContext();
   const handleChange = (selectedValue: any) => {
-
-     setValue(name,selectedValue.target?.value)
-    onChange?.(selectedValue.target?.value); 
-    clearErrors(name)
-     
+   
+    setValue(name, selectedValue);
+    onChange?.(selectedValue);
+    clearErrors(name);
   };
   return (
-    <Select variant="bordered" {...register(name)} {...selectProps} isInvalid={!!errors[name]}
-    errorMessage={errors[name]?.message as string} onChange={handleChange}>
+    <Select
+      variant="bordered"
+      {...register(name)}
+      {...selectProps}
+      isInvalid={!!errors[name]}
+      errorMessage={errors[name]?.message as string}
+      onChange={(e) => handleChange(e.target.value)} 
+    >
       {options?.map((option) => (
         <SelectItem key={option.value}>{option.label}</SelectItem>
       ))}

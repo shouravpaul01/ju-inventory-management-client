@@ -166,6 +166,7 @@ export type TOrderItem = {
   expectedQuantity: number;
   providedQuantity: number;
   providedAccessoryCodes: string[];
+  isProvided:boolean,
   returnDeadline?: Date;
   returnedQuantity: number;
   returnedDetails: TReturnDetails[];
