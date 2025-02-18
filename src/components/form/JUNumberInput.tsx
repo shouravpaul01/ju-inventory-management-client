@@ -8,9 +8,10 @@ import { MinusIcon, PlusIcon } from "../icons";
 interface IProps {
   name: string;
   inputProps?: InputProps;
+  className?:string
 }
 
-export default function JUNumberInput({ name, inputProps }: IProps) {
+export default function JUNumberInput({ name, inputProps ,className}: IProps) {
   const {
     register,
     setValue,
@@ -38,7 +39,7 @@ export default function JUNumberInput({ name, inputProps }: IProps) {
 
   return (
     <>
-      <div className="w-32 flex  items-center justify-center gap-1 p-1  border border-gray-200 rounded-md">
+      <div className={`w-32 flex  items-center justify-center gap-1 p-1  border border-gray-200 rounded-md ${className}`}>
         {/* Decrement Button */}
         <Button
           isIconOnly

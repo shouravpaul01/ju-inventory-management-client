@@ -1,10 +1,11 @@
+"use client";
 import JUCheckbox from "@/src/components/form/JUCheckbox";
 import JUDatePicker from "@/src/components/form/JUDatePicker";
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
 import JUNumberInput from "@/src/components/form/JUNumberInput";
 import JUSelect from "@/src/components/form/JUSelect";
-import { ImageIcon, InfoIcon } from "@/src/components/icons";
+import { EditIcon, ImageIcon, InfoIcon, MoreHorzIcon, MoreIcon } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
 import { getSingleOrder } from "@/src/hooks/order";
 import { updateOrderItemsReq } from "@/src/services/order";
@@ -33,8 +34,11 @@ import {
   TableHeader,
   TableRow,
 } from "@nextui-org/table";
+import { code, divider } from "@nextui-org/theme";
+import { Tooltip } from "@nextui-org/tooltip";
 import { User } from "@nextui-org/user";
 import { useQueryClient } from "@tanstack/react-query";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -47,13 +51,17 @@ export default function OrderItems({
   orderId: string;
 }) {
   const queryClient = useQueryClient();
-  const [isSubmitLoading, setSubmitLoading] = useState(false);
+  const [isSubmitLoading, setSubmitLoading] = useState<any>(null);
+  const [eidtItem, setEditItem] = useState<string | null>(null);
   const methods = useForm({
     resolver: zodResolver(orderedItemSchemaValidation),
   });
   const { data: order, isLoading: isOrderLoading } = getSingleOrder(orderId);
 
-  const { errors } = methods.formState;
+  const {
+    watch,
+    formState: { errors },
+  } = methods;
   useEffect(() => {
     if (order) {
       const defaultValues = order.items.map((item) => ({
@@ -62,42 +70,52 @@ export default function OrderItems({
         expectedQuantity: item.expectedQuantity,
         currentQuantity: (item.accessory as TAccessory)?.quantityDetails
           ?.currentQuantity,
-        providedQuantity: item.expectedQuantity,
+        providedQuantity: item.providedQuantity || item.expectedQuantity,
         isProvided: item.isProvided,
       }));
       methods.reset({ items: defaultValues });
     }
     if (!useDisclosure.isOpen) {
       methods.reset();
+      setEditItem(null);
     }
-  }, [order]);
-
-  const handleRowSubmit = async (index: number) => {
-    setSubmitLoading(true);
+  }, [order, useDisclosure]);
+  console.log(order, "ho");
+  const handleSubmit = async (index: number, itemId: string) => {
+    setSubmitLoading({ _id: itemId });
 
     // Validate only the current row's fields
     const isValid = await methods.trigger(`items.${index}`);
 
     if (isValid) {
       const rowData = methods.getValues(`items.${index}`);
-      console.log(rowData,"p")
-      // const res = await updateOrderItemsReq(order?._id!, [rowData]);
+      console.log(rowData, "before");
+      if (rowData?.providedAccessoryCodes && rowData?.returnDeadline) {
+        rowData.providedAccessoryCodes = rowData.providedAccessoryCodes
+          ?.split(",")
+          .map((code: any) => code.trim());
+        rowData.returnDeadline = dayjs(rowData.returnDeadline).format(
+          "MMM D, YYYY"
+        );
+      }
+      console.log(rowData, "after");
+      const res = await updateOrderItemsReq(order?._id!, itemId, rowData);
+      console.log(res, "res");
+      if (res?.success) {
+        queryClient.invalidateQueries({ queryKey: ["single-order"] });
+        toast.success(res?.message);
+      } else if (!res?.success && res?.errorMessages?.length > 0) {
+        if (res?.errorMessages[0]?.path == "orderError") {
+          toast.error(res?.errorMessages[0]?.message);
+        }
 
-      // if (res?.success) {
-      //   queryClient.invalidateQueries({ queryKey: ["single-order"] });
-      //   toast.success(res?.message);
-      // } else if (!res?.success && res?.errorMessages?.length > 0) {
-      //   if (res?.errorMessages[0]?.path == "orderError") {
-      //     toast.error(res?.errorMessages[0]?.message);
-      //   }
-
-      //   res?.errorMessages?.forEach((err: TErrorMessage) => {
-      //     methods.setError(err.path, { type: "server", message: err.message });
-      //   });
-      // }
+        res?.errorMessages?.forEach((err: TErrorMessage) => {
+          methods.setError(err.path, { type: "server", message: err.message });
+        });
+      }
     }
 
-    setSubmitLoading(false);
+    setSubmitLoading(null);
   };
 
   return (
@@ -156,15 +174,23 @@ export default function OrderItems({
                       order.items.map((item, index) => (
                         <TableRow key={index}>
                           <TableCell>
-                            <JUCheckbox name={`items.${index}.isProvided`} />
+                            <Tooltip
+                              content={
+                                item.isProvided ? "Already provided." : ""
+                              }
+                            >
+                              <JUCheckbox
+                                name={`items.${index}.isProvided`}
+                                checkboxProps={{
+                                  isReadOnly: item.isProvided,
+                                  defaultSelected: item.isProvided,
+                                }}
+                              />
+                            </Tooltip>
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <div>
-                                <JUInput
-                                  name={`items.${index}.accessory`}
-                                  inputProps={{ className: "hidden" }}
-                                />
                                 <Avatar
                                   radius="md"
                                   fallback={<ImageIcon />}
@@ -207,10 +233,33 @@ export default function OrderItems({
                                 checkEvent: "approved",
                               }) && (
                                 <div className="space-y-1">
-                                  <span>Provided Qty:</span>
-                                  <JUNumberInput
-                                    name={`items.${index}.providedQuantity`}
-                                  />
+                                  {item?.providedQuantity &&
+                                    eidtItem !==
+                                      (item.accessory as TAccessory)._id && (
+                                      <div className=" flex gap-1">
+                                        <span>Provided Qty:</span>
+
+                                        <Chip
+                                          size="sm"
+                                          color="success"
+                                          radius="full"
+                                        >
+                                          {item?.providedQuantity || 0}
+                                        </Chip>
+                                      </div>
+                                    )}
+                                  {(!item.isProvided ||
+                                    eidtItem ==
+                                      (item.accessory as TAccessory)._id) &&
+                                    watch(`items.${index}.isProvided`) && (
+                                      <div>
+                                        <span>Provided Qty:</span>
+                                        <JUNumberInput
+                                          name={`items.${index}.providedQuantity`}
+                                        />
+                                      </div>
+                                    )}
+
                                   {errors?.items &&
                                     (errors as FieldValues)?.items[index]
                                       ?.providedQuantity && (
@@ -230,8 +279,12 @@ export default function OrderItems({
                               {isEventExists({
                                 events: order?.events!,
                                 checkEvent: "approved",
-                              }) ? (
-                                (item.accessory as TAccessory)
+                              }) &&
+                                (!item.isProvided ||
+                                  eidtItem ==
+                                    (item.accessory as TAccessory)._id) &&
+                                watch(`items.${index}.isProvided`) &&
+                                ((item.accessory as TAccessory)
                                   .isItReturnable ? (
                                   <div className="space-y-1">
                                     <JUSelect
@@ -250,6 +303,10 @@ export default function OrderItems({
                                         label: "Provided Codes:",
                                         labelPlacement: "outside",
                                         placeholder: "Select Codes",
+                                        isDisabled:
+                                          methods.watch(
+                                            `items.${index}.isProvided`
+                                          ) == false,
                                         classNames: { label: "text-sm" },
                                       }}
                                     />
@@ -270,6 +327,10 @@ export default function OrderItems({
                                         label: "Return Deadline:",
                                         labelPlacement: "outside",
                                         variant: "bordered",
+                                        isDisabled:
+                                          methods.watch(
+                                            `items.${index}.isProvided`
+                                          ) == false,
                                         classNames: { label: "text-sm" },
                                       }}
                                     />
@@ -291,24 +352,115 @@ export default function OrderItems({
                                     return deadline and codes will not be
                                     provided.
                                   </p>
-                                )
-                              ) : (
-                                <Chip color="danger" size="sm">
-                                  Pending
-                                </Chip>
-                              )}
+                                ))}
+                              {item?.providedAccessoryCodes?.length > 0 &&
+                                eidtItem !==
+                                  (item.accessory as TAccessory)._id && (
+                                  <div>
+                                    <div className="space-y-1">
+                                    <span className="block">
+                                      Provided Codes:
+                                    </span>
+                                    <div className="flex flex-wrap gap-1">
+                                      {item?.providedAccessoryCodes
+                                        ?.slice(0, 2)
+                                        ?.map((code, index) => (
+                                          <Chip
+                                            key={index}
+                                            size="sm"
+                                            color="success"
+                                            radius="full"
+                                          >
+                                            {code}
+                                          </Chip>
+                                        ))}{" "}
+                                      {item?.providedAccessoryCodes?.length >
+                                        1 && (
+                                        <Tooltip
+                                          content={<div className="flex flex-wrap gap-1">
+                                            {
+                                              item?.providedAccessoryCodes?.map(
+                                                (code, index) => (
+                                                  <Chip
+                                                    key={index}
+                                                    size="sm"
+                                                    color="success"
+                                                    radius="full"
+                                                  >
+                                                    {code}
+                                                  </Chip>
+                                                )
+                                              )
+                                            }
+                                          </div>}
+                                        >
+                                          <Button
+                                            isIconOnly
+                                            radius="md"
+                                            color="primary"
+                                            variant="light"
+                                            size="sm"
+                                          >
+                                            <MoreHorzIcon />
+                                          </Button>
+                                        </Tooltip>
+                                      )}
+                                    </div>
+                                  </div>
+                                  <div className="flex items-center gap-1">
+                                  <span className="block">
+                                     Return DeadLine:
+                                    </span>
+                                    <Chip
+                                                    key={index}
+                                                    size="sm"
+                                                    color="success"
+                                                    radius="full"
+                                                  >
+                                                    {dayjs(item.returnDeadline).format("MMM D, YYYY")}
+                                                  </Chip>
+                                  </div>
+                                  </div>
+                                )}
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="flex gap-1">
-                              <Button
-                                color="primary"
-                                size="sm"
-                                isLoading={isSubmitLoading}
-                                onPress={() => handleRowSubmit(index)}
-                              >
-                                Submit
-                              </Button>
+                              {!item.isProvided ||
+                              eidtItem == (item.accessory as TAccessory)._id ? (
+                                <Button
+                                  color="primary"
+                                  size="sm"
+                                  isDisabled={
+                                    watch(`items.${index}.isProvided`) == false
+                                  }
+                                  isLoading={
+                                    isSubmitLoading?._id ===
+                                    (item.accessory as TAccessory)?._id!
+                                  }
+                                  onPress={() =>
+                                    handleSubmit(
+                                      index,
+                                      (item.accessory as TAccessory)._id!
+                                    )
+                                  }
+                                >
+                                  {item.isProvided ? "Update" : "Submit"}
+                                </Button>
+                              ) : (
+                                <Button
+                                  isIconOnly
+                                  color="primary"
+                                  variant="flat"
+                                  size="sm"
+                                  startContent={<EditIcon />}
+                                  onPress={() =>
+                                    setEditItem(
+                                      (item.accessory as TAccessory)._id!
+                                    )
+                                  }
+                                ></Button>
+                              )}
                               <Button
                                 color="primary"
                                 variant="flat"
