@@ -5,7 +5,13 @@ import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
 import JUNumberInput from "@/src/components/form/JUNumberInput";
 import JUSelect from "@/src/components/form/JUSelect";
-import { EditIcon, ImageIcon, InfoIcon, MoreHorzIcon, MoreIcon } from "@/src/components/icons";
+import {
+  EditIcon,
+  ImageIcon,
+  InfoIcon,
+  MoreHorzIcon,
+  MoreIcon,
+} from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
 import { getSingleOrder } from "@/src/hooks/order";
 import { updateOrderItemsReq } from "@/src/services/order";
@@ -42,6 +48,7 @@ import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { CalendarDate, parseDate } from "@internationalized/date";
 
 export default function OrderItems({
   useDisclosure,
@@ -71,8 +78,14 @@ export default function OrderItems({
         currentQuantity: (item.accessory as TAccessory)?.quantityDetails
           ?.currentQuantity,
         providedQuantity: item.providedQuantity || item.expectedQuantity,
+        providedAccessoryCodes: item.providedAccessoryCodes.map((element) => ({
+          value: element,
+          label: element,
+        })),
+         returnDeadline:parseDate(dayjs(item.returnDeadline as any).format('YYYY-MM-DD')) ,
         isProvided: item.isProvided,
       }));
+      console.log(defaultValues, "default");
       methods.reset({ items: defaultValues });
     }
     if (!useDisclosure.isOpen) {
@@ -93,7 +106,7 @@ export default function OrderItems({
       if (rowData?.providedAccessoryCodes && rowData?.returnDeadline) {
         rowData.providedAccessoryCodes = rowData.providedAccessoryCodes
           ?.split(",")
-          .map((code: any) => code.trim());
+          .map((code: any) => code.trim()).sort();
         rowData.returnDeadline = dayjs(rowData.returnDeadline).format(
           "MMM D, YYYY"
         );
@@ -288,14 +301,14 @@ export default function OrderItems({
                                   .isItReturnable ? (
                                   <div className="space-y-1">
                                     <JUSelect
-                                      options={(
-                                        item.accessory as TAccessory
-                                      ).codeDetails.currentCodes.map(
-                                        (element) => ({
-                                          value: element,
-                                          label: element,
-                                        })
-                                      )}
+                                      options={[
+                                        ...(item.accessory as TAccessory)
+                                          .codeDetails.currentCodes,
+                                        ...item?.providedAccessoryCodes,
+                                      ].sort().map((element) => ({
+                                        value: element,
+                                        label: element,
+                                      }))}
                                       name={`items.${index}.providedAccessoryCodes`}
                                       selectProps={{
                                         className: "max-w-[300px]",
@@ -303,6 +316,10 @@ export default function OrderItems({
                                         label: "Provided Codes:",
                                         labelPlacement: "outside",
                                         placeholder: "Select Codes",
+
+                                        defaultSelectedKeys: [
+                                          ...item?.providedAccessoryCodes,
+                                        ],
                                         isDisabled:
                                           methods.watch(
                                             `items.${index}.isProvided`
@@ -327,6 +344,8 @@ export default function OrderItems({
                                         label: "Return Deadline:",
                                         labelPlacement: "outside",
                                         variant: "bordered",
+
+                                       
                                         isDisabled:
                                           methods.watch(
                                             `items.${index}.isProvided`
@@ -358,68 +377,70 @@ export default function OrderItems({
                                   (item.accessory as TAccessory)._id && (
                                   <div>
                                     <div className="space-y-1">
-                                    <span className="block">
-                                      Provided Codes:
-                                    </span>
-                                    <div className="flex flex-wrap gap-1">
-                                      {item?.providedAccessoryCodes
-                                        ?.slice(0, 2)
-                                        ?.map((code, index) => (
-                                          <Chip
-                                            key={index}
-                                            size="sm"
-                                            color="success"
-                                            radius="full"
-                                          >
-                                            {code}
-                                          </Chip>
-                                        ))}{" "}
-                                      {item?.providedAccessoryCodes?.length >
-                                        1 && (
-                                        <Tooltip
-                                          content={<div className="flex flex-wrap gap-1">
-                                            {
-                                              item?.providedAccessoryCodes?.map(
-                                                (code, index) => (
-                                                  <Chip
-                                                    key={index}
-                                                    size="sm"
-                                                    color="success"
-                                                    radius="full"
-                                                  >
-                                                    {code}
-                                                  </Chip>
-                                                )
-                                              )
+                                      <span className="block">
+                                        Provided Codes:
+                                      </span>
+                                      <div className="flex flex-wrap gap-1">
+                                        {item?.providedAccessoryCodes
+                                          ?.slice(0, 2)
+                                          ?.map((code, index) => (
+                                            <Chip
+                                              key={index}
+                                              size="sm"
+                                              color="success"
+                                              radius="full"
+                                            >
+                                              {code}
+                                            </Chip>
+                                          ))}{" "}
+                                        {item?.providedAccessoryCodes?.length >
+                                          1 && (
+                                          <Tooltip
+                                            content={
+                                              <div className="flex flex-wrap gap-1">
+                                                {item?.providedAccessoryCodes?.map(
+                                                  (code, index) => (
+                                                    <Chip
+                                                      key={index}
+                                                      size="sm"
+                                                      color="success"
+                                                      radius="full"
+                                                    >
+                                                      {code}
+                                                    </Chip>
+                                                  )
+                                                )}
+                                              </div>
                                             }
-                                          </div>}
-                                        >
-                                          <Button
-                                            isIconOnly
-                                            radius="md"
-                                            color="primary"
-                                            variant="light"
-                                            size="sm"
                                           >
-                                            <MoreHorzIcon />
-                                          </Button>
-                                        </Tooltip>
-                                      )}
+                                            <Button
+                                              isIconOnly
+                                              radius="md"
+                                              color="primary"
+                                              variant="light"
+                                              size="sm"
+                                            >
+                                              <MoreHorzIcon />
+                                            </Button>
+                                          </Tooltip>
+                                        )}
+                                      </div>
                                     </div>
-                                  </div>
-                                  <div className="flex items-center gap-1">
-                                  <span className="block">
-                                     Return DeadLine:
-                                    </span>
-                                    <Chip
-                                                    key={index}
-                                                    size="sm"
-                                                    color="success"
-                                                    radius="full"
-                                                  >
-                                                    {dayjs(item.returnDeadline).format("MMM D, YYYY")}
-                                                  </Chip>
-                                  </div>
+                                    <div className="flex items-center gap-1">
+                                      <span className="block">
+                                        Return DeadLine:
+                                      </span>
+                                      <Chip
+                                        key={index}
+                                        size="sm"
+                                        color="success"
+                                        radius="full"
+                                      >
+                                        {dayjs(item.returnDeadline).format(
+                                          "MMM D, YYYY"
+                                        )}
+                                      </Chip>
+                                    </div>
                                   </div>
                                 )}
                             </div>
