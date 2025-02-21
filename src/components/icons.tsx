@@ -647,7 +647,7 @@ export const PlusIcon: React.FC<IconSvgProps> = ({
       height={size || height}
       width={size || width}
       {...props}
-      fill="#666666"
+     
     >
       <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
     </svg>
@@ -666,7 +666,7 @@ export const MinusIcon: React.FC<IconSvgProps> = ({
       height={size || height}
       width={size || width}
       {...props}
-      fill="#666666"
+   
     >
       <path d="M200-440v-80h560v80H200Z" />
     </svg>

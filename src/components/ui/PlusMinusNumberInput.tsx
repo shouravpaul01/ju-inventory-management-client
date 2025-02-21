@@ -2,7 +2,7 @@
 import { Button } from "@nextui-org/button";
 import { MinusIcon, PlusIcon } from "../icons";
 import { toast } from "sonner";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Input } from "@nextui-org/input";
 
 type QuantityInputProps = {
@@ -19,6 +19,11 @@ export default function PlusMinusNumberInput({
   max = Infinity,
 }: QuantityInputProps) {
   const [error, setError] = useState("");
+  const [localQuantity, setLocalQuantity] = useState(quantity);
+
+  useEffect(() => {
+    setLocalQuantity(quantity);
+  }, [quantity]);
 
   const handleDecrement = () => {
     if (quantity > min) {
@@ -37,26 +42,33 @@ export default function PlusMinusNumberInput({
   };
 
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value.replace(/[^0-9]/g, ""); // Allow only numbers
+    const inputValue = event.target.value.replace(/[^0-9]/g, "");
     const newQuantity = Number(inputValue);
 
     setError("");
-
+console.log(newQuantity,"jj")
     if (inputValue === "") {
+      console.log("1")
       setError("Please enter a valid number.");
+      setLocalQuantity(quantity);
       return;
     }
 
     if (newQuantity < min) {
+      console.log("2")
       setError(`Minimum order quantity is ${min}.`);
+      setLocalQuantity(quantity);
       return;
     }
 
     if (newQuantity > max) {
+      console.log("3")
       setError(`Maximum order quantity is ${max}.`);
+      setLocalQuantity(quantity);
       return;
     }
-
+    console.log("4")
+    setLocalQuantity(newQuantity);
     onChange(newQuantity);
   };
 
@@ -69,10 +81,10 @@ export default function PlusMinusNumberInput({
   };
 
   return (
+    <div>
     <div
-      className="w-32 flex  items-center justify-center gap-1 p-1  border border-gray-200 rounded-md"
+      className="w-32 flex items-center justify-center gap-1 p-1 border border-gray-200 rounded-md hover:border-primary transition-colors"
       onKeyDown={handleKeyDown}
-      
     >
       <Button
         size="sm"
@@ -82,19 +94,27 @@ export default function PlusMinusNumberInput({
         radius="full"
         isDisabled={quantity <= min}
         onPress={handleDecrement}
+        aria-label="Decrease quantity"
+        className="hover:bg-primary hover:fill-white"
       >
-        <MinusIcon className="size-5" />
+        <MinusIcon className="size-5 " />
       </Button>
+
       <Input
-         variant="bordered"
+        variant="bordered"
         size="sm"
-        className="12"
+        className="w-12"
         type="text"
-        defaultValue={quantity?.toString()}
+        value={localQuantity.toString()}
         onChange={handleInputChange}
-        errorMessage={error}
-        isInvalid={!!error}
+       
+        aria-label="Quantity input"
+        placeholder="Qty"
+        classNames={{
+          input: "text-center",
+        }}
       />
+
       <Button
         size="sm"
         isIconOnly
@@ -103,9 +123,15 @@ export default function PlusMinusNumberInput({
         radius="full"
         isDisabled={quantity >= max}
         onPress={handleIncrement}
+        aria-label="Increase quantity"
+        className="hover:bg-primary-100"
       >
         <PlusIcon className="size-5" />
       </Button>
+    </div>
+    {
+      error && <p className="text-red-500 p-1">{error}</p>
+    }
     </div>
   );
 }

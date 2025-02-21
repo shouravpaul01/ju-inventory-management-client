@@ -8,11 +8,11 @@ export const axiosInstance = axios.create({
     baseURL: envConfig.baseApi,
    
   });
-  axiosInstance.interceptors.request.use(function (config) {
+  axiosInstance.interceptors.request.use(async function (config) {
     // Do something before request is sent
 
-
-    const accessToken=cookies().get("accessToken")?.value
+    const cookieStore = await cookies()
+    const accessToken=cookieStore.get("accessToken")?.value
     if (accessToken) {
       config.headers.Authorization=`Bearer ${accessToken}`
     }

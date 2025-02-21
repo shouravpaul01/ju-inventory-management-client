@@ -1,4 +1,6 @@
 "use client";
+import JUForm from "@/src/components/form/JUForm";
+import JUNumberInput from "@/src/components/form/JUNumberInput";
 import { ArrowRightAltIcon, XmarkIcon } from "@/src/components/icons";
 import PlusMinusNumberInput from "@/src/components/ui/PlusMinusNumberInput";
 import { useCart } from "@/src/hooks/cart";
@@ -18,13 +20,23 @@ import {
 import { User } from "@nextui-org/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { ifError } from "assert";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function CartPage() {
   const queryClient = useQueryClient();
-  const { cart, updateSelection,updateOrderQuantity, removeFromCart,removeAllFromCart } = useCart();
+  const methods = useForm();
+  const {
+    cart,
+    updateSelection,
+    updateOrderQuantity,
+    removeFromCart,
+    removeAllFromCart,
+  } = useCart();
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isSelectedDistributeOption, setIsSelectedDistributeOption] =
+    useState<boolean>(false);
 
   const selectedItems = useMemo(
     () => cart.filter((item) => item.isSelected).map((item) => item._id),
@@ -47,25 +59,42 @@ export default function CartPage() {
 
     queryClient.setQueryData(["cart"], updatedCart);
   };
+  useEffect(()=>{
+    if (cart) {
+      const defaultValues = cart.map((item) => ({
+              accessory: item._id,
+              isItReturnable: item?.isItReturnable,
+              expectedQuantity: item.expectedQuantity,
+              // currentQuantity: (item.accessory as TAccessory)?.quantityDetails
+              //   ?.currentQuantity,
+              // providedQuantity: item.providedQuantity || item.expectedQuantity,
+              // providedAccessoryCodes: item.providedAccessoryCodes.map((element) => ({
+              //   value: element,
+              //   label: element,
+              // })),
+              
+            }));
+            
+            methods.reset({ items: defaultValues });
+    }
+  },[cart])
   const handleQuantityChange = (id: string, newQuantity: number) => {
-    updateOrderQuantity({id,newQuantity})
+    updateOrderQuantity({ id, newQuantity });
   };
-  const handleConfirmOrder = async (cartItems: TAccessoryCartItem[]) => {
-    if(cartItems.length<=0){
-      toast.error("Order failed to proceed. Please try again.")
+  const handleSubmitConfirmOrder = async (cartItems: TAccessoryCartItem[]) => {
+    if (cartItems.length <= 0) {
+      toast.error("Order failed to proceed. Please try again.");
     }
     setIsLoading(true);
-   
+
     const orderItems = cartItems?.map((item) => ({
       accessory: item._id,
       expectedQuantity: item.expectedQuantity,
     }));
-    console.log(cartItems,orderItems, "cartIt");
     const res = await createOrderReq(orderItems);
-    console.log(res,"res")
     if (res?.success) {
       toast.success(res?.message);
-      removeAllFromCart()
+      removeAllFromCart();
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "orderError") {
         toast.error(res?.errorMessages[0]?.message);
@@ -73,113 +102,135 @@ export default function CartPage() {
     }
     setIsLoading(false);
   };
-console.log(cart)
+  console.log(cart);
   return (
     <div className="my-11">
-      <Table
-        aria-label="Controlled table example with dynamic content"
-        shadow="none"
-      >
-        <TableHeader>
-          <TableColumn>
-            {cart?.length > 0 && (
-              <Checkbox
-                isSelected={selectedItems.length === cart?.length}
-                isIndeterminate={
-                  selectedItems.length > 0 &&
-                  selectedItems.length < cart?.length
-                }
-                onChange={handleSelectAll}
-              />
-            )}
-          </TableColumn>
-
-          <TableColumn>NAME</TableColumn>
-
-          <TableColumn>Quantity</TableColumn>
-          <TableColumn>ACTION</TableColumn>
-        </TableHeader>
-        <TableBody items={cart} emptyContent={"No users found"}>
-          {(item) => (
-            <TableRow key={item._id}>
-              <TableCell>
+      <div className="flex items-center justify-center border rounded-md p-4 ">
+        <Checkbox
+          isSelected={isSelectedDistributeOption}
+          onValueChange={setIsSelectedDistributeOption}
+          classNames={{ label: "text-sm md:text-base" }}
+        >
+          Do you want to distribute accessories?
+        </Checkbox>
+      </div>
+      <JUForm methods={methods} onSubmit={handleSubmitConfirmOrder}>
+        <Table
+          aria-label="Controlled table example with dynamic content"
+          shadow="none"
+          classNames={{ wrapper: "px-0 md:px-4" }}
+        >
+          <TableHeader>
+            <TableColumn>
+              {cart?.length > 0 && (
                 <Checkbox
-                  isSelected={selectedItems.includes(item._id)}
-                  onChange={() => handleSelectedItem(item._id)}
-                />
-              </TableCell>
-              <TableCell>
-                <User
-                  avatarProps={{ radius: "lg", src: item.image }}
-                  description={
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1">
-                        <span className="font-semibold">T.Quantity :</span>
-                        <Chip color="success" size="sm">
-                          {item.currentQuantity}
-                        </Chip>
-                      </div>
-                      <Chip
-                        color="warning"
-                        size="sm"
-                        classNames={{ content: "text-center w-26" }}
-                      >
-                        {item?.isItReturnable ? "Returnable" : "Non-returnable"}
-                      </Chip>
-                    </div>
+                  isSelected={selectedItems.length === cart?.length}
+                  isIndeterminate={
+                    selectedItems.length > 0 &&
+                    selectedItems.length < cart?.length
                   }
-                  name={item.name}
-                ></User>
-              </TableCell>
-              <TableCell>
-                <div>
-                  <PlusMinusNumberInput
-                    quantity={item.expectedQuantity!}
-                    onChange={(newQuantity) =>
-                      handleQuantityChange(item._id, newQuantity)
-                    }
-                    max={item.currentQuantity}
-                  />
-                </div>
-              </TableCell>
-              <TableCell>
-                <Button
-                  isIconOnly
-                  size="sm"
-                  radius="full"
-                  color="default"
-                  onPress={() => removeFromCart(item._id)}
-                >
-                  <XmarkIcon className="size-4" />
-                </Button>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    {cart.length>0 && <div className="flex gap-3 justify-end mx-6 my-6">
-      <Button
-        size="sm"
-        color="primary"
-        isLoading={isLoading}
-        isDisabled={selectedItems.length === 0}
-        startContent={
-        
-          !isLoading &&   <ArrowRightAltIcon className="fill-white" />
-          
-        }
-        onPress={() => handleConfirmOrder(cart)}
-      >
-        Proceed To Order
-      </Button>
-      <Button
-        size="sm"
-        color="primary"
-        isDisabled={selectedItems.length === 0}
-      >
-        Proceed to Distribution
-      </Button>
-    </div>}
+                  onChange={handleSelectAll}
+                />
+              )}
+            </TableColumn>
+
+            <TableColumn>NAME</TableColumn>
+
+            <TableColumn>Quantity</TableColumn>
+            <TableColumn>ACTION</TableColumn>
+          </TableHeader>
+          <TableBody>
+            {cart?.length > 0 ? (
+              cart?.map((item, index) => (
+                <TableRow key={item._id}>
+                  <TableCell>
+                    <Checkbox
+                      isSelected={selectedItems.includes(item._id)}
+                      onChange={() => handleSelectedItem(item._id)}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <User
+                      avatarProps={{ radius: "lg", src: item.image }}
+                      description={
+                        <div className="space-y-1">
+                          <div className="flex items-center gap-1">
+                            <span className="font-semibold">T.Quantity :</span>
+                            <Chip color="success" size="sm">
+                              {item.currentQuantity}
+                            </Chip>
+                          </div>
+                          <Chip
+                            color="warning"
+                            size="sm"
+                            classNames={{ content: "text-center w-26" }}
+                          >
+                            {item?.isItReturnable
+                              ? "Returnable"
+                              : "Non-returnable"}
+                          </Chip>
+                        </div>
+                      }
+                      name={item.name}
+                    ></User>
+                  </TableCell>
+                  <TableCell>
+                    <div>
+                      <JUNumberInput name={`items.${index}.expectedQuantity`} />
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      radius="full"
+                      color="default"
+                      onPress={() => removeFromCart(item._id)}
+                    >
+                      <XmarkIcon className="size-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center">
+                  No items found.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+        {cart.length > 0 && (
+          <div className="flex gap-3 justify-end mx-6 my-6">
+            {isSelectedDistributeOption ? (
+              <Button
+                size="sm"
+                color="primary"
+                isDisabled={selectedItems.length === 0}
+                startContent={
+                  !isLoading && <ArrowRightAltIcon className="fill-white" />
+                }
+              >
+                Proceed to Distribute
+              </Button>
+            ) : (
+              <Button
+                type="submit"
+                size="sm"
+                color="primary"
+                isLoading={isLoading}
+                isDisabled={selectedItems.length === 0}
+                startContent={
+                  !isLoading && <ArrowRightAltIcon className="fill-white" />
+                }
+              >
+                Proceed To Order
+              </Button>
+            )}
+          </div>
+        )}
+      </JUForm>
     </div>
   );
 }
