@@ -6,7 +6,9 @@ import PlusMinusNumberInput from "@/src/components/ui/PlusMinusNumberInput";
 import { useCart } from "@/src/hooks/cart";
 import { createOrderReq } from "@/src/services/order";
 import { TAccessoryCartItem } from "@/src/types";
+import { cartItemSchemaValidation } from "@/src/validations/cart.validation";
 import { Checkbox } from "@heroui/checkbox";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@nextui-org/button";
 import { Chip } from "@nextui-org/chip";
 import {
@@ -21,12 +23,16 @@ import { User } from "@nextui-org/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { ifError } from "assert";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 export default function CartPage() {
   const queryClient = useQueryClient();
-  const methods = useForm();
+  const methods = useForm({ resolver: zodResolver(cartItemSchemaValidation) });
+  const {
+    watch,
+    formState: { errors },
+  } = methods;
   const {
     cart,
     updateSelection,
@@ -59,39 +65,33 @@ export default function CartPage() {
 
     queryClient.setQueryData(["cart"], updatedCart);
   };
-  useEffect(()=>{
+  useEffect(() => {
     if (cart) {
       const defaultValues = cart.map((item) => ({
-              accessory: item._id,
-              isItReturnable: item?.isItReturnable,
-              expectedQuantity: item.expectedQuantity,
-              // currentQuantity: (item.accessory as TAccessory)?.quantityDetails
-              //   ?.currentQuantity,
-              // providedQuantity: item.providedQuantity || item.expectedQuantity,
-              // providedAccessoryCodes: item.providedAccessoryCodes.map((element) => ({
-              //   value: element,
-              //   label: element,
-              // })),
-              
-            }));
-            
-            methods.reset({ items: defaultValues });
-    }
-  },[cart])
-  const handleQuantityChange = (id: string, newQuantity: number) => {
-    updateOrderQuantity({ id, newQuantity });
-  };
-  const handleSubmitConfirmOrder = async (cartItems: TAccessoryCartItem[]) => {
-    if (cartItems.length <= 0) {
-      toast.error("Order failed to proceed. Please try again.");
-    }
-    setIsLoading(true);
+        accessory: item._id,
+        expectedQuantity: item.expectedQuantity,
+        // currentQuantity: (item.accessory as TAccessory)?.quantityDetails
+        //   ?.currentQuantity,
+        // providedQuantity: item.providedQuantity || item.expectedQuantity,
+        // providedAccessoryCodes: item.providedAccessoryCodes.map((element) => ({
+        //   value: element,
+        //   label: element,
+        // })),
+      }));
 
-    const orderItems = cartItems?.map((item) => ({
-      accessory: item._id,
-      expectedQuantity: item.expectedQuantity,
-    }));
-    const res = await createOrderReq(orderItems);
+      methods.reset({ items: defaultValues });
+    }
+  }, [cart]);
+  const handleQuantityChange = (id: string, newQuantity: number) => {
+ 
+     updateOrderQuantity({ id, newQuantity });
+  };
+  const handleSubmitConfirmOrder:SubmitHandler<FieldValues> = async (data) => {
+    
+    setIsLoading(true);
+ 
+  
+    const res = await createOrderReq(data?.items);
     if (res?.success) {
       toast.success(res?.message);
       removeAllFromCart();
@@ -102,7 +102,7 @@ export default function CartPage() {
     }
     setIsLoading(false);
   };
-  console.log(cart);
+
   return (
     <div className="my-11">
       <div className="flex items-center justify-center border rounded-md p-4 ">
@@ -140,7 +140,7 @@ export default function CartPage() {
             <TableColumn>ACTION</TableColumn>
           </TableHeader>
           <TableBody>
-            {cart?.length > 0 ? (
+            {cart && cart?.length > 0 ? (
               cart?.map((item, index) => (
                 <TableRow key={item._id}>
                   <TableCell>
@@ -153,13 +153,8 @@ export default function CartPage() {
                     <User
                       avatarProps={{ radius: "lg", src: item.image }}
                       description={
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1">
-                            <span className="font-semibold">T.Quantity :</span>
-                            <Chip color="success" size="sm">
-                              {item.currentQuantity}
-                            </Chip>
-                          </div>
+                        
+                          
                           <Chip
                             color="warning"
                             size="sm"
@@ -169,14 +164,24 @@ export default function CartPage() {
                               ? "Returnable"
                               : "Non-returnable"}
                           </Chip>
-                        </div>
+                       
                       }
-                      name={item.name}
+                      name={<p className="line-clamp-1">{item.name}</p>}
                     ></User>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <JUNumberInput name={`items.${index}.expectedQuantity`} />
+                      <JUNumberInput name={`items.${index}.expectedQuantity`} onChange={(value:any)=>handleQuantityChange(item._id!,value,)}/>
+                      {errors?.items &&
+                        (errors as FieldValues)?.items[index]
+                          ?.expectedQuantity && (
+                          <p className="text-red-500">
+                            {
+                              (errors as FieldValues)?.items[index]
+                                ?.expectedQuantity?.message
+                            }
+                          </p>
+                        )}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -194,7 +199,7 @@ export default function CartPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={4} className="text-center">
+                <TableCell colSpan={3} className="text-center">
                   No items found.
                 </TableCell>
               </TableRow>

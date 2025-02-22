@@ -8,10 +8,11 @@ import { MinusIcon, PlusIcon } from "../icons";
 interface IProps {
   name: string;
   inputProps?: InputProps;
-  className?:string
+  className?: string;
+  onChange?: (value: number) => void; // Add onChange prop
 }
 
-export default function JUNumberInput({ name, inputProps ,className}: IProps) {
+export default function JUNumberInput({ name, inputProps, className, onChange }: IProps) {
   const {
     register,
     setValue,
@@ -23,23 +24,29 @@ export default function JUNumberInput({ name, inputProps ,className}: IProps) {
 
   // Handle increment
   const handleIncrement = () => {
-    setValue(name, (currentValue || 0) + 1);
+    const newValue = (currentValue || 0) + 1;
+    setValue(name, newValue);
+    onChange?.(newValue); 
   };
 
   // Handle decrement
   const handleDecrement = () => {
-    setValue(name, (currentValue || 0) - 1);
+    const newValue = (currentValue || 0) - 1;
+    setValue(name, newValue);
+    onChange?.(newValue);
   };
 
   // Handle manual input changes
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const newValue = Number(e.target.value);
-    setValue(name, isNaN(newValue) ? 0 : newValue);
+    const finalValue = isNaN(newValue) ? 0 : newValue;
+    setValue(name, finalValue);
+    onChange?.(finalValue); 
   };
 
   return (
     <>
-      <div className={`w-32 flex  items-center justify-center gap-1 p-1  border border-gray-200 rounded-md ${className}`}>
+      <div className={`w-32 flex items-center justify-center gap-1 p-1 border border-gray-200 rounded-md ${className}`}>
         {/* Decrement Button */}
         <Button
           isIconOnly
@@ -53,6 +60,7 @@ export default function JUNumberInput({ name, inputProps ,className}: IProps) {
           <MinusIcon />
         </Button>
 
+        {/* Input Field */}
         <Input
           variant="bordered"
           size="sm"
@@ -75,9 +83,11 @@ export default function JUNumberInput({ name, inputProps ,className}: IProps) {
           <PlusIcon />
         </Button>
       </div>
+
+      {/* Display validation errors */}
       {errors[name] && (
         <p className="text-red-500">{errors[name]?.message as string}</p>
-      )}{" "}
+      )}
     </>
   );
 }
