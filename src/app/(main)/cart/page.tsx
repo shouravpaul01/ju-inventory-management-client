@@ -22,6 +22,7 @@ import {
 import { User } from "@nextui-org/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { ifError } from "assert";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -83,14 +84,11 @@ export default function CartPage() {
     }
   }, [cart]);
   const handleQuantityChange = (id: string, newQuantity: number) => {
- 
-     updateOrderQuantity({ id, newQuantity });
+    updateOrderQuantity({ id, newQuantity });
   };
-  const handleSubmitConfirmOrder:SubmitHandler<FieldValues> = async (data) => {
-    
+  const handleSubmitConfirmOrder: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
- 
-  
+
     const res = await createOrderReq(data?.items);
     if (res?.success) {
       toast.success(res?.message);
@@ -153,25 +151,27 @@ export default function CartPage() {
                     <User
                       avatarProps={{ radius: "lg", src: item.image }}
                       description={
-                        
-                          
-                          <Chip
-                            color="warning"
-                            size="sm"
-                            classNames={{ content: "text-center w-26" }}
-                          >
-                            {item?.isItReturnable
-                              ? "Returnable"
-                              : "Non-returnable"}
-                          </Chip>
-                       
+                        <Chip
+                          color="warning"
+                          size="sm"
+                          classNames={{ content: "text-center w-26" }}
+                        >
+                          {item?.isItReturnable
+                            ? "Returnable"
+                            : "Non-returnable"}
+                        </Chip>
                       }
                       name={<p className="line-clamp-1">{item.name}</p>}
                     ></User>
                   </TableCell>
                   <TableCell>
                     <div>
-                      <JUNumberInput name={`items.${index}.expectedQuantity`} onChange={(value:any)=>handleQuantityChange(item._id!,value,)}/>
+                      <JUNumberInput
+                        name={`items.${index}.expectedQuantity`}
+                        onChange={(value: any) =>
+                          handleQuantityChange(item._id!, value)
+                        }
+                      />
                       {errors?.items &&
                         (errors as FieldValues)?.items[index]
                           ?.expectedQuantity && (
@@ -210,6 +210,8 @@ export default function CartPage() {
           <div className="flex gap-3 justify-end mx-6 my-6">
             {isSelectedDistributeOption ? (
               <Button
+                as={Link}
+                href="/distribute"
                 size="sm"
                 color="primary"
                 isDisabled={selectedItems.length === 0}
