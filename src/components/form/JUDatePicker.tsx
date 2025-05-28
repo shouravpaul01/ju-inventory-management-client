@@ -4,7 +4,7 @@ import {
   CalendarDateTime,
   ZonedDateTime,
 } from "@internationalized/date";
-import { DatePicker, DatePickerProps } from "@nextui-org/date-picker";
+import { DatePicker, DatePickerProps } from "@heroui/date-picker";
 import dayjs from "dayjs";
 import React from "react";
 

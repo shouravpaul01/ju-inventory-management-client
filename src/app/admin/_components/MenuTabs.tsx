@@ -8,7 +8,7 @@ import {
   ReturnedIcon,
   WidgetIcon,
 } from "@/src/components/icons";
-import { Tab, Tabs } from "@nextui-org/tabs";
+import { Tab, Tabs } from "@heroui/tabs";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 

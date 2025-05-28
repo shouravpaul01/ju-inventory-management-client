@@ -1,5 +1,5 @@
 "use client";
-import { Input, InputProps } from "@nextui-org/input";
+import { Input, InputProps } from "@heroui/input";
 import { EyeFilledIcon, EyeSlashFilledIcon } from "../icons";
 import { useState } from "react";
 import { useFormContext } from "react-hook-form";

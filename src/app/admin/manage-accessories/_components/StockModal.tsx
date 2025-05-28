@@ -8,9 +8,9 @@ import {
 } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
 import { TCodeDetails, TQuantityDetails, TQuery } from "@/src/types";
-import { Button } from "@nextui-org/button";
-import { Chip } from "@nextui-org/chip";
-import { Listbox, ListboxItem } from "@nextui-org/listbox";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import { Listbox, ListboxItem } from "@heroui/listbox";
 import {
   Modal,
   ModalBody,
@@ -18,10 +18,10 @@ import {
   ModalHeader,
   useDisclosure,
   UseDisclosureProps,
-} from "@nextui-org/modal";
-import { DateRangePicker } from "@nextui-org/date-picker";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { Skeleton } from "@nextui-org/skeleton";
+} from "@heroui/modal";
+import { DateRangePicker } from "@heroui/date-picker";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
+import { Skeleton } from "@heroui/skeleton";
 import {
   Table,
   TableBody,
@@ -29,9 +29,9 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
-import { Tooltip } from "@nextui-org/tooltip";
-import { User } from "@nextui-org/user";
+} from "@heroui/table";
+import { Tooltip } from "@heroui/tooltip";
+import { User } from "@heroui/user";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useEffect, useMemo, useState } from "react";
@@ -40,11 +40,11 @@ import UpdateStockModal from "./UpdateStockModal";
 import { toast } from "sonner";
 import { updateStockApprovedStatus } from "@/src/services/Stock";
 
-import { Select, SelectItem } from "@nextui-org/select";
+import { Select, SelectItem } from "@heroui/select";
 import { approvalFilterOptions, limitOptions } from "@/src/constents";
-import { Card, CardBody, CardHeader } from "@nextui-org/card";
-import { Divider } from "@nextui-org/divider";
-import { Spinner } from "@nextui-org/spinner";
+import { Card, CardBody, CardHeader } from "@heroui/card";
+import { Divider } from "@heroui/divider";
+import { Spinner } from "@heroui/spinner";
 import { getSingleAccessory } from "@/src/hooks/Accessory";
 import { getAllStocks } from "@/src/hooks/Stock";
 

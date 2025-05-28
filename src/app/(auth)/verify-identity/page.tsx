@@ -13,9 +13,9 @@ import {
 } from "@/src/services/Auth";
 import { otpValidation } from "@/src/validations/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
-import { Chip } from "@nextui-org/chip";
-import { Link } from "@nextui-org/link";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import { Link } from "@heroui/link";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";

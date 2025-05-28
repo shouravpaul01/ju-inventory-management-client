@@ -1,6 +1,6 @@
 "use client";
-import { Button, ButtonGroup } from "@nextui-org/button";
-import { useDisclosure } from "@nextui-org/modal";
+import { Button, ButtonGroup } from "@heroui/button";
+import { useDisclosure } from "@heroui/modal";
 import CreateUpdateUserFromModal from "./_components/CreateUpdateUserFromModal";
 import {
   Table,
@@ -9,14 +9,14 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
-import { Pagination } from "@nextui-org/pagination";
+} from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
 import { useEffect, useMemo, useState } from "react";
 import { getAllUsers, getSingleUser } from "@/src/hooks/User";
 import JULoading from "@/src/components/ui/JULoading";
-import { User } from "@nextui-org/user";
-import { Chip } from "@nextui-org/chip";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
+import { User } from "@heroui/user";
+import { Chip } from "@heroui/chip";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import {
   DeleteIcon,
   EditIcon,
@@ -26,8 +26,8 @@ import {
   PersonAddIcon,
   RestoreIcon,
 } from "@/src/components/icons";
-import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Listbox, ListboxItem } from "@heroui/listbox";
+import { Tooltip } from "@heroui/tooltip";
 import {
   deleteUserReq,
   restoreUserReq,

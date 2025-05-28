@@ -1,23 +1,23 @@
 "use client"
 import { AddIcon, EditIcon, InfoIcon, MoreIcon } from "@/src/components/icons";
-import { Button } from "@nextui-org/button";
-import { useDisclosure } from "@nextui-org/modal";
+import { Button } from "@heroui/button";
+import { useDisclosure } from "@heroui/modal";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import CreateUpdateSubCategoryFromModal from "./_components/CreateUpdateSubCategoryFromModal";
 import { useEffect, useMemo, useState } from "react";
-import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@nextui-org/table";
-import { Pagination } from "@nextui-org/pagination";
+import { Table, TableBody, TableCell, TableColumn, TableHeader, TableRow } from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
 import JULoading from "@/src/components/ui/JULoading";
-import { Chip } from "@nextui-org/chip";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { Listbox, ListboxItem } from "@nextui-org/listbox";
+import { Chip } from "@heroui/chip";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
+import { Listbox, ListboxItem } from "@heroui/listbox";
 import { TQuery } from "@/src/types";
 import { getAllSubCategories } from "@/src/hooks/Sub Category";
 import { updateSubCategoryActiveStatus, updateSubCategoryApprovedStatus } from "@/src/services/Sub Category";
 import { toast } from "sonner";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Tooltip } from "@heroui/tooltip";
 import DetailsModal from "./_components/DetailsModal";
 
 export default function ManageSubCategories() {

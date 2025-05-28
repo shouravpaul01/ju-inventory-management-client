@@ -1,5 +1,5 @@
 import { TSelectOption } from "@/src/types";
-import { Select, SelectItem, SelectProps } from "@nextui-org/select";
+import { Select, SelectItem, SelectProps } from "@heroui/select";
 import { ChangeEvent } from "react";
 
 import { useFormContext } from "react-hook-form";

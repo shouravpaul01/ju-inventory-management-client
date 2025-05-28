@@ -1,5 +1,5 @@
 "use client"
-import { Input, InputProps } from "@nextui-org/input";
+import { Input, InputProps } from "@heroui/input";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { SearchIcon } from "../icons";

@@ -1,8 +1,8 @@
 import { InfoIcon } from "@/src/components/icons";
 import { TUser } from "@/src/types";
 import { Image } from "@heroui/image";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
 
 export default function UserInfoTooltip({ user }: { user: TUser }) {
   return (

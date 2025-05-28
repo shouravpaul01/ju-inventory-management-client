@@ -6,14 +6,14 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
-import { User } from "@nextui-org/user";
+} from "@heroui/table";
+import { User } from "@heroui/user";
 import JUForm from "@/src/components/form/JUForm";
 import { useCart } from "@/src/hooks/cart";
 import { FieldValues, useForm } from "react-hook-form";
-import { Chip } from "@nextui-org/chip";
+import { Chip } from "@heroui/chip";
 import JUNumberInput from "@/src/components/form/JUNumberInput";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import {
   ArrowRightAltIcon,
   ImageIcon,
@@ -24,10 +24,13 @@ import { TAccessoryCartItem, TQuery } from "@/src/types";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import JUSelect from "@/src/components/form/JUSelect";
 import { string } from "zod";
-import { Avatar } from "@nextui-org/avatar";
+import { Avatar } from "@heroui/avatar";
 import JULoading from "@/src/components/ui/JULoading";
+import { useRouter } from "next/navigation";
+import JUInput from "@/src/components/form/JUInput";
 
 const Distributepage = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const {
     cart,
@@ -43,7 +46,8 @@ const Distributepage = () => {
       .map((item) => ({ name: "_id", value: item._id }));
   }, [cart]);
 
-  const { data: accessories,isLoading:isAccessoriesLoading } = getAllAccessories({ query: queryParams });
+  const { data: accessories, isLoading: isAccessoriesLoading } =
+    getAllAccessories({ query: queryParams });
   const distributeAccessories = useMemo(() => {
     if (!cart || !accessories) return [];
 
@@ -70,7 +74,10 @@ const Distributepage = () => {
     updateOrderQuantity({ id, newQuantity });
   };
   if (isAccessoriesLoading) {
-    return <JULoading/>
+    return <JULoading />;
+  }
+  if (cart?.length === 0) {
+    return router.push("/");
   }
   return (
     <div className="my-11">
@@ -87,9 +94,8 @@ const Distributepage = () => {
             <TableColumn width={350}>Provide Accessories code</TableColumn>
             <TableColumn width={200}>Action</TableColumn>
           </TableHeader>
-          {distributeAccessories && distributeAccessories?.length > 0 ?
-             (
-                <TableBody>
+          {distributeAccessories && distributeAccessories?.length > 0 ? (
+            <TableBody>
               {distributeAccessories?.map((item, index) => (
                 <TableRow key={item._id}>
                   <TableCell>
@@ -134,7 +140,7 @@ const Distributepage = () => {
                     </div>
                   </TableCell>
                   <TableCell>
-                    {item.isItReturnable? (
+                    {item.isItReturnable ? (
                       <JUSelect
                         options={item?.currentCodes!?.sort().map((element) => ({
                           value: element,
@@ -150,11 +156,12 @@ const Distributepage = () => {
                           classNames: { label: "text-sm" },
                         }}
                       />
-                    ):<p className="text-slate-600">
-                    The order item is non-returnable, so the
-                    return deadline and codes will not be
-                    provided.
-                  </p>}
+                    ) : (
+                      <p className="text-slate-600">
+                        The order item is non-returnable, so the return deadline
+                        and codes will not be provided.
+                      </p>
+                    )}
                   </TableCell>
                   <TableCell>
                     <Button
@@ -169,16 +176,21 @@ const Distributepage = () => {
                   </TableCell>
                 </TableRow>
               ))}
-            
-          </TableBody> ): (<TableBody>
-            <TableRow>
-              <TableCell  className="text-center">
-                No items found.
-              </TableCell>
-            </TableRow>
+            </TableBody>
+          ) : (
+            <TableBody>
+              <TableRow>
+                <TableCell className="text-center">No items found.</TableCell>
+              </TableRow>
             </TableBody>
           )}
         </Table>
+        <div>
+          <div>
+            <label className="text-base font-semibold">Distribute For:</label>
+            <JUInput name="distri" inputProps={{className:"max-w-lg" ,placeholder:"Name"}}/>
+          </div>
+        </div>
         {cart.length > 0 && (
           <div className="flex gap-3 justify-end mx-6 my-6">
             <Button

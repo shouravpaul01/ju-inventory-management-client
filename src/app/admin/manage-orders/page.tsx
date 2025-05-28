@@ -8,10 +8,10 @@ import {
 import { limitOptions, orderEventOptions } from "@/src/constents";
 import { getAllOrders } from "@/src/hooks/order";
 import { TQuery, TUser } from "@/src/types";
-import { Button } from "@nextui-org/button";
-import { DateRangePicker } from "@nextui-org/date-picker";
-import { Select, SelectItem } from "@nextui-org/select";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Button } from "@heroui/button";
+import { DateRangePicker } from "@heroui/date-picker";
+import { Select, SelectItem } from "@heroui/select";
+import { Tooltip } from "@heroui/tooltip";
 import { useSearchParams } from "next/navigation";
 import {
   Table,
@@ -20,21 +20,21 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
+} from "@heroui/table";
 import React, { useMemo, useState } from "react";
 import JULoading from "@/src/components/ui/JULoading";
-import { Pagination } from "@nextui-org/pagination";
-import { Chip } from "@nextui-org/chip";
+import { Pagination } from "@heroui/pagination";
+import { Chip } from "@heroui/chip";
 import dayjs from "dayjs";
-import { User } from "@nextui-org/user";
+import { User } from "@heroui/user";
 import UserInfoTooltip from "./_components/UserInfoTooltip";
-import { Badge } from "@nextui-org/badge";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { Listbox, ListboxItem } from "@nextui-org/listbox";
+import { Badge } from "@heroui/badge";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
+import { Listbox, ListboxItem } from "@heroui/listbox";
 import { updateEventStatusReq } from "@/src/services/order";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { useDisclosure } from "@nextui-org/modal";
+import { useDisclosure } from "@heroui/modal";
 import OrderItems from "./_components/OrderItems";
 
 export default function ManageOrdersPage() {

@@ -10,9 +10,9 @@ import { TUser } from "@/src/types";
 import { findAccountValidation } from "@/src/validations/auth.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 
-import { Button } from "@nextui-org/button";
-import { Chip } from "@nextui-org/chip";
-import { User } from "@nextui-org/user";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import { User } from "@heroui/user";
 import {  useRouter } from "next/navigation";
 import { useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";

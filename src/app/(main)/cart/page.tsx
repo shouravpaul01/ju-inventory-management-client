@@ -2,15 +2,13 @@
 import JUForm from "@/src/components/form/JUForm";
 import JUNumberInput from "@/src/components/form/JUNumberInput";
 import { ArrowRightAltIcon, XmarkIcon } from "@/src/components/icons";
-import PlusMinusNumberInput from "@/src/components/ui/PlusMinusNumberInput";
 import { useCart } from "@/src/hooks/cart";
 import { createOrderReq } from "@/src/services/order";
-import { TAccessoryCartItem } from "@/src/types";
 import { cartItemSchemaValidation } from "@/src/validations/cart.validation";
 import { Checkbox } from "@heroui/checkbox";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
-import { Chip } from "@nextui-org/chip";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
 import {
   Table,
   TableBody,
@@ -18,8 +16,8 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
-import { User } from "@nextui-org/user";
+} from "@heroui/table";
+import { User } from "@heroui/user";
 import { useQueryClient } from "@tanstack/react-query";
 import { ifError } from "assert";
 import Link from "next/link";
@@ -71,13 +69,7 @@ export default function CartPage() {
       const defaultValues = cart.map((item) => ({
         accessory: item._id,
         expectedQuantity: item.expectedQuantity,
-        // currentQuantity: (item.accessory as TAccessory)?.quantityDetails
-        //   ?.currentQuantity,
-        // providedQuantity: item.providedQuantity || item.expectedQuantity,
-        // providedAccessoryCodes: item.providedAccessoryCodes.map((element) => ({
-        //   value: element,
-        //   label: element,
-        // })),
+        
       }));
 
       methods.reset({ items: defaultValues });

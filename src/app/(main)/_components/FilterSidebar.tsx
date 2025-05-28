@@ -4,7 +4,7 @@ import { getCategoriesWithSubCategories } from "@/src/hooks/Category";
 import { Checkbox, CheckboxGroup } from "@heroui/checkbox";
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Select, SelectItem } from "@nextui-org/select";
+import { Select, SelectItem } from "@heroui/select";
 import { returnableOptions } from "@/src/constents";
 
 export default function FilterSidebar() {

@@ -1,4 +1,4 @@
-import { Spinner } from "@nextui-org/spinner";
+import { Spinner } from "@heroui/spinner";
 import Image from "next/image";
 
 export default function JULoading({ className="h-screen" }: { className?: string }) {

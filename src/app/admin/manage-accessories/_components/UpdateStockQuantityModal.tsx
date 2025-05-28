@@ -3,7 +3,7 @@ import JUInput from "@/src/components/form/JUInput";
 import { updateStockQuantity } from "@/src/services/Accessory";
 import { updateStockQuantityValidation } from "@/src/validations/accessory.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import {
   Modal,
   ModalBody,
@@ -11,7 +11,7 @@ import {
   ModalFooter,
   ModalHeader,
   UseDisclosureProps,
-} from "@nextui-org/modal";
+} from "@heroui/modal";
 import { useQueryClient } from "@tanstack/react-query";
 import React, { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";

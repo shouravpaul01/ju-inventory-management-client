@@ -1,8 +1,8 @@
 "use client";
 import { ChangeEvent, useState } from "react";
-import { Input, InputProps } from "@nextui-org/input";
+import { Input, InputProps } from "@heroui/input";
 import { useFormContext } from "react-hook-form";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { MinusIcon, PlusIcon } from "../icons";
 
 interface IProps {

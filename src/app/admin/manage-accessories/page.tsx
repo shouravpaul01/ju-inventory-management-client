@@ -8,8 +8,8 @@ import {
   MoreIcon,
   WidgetIcon,
 } from "@/src/components/icons";
-import { Button, ButtonGroup } from "@nextui-org/button";
-import { useDisclosure } from "@nextui-org/modal";
+import { Button, ButtonGroup } from "@heroui/button";
+import { useDisclosure } from "@heroui/modal";
 import { useQueryClient } from "@tanstack/react-query";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
@@ -22,23 +22,23 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
-import { Pagination } from "@nextui-org/pagination";
+} from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
 import JULoading from "@/src/components/ui/JULoading";
-import { Chip } from "@nextui-org/chip";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { Listbox, ListboxItem } from "@nextui-org/listbox";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Chip } from "@heroui/chip";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
+import { Listbox, ListboxItem } from "@heroui/listbox";
+import { Tooltip } from "@heroui/tooltip";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import { TQuery } from "@/src/types";
-import { User } from "@nextui-org/user";
+import { User } from "@heroui/user";
 import {
   updateAccessoryActiveStatus,
   updateAccessoryApprovedStatus,
 } from "@/src/services/Accessory";
 import { toast } from "sonner";
 import StockModal from "./_components/StockModal";
-import { Avatar } from "@nextui-org/avatar";
+import { Avatar } from "@heroui/avatar";
 
 export default function ManageAccessories() {
   const searchParams = useSearchParams();

@@ -1,15 +1,15 @@
 import { TAccessory, TAccessoryCartItem } from "@/src/types";
 import { Image } from "@heroui/image";
-import { Button } from "@nextui-org/button";
-import { Card, CardBody, CardFooter } from "@nextui-org/card";
+import { Button } from "@heroui/button";
+import { Card, CardBody, CardFooter } from "@heroui/card";
 import NextImage from "next/image";
 
 import React from "react";
 import { ImageIcon, InfoIcon, LocalMallIcon } from "../icons";
 import { blankImage } from "@/src/constents";
-import { Divider } from "@nextui-org/divider";
-import { Chip } from "@nextui-org/chip";
-import { Badge } from "@nextui-org/badge";
+import { Divider } from "@heroui/divider";
+import { Chip } from "@heroui/chip";
+import { Badge } from "@heroui/badge";
 import { useCart } from "@/src/hooks/cart";
 
 

@@ -7,25 +7,25 @@ import {
   NavbarBrand,
   NavbarItem,
   NavbarMenuItem,
-} from "@nextui-org/navbar";
-import { Button } from "@nextui-org/button";
+} from "@heroui/navbar";
+import { Button } from "@heroui/button";
 
-import { Link } from "@nextui-org/link";
+import { Link } from "@heroui/link";
 
 import NextLink from "next/link";
 
 import { siteConfig } from "@/src/config/site";
 
-import { LocalMallIcon, LogoutIcon } from "@/src/components/icons";
+import { DashboardIcon, LocalMallIcon, LogoutIcon } from "@/src/components/icons";
 import Image from "next/image";
 import {
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownTrigger,
-} from "@nextui-org/dropdown";
-import { Avatar } from "@nextui-org/avatar";
-import { Badge } from "@nextui-org/badge";
+} from "@heroui/dropdown";
+import { Avatar } from "@heroui/avatar";
+import { Badge } from "@heroui/badge";
 import SearchInput from "./ui/SearchInput";
 import { useUser } from "../context/user.provider";
 import { logoutUser } from "../services/Auth";
@@ -139,6 +139,17 @@ export const Navbar = () => {
             />
           </DropdownTrigger>
           <DropdownMenu aria-label="Profile Actions" variant="flat">
+            <DropdownItem
+              href="/dashboard"
+              as={Link}
+              key="dashboard"
+              color="primary"
+              className="flex items-center gap-2"
+              startContent={<DashboardIcon />}
+              
+            >
+              Dashboard
+            </DropdownItem>
             <DropdownItem
               href="/login"
               as={Link}

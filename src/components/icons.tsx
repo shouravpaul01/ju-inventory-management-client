@@ -394,7 +394,6 @@ export const MoreHorzIcon: React.FC<IconSvgProps> = ({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-    
       viewBox="0 -960 960 960"
       height={size || height}
       width={size || width}
@@ -647,7 +646,6 @@ export const PlusIcon: React.FC<IconSvgProps> = ({
       height={size || height}
       width={size || width}
       {...props}
-     
     >
       <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
     </svg>
@@ -666,7 +664,6 @@ export const MinusIcon: React.FC<IconSvgProps> = ({
       height={size || height}
       width={size || width}
       {...props}
-   
     >
       <path d="M200-440v-80h560v80H200Z" />
     </svg>
@@ -707,6 +704,83 @@ export const ArrowForwardIcon: React.FC<IconSvgProps> = ({
       fill="#666666"
     >
       <path d="M647-440H160v-80h487L423-744l57-56 320 320-320 320-57-56 224-224Z" />
+    </svg>
+  );
+};
+export const DashboardIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#1f1f1f"
+    >
+      <path d="M520-600v-240h320v240H520ZM120-440v-400h320v400H120Zm400 320v-400h320v400H520Zm-400 0v-240h320v240H120Zm80-400h160v-240H200v240Zm400 320h160v-240H600v240Zm0-480h160v-80H600v80ZM200-200h160v-80H200v80Zm160-320Zm240-160Zm0 240ZM360-280Z" />
+    </svg>
+  );
+};
+export const PersonIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#1f1f1f"
+    >
+      <path d="M480-480q-66 0-113-47t-47-113q0-66 47-113t113-47q66 0 113 47t47 113q0 66-47 113t-113 47ZM160-160v-112q0-34 17.5-62.5T224-378q62-31 126-46.5T480-440q66 0 130 15.5T736-378q29 15 46.5 43.5T800-272v112H160Zm80-80h480v-32q0-11-5.5-20T700-306q-54-27-109-40.5T480-360q-56 0-111 13.5T260-306q-9 5-14.5 14t-5.5 20v32Zm240-320q33 0 56.5-23.5T560-640q0-33-23.5-56.5T480-720q-33 0-56.5 23.5T400-640q0 33 23.5 56.5T480-560Zm0-80Zm0 400Z" />
+    </svg>
+  );
+};
+export const InventoryIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 -960 960 960"
+      height={size || height}
+      width={size || width}
+      {...props}
+      fill="#1f1f1f"
+    >
+      <path d="M620-163 450-333l56-56 114 114 226-226 56 56-282 282Zm220-397h-80v-200h-80v120H280v-120h-80v560h240v80H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h167q11-35 43-57.5t70-22.5q40 0 71.5 22.5T594-840h166q33 0 56.5 23.5T840-760v200ZM480-760q17 0 28.5-11.5T520-800q0-17-11.5-28.5T480-840q-17 0-28.5 11.5T440-800q0 17 11.5 28.5T480-760Z" />
+    </svg>
+  );
+};
+export const PasswordIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+     
+      viewBox="0 -960 960 960"
+       height={size || height}
+      width={size || width}
+      {...props}
+      fill="#1f1f1f"
+    >
+      <path d="M80-200v-80h800v80H80Zm46-242-52-30 34-60H40v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Zm320 0-52-30 34-60h-68v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Zm320 0-52-30 34-60h-68v-60h68l-34-58 52-30 34 58 34-58 52 30-34 58h68v60h-68l34 60-52 30-34-60-34 60Z" />
     </svg>
   );
 };

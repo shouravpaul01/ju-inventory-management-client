@@ -1,6 +1,6 @@
 "use client";
 
-import { Checkbox, CheckboxProps } from "@nextui-org/checkbox";
+import { Checkbox, CheckboxProps } from "@heroui/checkbox";
 import { RegisterOptions, useFormContext } from "react-hook-form";
 
 interface IProps {

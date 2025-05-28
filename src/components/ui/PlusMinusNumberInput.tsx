@@ -1,9 +1,9 @@
 "use client";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import { MinusIcon, PlusIcon } from "../icons";
 import { toast } from "sonner";
 import React, { useState, useEffect } from "react";
-import { Input } from "@nextui-org/input";
+import { Input } from "@heroui/input";
 
 type QuantityInputProps = {
   quantity: number;

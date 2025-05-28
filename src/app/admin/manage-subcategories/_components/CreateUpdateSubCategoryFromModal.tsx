@@ -11,7 +11,7 @@ import {
 import { TErrorMessage } from "@/src/types";
 import { subCategoryValidation } from "@/src/validations/subCategory.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import {
   Modal,
   ModalBody,
@@ -19,8 +19,8 @@ import {
   ModalFooter,
   ModalHeader,
   UseDisclosureProps,
-} from "@nextui-org/modal";
-import { Skeleton } from "@nextui-org/skeleton";
+} from "@heroui/modal";
+import { Skeleton } from "@heroui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";

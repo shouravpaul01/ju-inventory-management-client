@@ -19,10 +19,10 @@ import { TAccessory, TErrorMessage } from "@/src/types";
 import isEventExists from "@/src/utils/isEventExists";
 import { orderedItemSchemaValidation } from "@/src/validations/order.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Avatar } from "@nextui-org/avatar";
-import { Button } from "@nextui-org/button";
-import { Chip } from "@nextui-org/chip";
-import { Input } from "@nextui-org/input";
+import { Avatar } from "@heroui/avatar";
+import { Button } from "@heroui/button";
+import { Chip } from "@heroui/chip";
+import { Input } from "@heroui/input";
 import {
   Modal,
   ModalBody,
@@ -30,8 +30,8 @@ import {
   ModalFooter,
   ModalHeader,
   UseDisclosureProps,
-} from "@nextui-org/modal";
-import { Skeleton } from "@nextui-org/skeleton";
+} from "@heroui/modal";
+import { Skeleton } from "@heroui/skeleton";
 import {
   Table,
   TableBody,
@@ -39,16 +39,16 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
-import { code, divider } from "@nextui-org/theme";
-import { Tooltip } from "@nextui-org/tooltip";
-import { User } from "@nextui-org/user";
+} from "@heroui/table";
+import { code, divider } from "@heroui/theme";
+import { Tooltip } from "@heroui/tooltip";
+import { User } from "@heroui/user";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { FieldValues,  useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { CalendarDate, parseDate } from "@internationalized/date";
+import {  parseDate } from "@internationalized/date";
 
 export default function OrderItems({
   useDisclosure,
@@ -85,7 +85,7 @@ export default function OrderItems({
          returnDeadline:parseDate(dayjs(item.returnDeadline as any).format('YYYY-MM-DD')) ,
         isProvided: item.isProvided,
       }));
-      console.log(defaultValues, "default");
+      
       methods.reset({ items: defaultValues });
     }
     if (!useDisclosure.isOpen) {

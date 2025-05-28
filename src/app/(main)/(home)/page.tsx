@@ -2,7 +2,7 @@
 import AccessoryCard from "@/src/components/card/AccessoryCard";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import { TQuery } from "@/src/types";
-import { Pagination } from "@nextui-org/pagination";
+import { Pagination } from "@heroui/pagination";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 

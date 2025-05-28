@@ -5,8 +5,8 @@ import {
   InfoIcon,
   MoreIcon,
 } from "@/src/components/icons";
-import { Button, ButtonGroup } from "@nextui-org/button";
-import { useDisclosure } from "@nextui-org/modal";
+import { Button, ButtonGroup } from "@heroui/button";
+import { useDisclosure } from "@heroui/modal";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import CreateUpdateCategoryFromModal from "./_components/CreateUpdateCategoryFromModal";
@@ -18,16 +18,16 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from "@nextui-org/table";
-import { Pagination } from "@nextui-org/pagination";
-import { Chip } from "@nextui-org/chip";
-import { Popover, PopoverContent, PopoverTrigger } from "@nextui-org/popover";
-import { Listbox, ListboxItem } from "@nextui-org/listbox";
+} from "@heroui/table";
+import { Pagination } from "@heroui/pagination";
+import { Chip } from "@heroui/chip";
+import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
+import { Listbox, ListboxItem } from "@heroui/listbox";
 import { TQuery } from "@/src/types";
 import { getAllCategories } from "@/src/hooks/Category";
 import { useQueryClient } from "@tanstack/react-query";
 import JULoading from "@/src/components/ui/JULoading";
-import { Tooltip } from "@nextui-org/tooltip";
+import { Tooltip } from "@heroui/tooltip";
 import {
   updateCategoryActiveStatus,
   updateCategoryApprovedStatus,

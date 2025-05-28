@@ -1,6 +1,6 @@
 import JULoading from "@/src/components/ui/JULoading";
 import { getSingleSubCategory } from "@/src/hooks/Sub Category";
-import { Chip } from "@nextui-org/chip";
+import { Chip } from "@heroui/chip";
 import {
   Modal,
   ModalBody,
@@ -8,8 +8,8 @@ import {
   ModalFooter,
   ModalHeader,
   UseDisclosureProps,
-} from "@nextui-org/modal";
-import { Skeleton } from "@nextui-org/skeleton";
+} from "@heroui/modal";
+import { Skeleton } from "@heroui/skeleton";
 
 interface IProps {
   useDisclosure: UseDisclosureProps | any;

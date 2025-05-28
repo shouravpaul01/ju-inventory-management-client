@@ -10,7 +10,7 @@ import { TErrorMessage } from "@/src/types";
 import {
   facultyValidation,
 } from "@/src/validations/faculty.validation";
-import { Button } from "@nextui-org/button";
+import { Button } from "@heroui/button";
 import {
   Modal,
   ModalBody,
@@ -18,7 +18,7 @@ import {
   ModalFooter,
   ModalHeader,
   UseDisclosureProps,
-} from "@nextui-org/modal";
+} from "@heroui/modal";
 import { useQueryClient } from "@tanstack/react-query";
 import { useMemo, useState } from "react";
 import { FieldValues, SubmitHandler } from "react-hook-form";
