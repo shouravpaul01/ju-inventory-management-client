@@ -30,10 +30,13 @@ import SearchInput from "./ui/SearchInput";
 import { useUser } from "../context/user.provider";
 import { logoutUser } from "../services/Auth";
 import { useCart } from "../hooks/cart";
+import { useQueryClient } from "@tanstack/react-query";
+import { useGetCurrentUser } from "../hooks/Auth";
 
 
 export const Navbar = () => {
-  const { user, setIsLoading } = useUser();
+const queryClient = useQueryClient()
+const {data:user} = useGetCurrentUser()
  const {cart} =useCart()
   return (
     <NextUINavbar
@@ -157,7 +160,7 @@ export const Navbar = () => {
               color="danger"
               startContent={<LogoutIcon />}
               onPress={async () => {
-                await logoutUser(), setIsLoading(true);
+                await logoutUser(), queryClient.removeQueries({ queryKey: ['current-user'] });;
               }}
             >
               Log Out

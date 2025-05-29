@@ -75,3 +75,24 @@ export const updateOrderItemsReq = async (orderId: string,itemId:string, payload
     return error?.response?.data;
   }
 };
+export const getAllUserOrdersReq = async ({userId,
+  query,
+}: {
+  userId: string;
+  query: TQuery[];
+}): Promise<{
+  success: string;
+  message: string;
+  data: { data: TOrder[]; totalPages: number } | undefined;
+}> => {
+  const params = new URLSearchParams();
+  if (Array.isArray(query) && query?.length > 0) {
+    query?.forEach((item) => params.append(item.name, item.value));
+  }
+  try {
+    const res = await axiosInstance.get(`/orders/user-orders/${userId}`, { params });
+    return res.data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};

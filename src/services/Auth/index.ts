@@ -8,6 +8,8 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { FieldValues } from "react-hook-form";
 
+
+
 export const loginReq = async (payload: FieldValues) => {
   try {
     const cookieStore = await cookies()
@@ -32,6 +34,8 @@ export const getCurrentuser = async () => {
   return decodedResult;
 };
 export const logoutUser = async () => {
+  
+    
   const cookieStore = await cookies()
   return cookieStore.delete("accessToken");
 };

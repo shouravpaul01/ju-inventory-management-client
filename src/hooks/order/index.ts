@@ -1,4 +1,4 @@
-import { getAllOrdersReq, getSingleOrderReq } from "@/src/services/order";
+import { getAllOrdersReq, getAllUserOrdersReq, getSingleOrderReq } from "@/src/services/order";
 import { TQuery } from "@/src/types";
 import { useQuery } from "@tanstack/react-query";
 
@@ -19,5 +19,15 @@ export const getAllOrders = ({ query }: { query: TQuery[] }) => {
         return res?.data;
       },
       enabled:!!orderId
+    });
+  };
+  export const useGetAllUserOrders = ({userId, query }: {userId:string, query: TQuery[] }) => {
+    return useQuery({
+      queryKey: ["user-orders", query],
+      queryFn: async () => {
+        const res = await getAllUserOrdersReq({userId, query });
+        return res?.data;
+      },
+      enabled: !!userId,
     });
   };
