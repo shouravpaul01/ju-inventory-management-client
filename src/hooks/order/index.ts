@@ -18,7 +18,8 @@ export const getAllOrders = ({ query }: { query: TQuery[] }) => {
         const res = await getSingleOrderReq(orderId);
         return res?.data;
       },
-      enabled:!!orderId
+      enabled:!!orderId,
+      staleTime:0,
     });
   };
   export const useGetAllUserOrders = ({userId, query }: {userId:string, query: TQuery[] }) => {

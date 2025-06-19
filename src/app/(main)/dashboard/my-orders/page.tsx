@@ -36,6 +36,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useDisclosure } from "@heroui/modal";
 import { useGetCurrentUser } from "@/src/hooks/Auth";
+import OrderItems from "../_components/OrderItems";
 // import OrderItems from "./_components/OrderItems";
 
 export default function MyOrdersPage() {
@@ -200,9 +201,9 @@ export default function MyOrdersPage() {
                   shape="circle"
                   size="md"
                 >
-                  <Tooltip content="Set Deadline" showArrow={true}>
+                  <Tooltip content="View Accessories" showArrow={true}>
                     <Button color="primary" size="sm" onPress={()=>{setOrderId(item._id),modelOrderItems.onOpen()}}>
-                      Items
+                      Accessories
                     </Button>
                   </Tooltip>
                 </Badge>
@@ -357,7 +358,7 @@ export default function MyOrdersPage() {
           )}
         </TableBody>
       </Table>
-      {/* <OrderItems orderId={orderId} useDisclosure={modelOrderItems}/> */}
+      <OrderItems orderId={orderId} useDisclosure={modelOrderItems}/>
     </div>
   );
 }

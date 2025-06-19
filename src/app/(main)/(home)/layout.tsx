@@ -5,7 +5,12 @@ import FilterSidebar from "../_components/FilterSidebar";
 
 
 
-export default function MainLayout({ children }: { children: ReactNode }) {
+
+
+export default function MainLayout({ children  }: { children: ReactNode }) {
+
+  
+
   return (
    
          

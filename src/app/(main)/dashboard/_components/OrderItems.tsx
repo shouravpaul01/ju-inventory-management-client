@@ -64,7 +64,7 @@ export default function OrderItems({
     resolver: zodResolver(orderedItemSchemaValidation),
   });
   const { data: order, isLoading: isOrderLoading } = getSingleOrder(orderId);
-
+console.log(orderId,"orderId")
   const {
     watch,
     formState: { errors },
@@ -187,7 +187,11 @@ export default function OrderItems({
                       order.items.map((item, index) => (
                         <TableRow key={index}>
                           <TableCell>
-                            <Tooltip
+                            {
+                              !isEventExists({
+                                events: order?.events!,
+                                checkEvent: "approved",
+                              }) && <Tooltip
                               content={
                                 item.isProvided ? "Already provided." : ""
                               }
@@ -200,6 +204,8 @@ export default function OrderItems({
                                 }}
                               />
                             </Tooltip>
+                            }
+                            
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -215,15 +221,7 @@ export default function OrderItems({
                                 <p className="font-bold line-clamp-1">
                                   {(item.accessory as TAccessory)?.name}
                                 </p>
-                                <div className="flex items-center gap-1">
-                                  <span>Quantity:</span>
-                                  <Chip size="sm" color="success" radius="full">
-                                    {
-                                      (item.accessory as TAccessory)
-                                        ?.quantityDetails?.currentQuantity
-                                    }
-                                  </Chip>
-                                </div>
+                                
                                 <Chip size="sm" color="warning">
                                   {(item.accessory as TAccessory)
                                     ?.isItReturnable
@@ -234,148 +232,30 @@ export default function OrderItems({
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div>
+                            <div className="space-y-1">
                               <div className="flex gap-2">
                                 <span>Expected Qty:</span>
                                 <Chip size="sm" color="success">
                                   {item?.expectedQuantity}
                                 </Chip>
                               </div>
-                              {isEventExists({
+                              {(isEventExists({
                                 events: order?.events!,
                                 checkEvent: "approved",
-                              }) && (
-                                <div className="space-y-1">
-                                  {item?.providedQuantity &&
-                                    eidtItem !==
-                                      (item.accessory as TAccessory)._id && (
-                                      <div className=" flex gap-1">
-                                        <span>Provided Qty:</span>
-
-                                        <Chip
-                                          size="sm"
-                                          color="success"
-                                          radius="full"
-                                        >
-                                          {item?.providedQuantity || 0}
-                                        </Chip>
-                                      </div>
-                                    )}
-                                  {(!item.isProvided ||
-                                    eidtItem ==
-                                      (item.accessory as TAccessory)._id) &&
-                                    watch(`items.${index}.isProvided`) && (
-                                      <div>
-                                        <span>Provided Qty:</span>
-                                        <JUNumberInput
-                                          name={`items.${index}.providedQuantity`}
-                                        />
-                                      </div>
-                                    )}
-
-                                  {errors?.items &&
-                                    (errors as FieldValues)?.items[index]
-                                      ?.providedQuantity && (
-                                      <p className="text-red-500">
-                                        {
-                                          (errors as FieldValues)?.items[index]
-                                            ?.providedQuantity?.message
-                                        }
-                                      </p>
-                                    )}
-                                </div>
-                              )}
+                              }) && item?.isProvided) ?<div className="flex gap-2">
+                                <span>Provided Qty:</span>
+                                <Chip size="sm" color="success" radius="full">
+                                  {item?.providedQuantity}
+                                </Chip>
+                              </div>:<Chip color="danger" size="sm">Not Approved</Chip>}
                             </div>
                           </TableCell>
                           <TableCell>
                             <div>
-                              {isEventExists({
+                              {(isEventExists({
                                 events: order?.events!,
                                 checkEvent: "approved",
-                              }) &&
-                                (!item.isProvided ||
-                                  eidtItem ==
-                                    (item.accessory as TAccessory)._id) &&
-                                watch(`items.${index}.isProvided`) &&
-                                ((item.accessory as TAccessory)
-                                  .isItReturnable ? (
-                                  <div className="space-y-1">
-                                    <JUSelect
-                                      options={[
-                                        ...(item.accessory as TAccessory)
-                                          .codeDetails.currentCodes,
-                                        ...item?.providedAccessoryCodes,
-                                      ].sort().map((element) => ({
-                                        value: element,
-                                        label: element,
-                                      }))}
-                                      name={`items.${index}.providedAccessoryCodes`}
-                                      selectProps={{
-                                        className: "max-w-[300px]",
-                                        selectionMode: "multiple",
-                                        label: "Provided Codes:",
-                                        labelPlacement: "outside",
-                                        placeholder: "Select Codes",
-
-                                        defaultSelectedKeys: [
-                                          ...item?.providedAccessoryCodes,
-                                        ],
-                                        isDisabled:
-                                          methods.watch(
-                                            `items.${index}.isProvided`
-                                          ) == false,
-                                        classNames: { label: "text-sm" },
-                                      }}
-                                    />
-                                    {errors?.items &&
-                                      (errors as FieldValues)?.items[index]
-                                        ?.providedAccessoryCodes && (
-                                        <p className="text-red-500">
-                                          {
-                                            (errors as FieldValues)?.items[
-                                              index
-                                            ]?.providedAccessoryCodes?.message
-                                          }
-                                        </p>
-                                      )}
-                                    <JUDatePicker
-                                      name={`items.${index}.returnDeadline`}
-                                      inputProps={{
-                                        label: "Return Deadline:",
-                                        labelPlacement: "outside",
-                                        variant: "bordered",
-
-                                       
-                                        isDisabled:
-                                          methods.watch(
-                                            `items.${index}.isProvided`
-                                          ) == false,
-                                        classNames: { label: "text-sm" },
-                                      }}
-                                    />
-                                    {errors?.items &&
-                                      (errors as FieldValues)?.items[index]
-                                        ?.returnDeadline && (
-                                        <p className="text-red-500">
-                                          {
-                                            (errors as FieldValues)?.items[
-                                              index
-                                            ]?.returnDeadline?.message
-                                          }
-                                        </p>
-                                      )}
-                                  </div>
-                                ) : (
-                                  <p className="text-slate-600">
-                                    The order item is non-returnable, so the
-                                    return deadline and codes will not be
-                                    provided.
-                                  </p>
-                                ))}
-                              {item?.providedAccessoryCodes?.length > 0 &&
-                                eidtItem !==
-                                  (item.accessory as TAccessory)._id && (
-                                  <div>
+                              }) && item.isProvided )?<div>
                                     <div className="space-y-1">
                                       <span className="block">
                                         Provided Codes:
@@ -441,8 +321,7 @@ export default function OrderItems({
                                         )}
                                       </Chip>
                                     </div>
-                                  </div>
-                                )}
+                                  </div>:<Chip color="danger" size="sm">Not Approved</Chip>}
                             </div>
                           </TableCell>
                           <TableCell>
