@@ -3,7 +3,7 @@ import {
   HomeIcon,
   InventoryIcon,
   PasswordIcon,
-  PersonIcon,
+
 } from "@/src/components/icons";
 import { Link } from "@heroui/link";
 import { Listbox, ListboxItem } from "@heroui/listbox";

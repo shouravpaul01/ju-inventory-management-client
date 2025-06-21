@@ -27,7 +27,7 @@ const orderedItemSchema = z
     if (data.returnDeadline) {
       data.returnDeadline = dayjs(data.returnDeadline).format("MMM D, YYYY");
     }
-console.log(data,"superRe")
+
     // Validation logic
     if (data.providedQuantity > data.expectedQuantity) {
       ctx.addIssue({
@@ -82,7 +82,10 @@ console.log(data,"superRe")
       }
     }
   });
-
+export const ReturnedItemSchemValidation = z.object({
+ items: z.array(
+    z.object({ returnedAccessoriesCodes: z.union([z.string(), z.array(z.string()).nonempty("Returned accessory codes cannot be empty.")]) }))
+})
 export const orderedItemSchemaValidation = z.object({
   items: z.array(orderedItemSchema),
 });

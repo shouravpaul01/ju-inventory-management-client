@@ -96,3 +96,15 @@ export const getAllUserOrdersReq = async ({userId,
     return error?.response?.data;
   }
 };
+export const returnedAccessoriesCodesReq = async(orderId: string, returnDetails: FieldValues) => {
+  try {
+    const res = await axiosInstance.patch(
+      `/orders/retured-accessories/${orderId}`, returnDetails
+    );
+
+    return res.data;
+  } catch (error: any) {
+    console.log(error, "error");
+    return error?.response?.data;
+  }
+}

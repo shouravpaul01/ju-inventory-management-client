@@ -17,7 +17,7 @@ import { getSingleOrder } from "@/src/hooks/order";
 import { updateOrderItemsReq } from "@/src/services/order";
 import { TAccessory, TErrorMessage } from "@/src/types";
 import isEventExists from "@/src/utils/isEventExists";
-import { orderedItemSchemaValidation } from "@/src/validations/order.validation";
+import { orderedItemSchemaValidation, ReturnedItemSchemValidation } from "@/src/validations/order.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
@@ -46,9 +46,9 @@ import { User } from "@heroui/user";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
-import { FieldValues,  useForm } from "react-hook-form";
+import { FieldValues, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {  parseDate } from "@internationalized/date";
+import { parseDate } from "@internationalized/date";
 
 export default function OrderItems({
   useDisclosure,
@@ -60,11 +60,12 @@ export default function OrderItems({
   const queryClient = useQueryClient();
   const [isSubmitLoading, setSubmitLoading] = useState<any>(null);
   const [eidtItem, setEditItem] = useState<string | null>(null);
+  const [returnItem, setReturnItem] = useState<string | null>(null);
   const methods = useForm({
-    resolver: zodResolver(orderedItemSchemaValidation),
+   resolver: zodResolver( ReturnedItemSchemValidation),
   });
   const { data: order, isLoading: isOrderLoading } = getSingleOrder(orderId);
-console.log(orderId,"orderId")
+  console.log(orderId, "orderId");
   const {
     watch,
     formState: { errors },
@@ -82,10 +83,12 @@ console.log(orderId,"orderId")
           value: element,
           label: element,
         })),
-         returnDeadline:parseDate(dayjs(item.returnDeadline as any).format('YYYY-MM-DD')) ,
+        returnDeadline: parseDate(
+          dayjs(item.returnDeadline as any).format("YYYY-MM-DD")
+        ),
         isProvided: item.isProvided,
       }));
-      
+
       methods.reset({ items: defaultValues });
     }
     if (!useDisclosure.isOpen) {
@@ -106,7 +109,8 @@ console.log(orderId,"orderId")
       if (rowData?.providedAccessoryCodes && rowData?.returnDeadline) {
         rowData.providedAccessoryCodes = rowData.providedAccessoryCodes
           ?.split(",")
-          .map((code: any) => code.trim()).sort();
+          .map((code: any) => code.trim())
+          .sort();
         rowData.returnDeadline = dayjs(rowData.returnDeadline).format(
           "MMM D, YYYY"
         );
@@ -130,7 +134,46 @@ console.log(orderId,"orderId")
 
     setSubmitLoading(null);
   };
+  const handleReturndSubmit = async (index: number, itemId: string) => {
+    setSubmitLoading({ _id: itemId });
+console.log(index,itemId, "index,itemId");
+    // Validate only the current row's fields
+    const isValid = await methods.trigger(`items.${index}`);
+const rowData = methods.getValues(`items.${index}`);
 
+console.log(rowData, "rowData");
+console.log(isValid, "isValid");
+    // if (isValid) {
+    //   const rowData = methods.getValues(`items.${index}`);
+    //   console.log(rowData, "before");
+    //   if (rowData?.providedAccessoryCodes && rowData?.returnDeadline) {
+    //     rowData.providedAccessoryCodes = rowData.providedAccessoryCodes
+    //       ?.split(",")
+    //       .map((code: any) => code.trim())
+    //       .sort();
+    //     rowData.returnDeadline = dayjs(rowData.returnDeadline).format(
+    //       "MMM D, YYYY"
+    //     );
+    //   }
+    //   console.log(rowData, "after");
+    //   const res = await updateOrderItemsReq(order?._id!, itemId, rowData);
+    //   console.log(res, "res");
+    //   if (res?.success) {
+    //     queryClient.invalidateQueries({ queryKey: ["single-order"] });
+    //     toast.success(res?.message);
+    //   } else if (!res?.success && res?.errorMessages?.length > 0) {
+    //     if (res?.errorMessages[0]?.path == "orderError") {
+    //       toast.error(res?.errorMessages[0]?.message);
+    //     }
+
+    //     res?.errorMessages?.forEach((err: TErrorMessage) => {
+    //       methods.setError(err.path, { type: "server", message: err.message });
+    //     });
+    //   }
+    // }
+
+    setSubmitLoading(null);
+  };
   return (
     <Modal
       isOpen={useDisclosure.isOpen}
@@ -162,22 +205,19 @@ console.log(orderId,"orderId")
                   }}
                 >
                   <TableHeader>
-                    <TableColumn key="isProvided">
-                      <></>
-                    </TableColumn>
                     <TableColumn key="item" width={280}>
                       Item
                     </TableColumn>
-                    <TableColumn key="expectedQty" width={180}>
+                    <TableColumn key="expectedQty" width={150}>
                       Order Qty
                     </TableColumn>
-                    <TableColumn key="providedQty" width={300}>
+                    <TableColumn key="providedQty" width={320}>
                       {isEventExists({
                         events: order?.events!,
                         checkEvent: "approved",
                       })
-                        ? "Provided Qty - Return Deadline"
-                        : "Approval"}
+                        ? "Accessory Codes"
+                        : "Accessories"}
                     </TableColumn>
                     <TableColumn key="action">Action</TableColumn>
                   </TableHeader>
@@ -186,27 +226,6 @@ console.log(orderId,"orderId")
                     {order?.items && order.items.length > 0 ? (
                       order.items.map((item, index) => (
                         <TableRow key={index}>
-                          <TableCell>
-                            {
-                              !isEventExists({
-                                events: order?.events!,
-                                checkEvent: "approved",
-                              }) && <Tooltip
-                              content={
-                                item.isProvided ? "Already provided." : ""
-                              }
-                            >
-                              <JUCheckbox
-                                name={`items.${index}.isProvided`}
-                                checkboxProps={{
-                                  isReadOnly: item.isProvided,
-                                  defaultSelected: item.isProvided,
-                                }}
-                              />
-                            </Tooltip>
-                            }
-                            
-                          </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <div>
@@ -217,45 +236,132 @@ console.log(orderId,"orderId")
                                   src={(item.accessory as TAccessory)?.image}
                                 />
                               </div>
-                              <div className="space-y-1">
+                              <div className="flex flex-col gap-1">
                                 <p className="font-bold line-clamp-1">
                                   {(item.accessory as TAccessory)?.name}
                                 </p>
-                                
+
                                 <Chip size="sm" color="warning">
                                   {(item.accessory as TAccessory)
                                     ?.isItReturnable
                                     ? "Returnable"
                                     : "Non-returnable"}
                                 </Chip>
+                                <Chip
+                                  size="sm"
+                                  color={item.isProvided ? "success" : "danger"}
+                                >
+                                  {item.isProvided
+                                    ? "Provided"
+                                    : "Not Provided"}
+                                </Chip>
+                                 {(item.accessory as TAccessory)?.isItReturnable && <div className="flex items-center gap-1">
+                                      <span className="block">
+                                        Return D:
+                                      </span>
+                                      <Chip
+                                        key={index}
+                                        size="sm"
+                                        color="success"
+                                        radius="full"
+                                      >
+                                        {dayjs(item.returnDeadline).format(
+                                          "MMM D, YYYY"
+                                        )}
+                                      </Chip>
+                                    </div>}
                               </div>
+                             
                             </div>
                           </TableCell>
                           <TableCell>
                             <div className="space-y-1">
-                              <div className="flex gap-2">
-                                <span>Expected Qty:</span>
-                                <Chip size="sm" color="success">
-                                  {item?.expectedQuantity}
-                                </Chip>
-                              </div>
-                              {(isEventExists({
+                              {!isEventExists({
                                 events: order?.events!,
                                 checkEvent: "approved",
-                              }) && item?.isProvided) ?<div className="flex gap-2">
-                                <span>Provided Qty:</span>
-                                <Chip size="sm" color="success" radius="full">
-                                  {item?.providedQuantity}
-                                </Chip>
-                              </div>:<Chip color="danger" size="sm">Not Approved</Chip>}
+                              }) &&
+                              eidtItem == (item.accessory as TAccessory)._id ? (
+                                <div>
+                                  <span>Expected Qty:</span>
+                                  <JUNumberInput
+                                    name={`items.${index}.expectedQuantity`}
+                                  />
+                                </div>
+                              ) : (
+                                <div className="flex gap-2">
+                                  <span>Expected Qty:</span>
+                                  <Chip size="sm" radius="md" color="success">
+                                    {item?.expectedQuantity}
+                                  </Chip>
+                                </div>
+                              )}
+
+                              {isEventExists({
+                                events: order?.events!,
+                                checkEvent: "approved",
+                              }) &&
+                                item?.isProvided && (
+                                  <div className="flex gap-2">
+                                    <span>Provided Qty:</span>
+                                    <Chip
+                                      size="sm"
+                                      color="success"
+                                      radius="md"
+                                    >
+                                      {item?.providedQuantity}
+                                    </Chip>
+                                  </div>
+                                )}
                             </div>
                           </TableCell>
                           <TableCell>
                             <div>
-                              {(isEventExists({
-                                events: order?.events!,
-                                checkEvent: "approved",
-                              }) && item.isProvided )?<div>
+                              {(item.accessory as TAccessory).isItReturnable ? (
+                                isEventExists({
+                                  events: order?.events!,
+                                  checkEvent: "approved",
+                                }) &&
+                                returnItem ==
+                                  (item.accessory as TAccessory)?._id! ? (
+                                  <div className="space-y-1">
+                                    <JUSelect
+                                      options={[
+                              
+                                        ...item?.providedAccessoryCodes,
+                                      ]
+                                        .sort()
+                                        .map((element) => ({
+                                          value: element,
+                                          label: element,
+                                        }))}
+                                      name={`items.${index}.returnedAccessoriesCodes`}
+                                      selectProps={{
+                                        className: "max-w-[300px]",
+                                        selectionMode: "multiple",
+                                        label: "Return Codes:",
+                                        labelPlacement: "outside",
+                                        placeholder: "Select Codes",
+
+                                       
+                                        isClearable: true,
+                                        classNames: { label: "text-sm" },
+                                      }}
+                                    />
+                                    {errors?.items &&
+                                      (errors as FieldValues)?.items[index]
+                                        ?.returnedAccessoriesCodes && (
+                                        <p className="text-red-500">
+                                          {
+                                            (errors as FieldValues)?.items[
+                                              index
+                                            ]?.returnedAccessoriesCodes?.message
+                                          }
+                                        </p>
+                                      )}
+                                   
+                                  </div>
+                                ) : (
+                                  <div>
                                     <div className="space-y-1">
                                       <span className="block">
                                         Provided Codes:
@@ -306,61 +412,89 @@ console.log(orderId,"orderId")
                                         )}
                                       </div>
                                     </div>
-                                    <div className="flex items-center gap-1">
-                                      <span className="block">
-                                        Return DeadLine:
-                                      </span>
-                                      <Chip
-                                        key={index}
-                                        size="sm"
-                                        color="success"
-                                        radius="full"
-                                      >
-                                        {dayjs(item.returnDeadline).format(
-                                          "MMM D, YYYY"
-                                        )}
-                                      </Chip>
-                                    </div>
-                                  </div>:<Chip color="danger" size="sm">Not Approved</Chip>}
+                                    
+                                  </div>
+                                )
+                              ) : (
+                                <p className="text-gray-500">
+                                  The accessory is not returnable.
+                                </p>
+                              )}
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="flex gap-1">
-                              {!item.isProvided ||
-                              eidtItem == (item.accessory as TAccessory)._id ? (
-                                <Button
-                                  color="primary"
-                                  size="sm"
-                                  isDisabled={
-                                    watch(`items.${index}.isProvided`) == false
-                                  }
-                                  isLoading={
-                                    isSubmitLoading?._id ===
-                                    (item.accessory as TAccessory)?._id!
-                                  }
-                                  onPress={() =>
-                                    handleSubmit(
-                                      index,
-                                      (item.accessory as TAccessory)._id!
-                                    )
-                                  }
-                                >
-                                  {item.isProvided ? "Update" : "Submit"}
-                                </Button>
-                              ) : (
-                                <Button
-                                  isIconOnly
-                                  color="primary"
-                                  variant="flat"
-                                  size="sm"
-                                  startContent={<EditIcon />}
-                                  onPress={() =>
-                                    setEditItem(
-                                      (item.accessory as TAccessory)._id!
-                                    )
-                                  }
-                                ></Button>
-                              )}
+                            <div className="flex flex-col gap-1">
+                              {(item.accessory as TAccessory)?.isItReturnable &&
+                                isEventExists({
+                                  events: order?.events!,
+                                  checkEvent: "approved",
+                                }) &&
+                                (returnItem ==
+                                (item.accessory as TAccessory)._id ? (
+                                  <Button
+                                    color="primary"
+                                    variant="flat"
+                                    size="sm"
+                                    startContent={<EditIcon />}
+                                    onPress={()=>handleReturndSubmit(index, (item.accessory as TAccessory)._id!)}
+                                  >
+                                    Return Submit
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    color="primary"
+                                    variant="flat"
+                                    size="sm"
+                                    startContent={<EditIcon />}
+                                    onPress={() =>
+                                      setReturnItem(
+                                        (item.accessory as TAccessory)._id!
+                                      )
+                                    }
+                                  >
+                                    Return
+                                  </Button>
+                                ))}
+                              {!isEventExists({
+                                events: order?.events!,
+                                checkEvent: "approved",
+                              }) &&
+                                (eidtItem ==
+                                (item.accessory as TAccessory)._id ? (
+                                  <Button
+                                    color="primary"
+                                    size="sm"
+                                    isDisabled={
+                                      watch(`items.${index}.isProvided`) ==
+                                      false
+                                    }
+                                    isLoading={
+                                      isSubmitLoading?._id ===
+                                      (item.accessory as TAccessory)?._id!
+                                    }
+                                    onPress={() =>
+                                      handleSubmit(
+                                        index,
+                                        (item.accessory as TAccessory)._id!
+                                      )
+                                    }
+                                  >
+                                    {item.isProvided ? "Update" : "Submit"}
+                                  </Button>
+                                ) : (
+                                  <Button
+                                    isIconOnly
+                                    color="primary"
+                                    variant="flat"
+                                    size="sm"
+                                    startContent={<EditIcon />}
+                                    onPress={() =>
+                                      setEditItem(
+                                        (item.accessory as TAccessory)._id!
+                                      )
+                                    }
+                                  ></Button>
+                                ))}
                               <Button
                                 color="primary"
                                 variant="flat"
