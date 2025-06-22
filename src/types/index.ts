@@ -155,7 +155,7 @@ export type TAccessoryCartItem = {
 export type TReturnDetails = {
   orderItem: string;
   quantity: number;
-  returnedAccessoryCodes: string[];
+  returnedAccessoriesCodes: string[];
   returnedAt: Date;
   isReturnedOnTime: boolean;
   returnReceived: string;
@@ -169,6 +169,7 @@ export type TOrderItem = {
   isProvided:boolean,
   returnDeadline?: Date;
   returnedQuantity: number;
+  returnedAllAccessoriesCodes: string[];
   returnedDetails: TReturnDetails[];
 } 
 export type TEvents="pending" | "approved" | "delivered" | "received" | "cancelled";

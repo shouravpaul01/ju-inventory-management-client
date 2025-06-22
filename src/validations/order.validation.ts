@@ -8,8 +8,12 @@ const orderedItemSchema = z
       invalid_type_error: "Invalid Type.",
     }),
     currentQuantity: z.number().min(0, "Current quantity must be non-negative"),
-    expectedQuantity: z.number().min(1, "Expected quantity must be non-negative"),
-    providedQuantity: z.number().min(0, "Provided quantity must be non-negative"),
+    expectedQuantity: z
+      .number()
+      .min(1, "Expected quantity must be non-negative"),
+    providedQuantity: z
+      .number()
+      .min(0, "Provided quantity must be non-negative"),
     providedAccessoryCodes: z
       .union([z.string(), z.array(z.string())]) // Allow both string and array
       .optional(),
@@ -54,9 +58,7 @@ const orderedItemSchema = z
           path: ["providedAccessoryCodes"],
         });
       }
-      if (
-        data.providedAccessoryCodes?.length !== data.providedQuantity
-      ) {
+      if (data.providedAccessoryCodes?.length !== data.providedQuantity) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: `Select the code for the ${data.providedQuantity} items.`,
@@ -70,10 +72,7 @@ const orderedItemSchema = z
           path: ["returnDeadline"],
         });
       }
-      if (
-        data.returnDeadline &&
-        dayjs(data.returnDeadline).isBefore(dayjs())
-      ) {
+      if (data.returnDeadline && dayjs(data.returnDeadline).isBefore(dayjs())) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
           message: "Return Deadline cannot be in the past.",
@@ -82,10 +81,28 @@ const orderedItemSchema = z
       }
     }
   });
-export const ReturnedItemSchemValidation = z.object({
- items: z.array(
-    z.object({ returnedAccessoriesCodes: z.union([z.string(), z.array(z.string()).nonempty("Returned accessory codes cannot be empty.")]) }))
-})
+export const updateExpectedQuantitySchemValidation = z.object({
+  items: z.array(
+    z.object({
+      expectedQuantity: z
+        .number({required_error: "Expected quantity is required."})
+        .min(1, "Expected quantity must be non-negative")
+        .max(5, "Expected quantity must be at most 5")
+    })
+  ),
+});
+export const returnedItemSchemValidation = z.object({
+  items: z.array(
+    z.object({
+      returnedAccessoriesCodes: z.union([
+        z.string(),
+        z
+          .array(z.string())
+          .nonempty("Returned accessory codes cannot be empty."),
+      ]),
+    })
+  ),
+});
 export const orderedItemSchemaValidation = z.object({
   items: z.array(orderedItemSchema),
 });

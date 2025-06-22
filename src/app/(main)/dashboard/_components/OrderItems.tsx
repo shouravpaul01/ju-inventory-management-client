@@ -6,18 +6,22 @@ import JUInput from "@/src/components/form/JUInput";
 import JUNumberInput from "@/src/components/form/JUNumberInput";
 import JUSelect from "@/src/components/form/JUSelect";
 import {
+  ArrowRightAltIcon,
+  CycleIcon,
   EditIcon,
   ImageIcon,
   InfoIcon,
+  InputIcon,
   MoreHorzIcon,
   MoreIcon,
+  XmarkIcon,
 } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
 import { getSingleOrder } from "@/src/hooks/order";
-import { updateOrderItemsReq } from "@/src/services/order";
+import { returnedAccessoriesCodesReq, updateExpectedQuantityReq, updateOrderItemsReq } from "@/src/services/order";
 import { TAccessory, TErrorMessage } from "@/src/types";
 import isEventExists from "@/src/utils/isEventExists";
-import { orderedItemSchemaValidation, ReturnedItemSchemValidation } from "@/src/validations/order.validation";
+import { orderedItemSchemaValidation, returnedItemSchemValidation, updateExpectedQuantitySchemValidation } from "@/src/validations/order.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
@@ -59,10 +63,10 @@ export default function OrderItems({
 }) {
   const queryClient = useQueryClient();
   const [isSubmitLoading, setSubmitLoading] = useState<any>(null);
-  const [eidtItem, setEditItem] = useState<string | null>(null);
+  const [editItem, setEditItem] = useState<string | null>(null);
   const [returnItem, setReturnItem] = useState<string | null>(null);
   const methods = useForm({
-   resolver: zodResolver( ReturnedItemSchemValidation),
+    resolver: zodResolver(editItem ? updateExpectedQuantitySchemValidation : returnedItemSchemValidation),
   });
   const { data: order, isLoading: isOrderLoading } = getSingleOrder(orderId);
   console.log(orderId, "orderId");
@@ -94,32 +98,26 @@ export default function OrderItems({
     if (!useDisclosure.isOpen) {
       methods.reset();
       setEditItem(null);
+      setReturnItem(null);
     }
   }, [order, useDisclosure]);
   console.log(order, "ho");
-  const handleSubmit = async (index: number, itemId: string) => {
-    setSubmitLoading({ _id: itemId });
+  const handleUpdateExpectedQty = async (index: number, accessory: string) => {
+    setSubmitLoading({ _id: accessory });
 
     // Validate only the current row's fields
     const isValid = await methods.trigger(`items.${index}`);
-
+console.log(isValid, "isValid");
     if (isValid) {
       const rowData = methods.getValues(`items.${index}`);
-      console.log(rowData, "before");
-      if (rowData?.providedAccessoryCodes && rowData?.returnDeadline) {
-        rowData.providedAccessoryCodes = rowData.providedAccessoryCodes
-          ?.split(",")
-          .map((code: any) => code.trim())
-          .sort();
-        rowData.returnDeadline = dayjs(rowData.returnDeadline).format(
-          "MMM D, YYYY"
-        );
-      }
+      
+      const updateData = { accessory, expectedQuantity: rowData.expectedQuantity };
       console.log(rowData, "after");
-      const res = await updateOrderItemsReq(order?._id!, itemId, rowData);
-      console.log(res, "res");
+      const res = await updateExpectedQuantityReq(order?._id!, updateData);
+   
       if (res?.success) {
         queryClient.invalidateQueries({ queryKey: ["single-order"] });
+        setEditItem(null);
         toast.success(res?.message);
       } else if (!res?.success && res?.errorMessages?.length > 0) {
         if (res?.errorMessages[0]?.path == "orderError") {
@@ -134,43 +132,40 @@ export default function OrderItems({
 
     setSubmitLoading(null);
   };
-  const handleReturndSubmit = async (index: number, itemId: string) => {
-    setSubmitLoading({ _id: itemId });
-console.log(index,itemId, "index,itemId");
+  const handleReturnedSubmit = async (index: number, accessory: string) => {
+    setSubmitLoading({ _id: accessory });
+
     // Validate only the current row's fields
     const isValid = await methods.trigger(`items.${index}`);
-const rowData = methods.getValues(`items.${index}`);
 
-console.log(rowData, "rowData");
-console.log(isValid, "isValid");
-    // if (isValid) {
-    //   const rowData = methods.getValues(`items.${index}`);
-    //   console.log(rowData, "before");
-    //   if (rowData?.providedAccessoryCodes && rowData?.returnDeadline) {
-    //     rowData.providedAccessoryCodes = rowData.providedAccessoryCodes
-    //       ?.split(",")
-    //       .map((code: any) => code.trim())
-    //       .sort();
-    //     rowData.returnDeadline = dayjs(rowData.returnDeadline).format(
-    //       "MMM D, YYYY"
-    //     );
-    //   }
-    //   console.log(rowData, "after");
-    //   const res = await updateOrderItemsReq(order?._id!, itemId, rowData);
-    //   console.log(res, "res");
-    //   if (res?.success) {
-    //     queryClient.invalidateQueries({ queryKey: ["single-order"] });
-    //     toast.success(res?.message);
-    //   } else if (!res?.success && res?.errorMessages?.length > 0) {
-    //     if (res?.errorMessages[0]?.path == "orderError") {
-    //       toast.error(res?.errorMessages[0]?.message);
-    //     }
+    if (isValid) {
+      const rowData = methods.getValues(`items.${index}`);
+      const updateReturnedData:any={accessory}
+      if (rowData?.returnedAccessoriesCodes && rowData?.returnDeadline) {
+        updateReturnedData.returnedAccessoriesCodes = rowData.returnedAccessoriesCodes
+          ?.split(",")
+          .map((code: any) => code.trim())
+          .sort();
 
-    //     res?.errorMessages?.forEach((err: TErrorMessage) => {
-    //       methods.setError(err.path, { type: "server", message: err.message });
-    //     });
-    //   }
-    // }
+        
+      }
+      console.log(updateReturnedData, "after");
+      const res = await returnedAccessoriesCodesReq(order?._id!, updateReturnedData);
+      console.log(res, "res");
+      if (res?.success) {
+        queryClient.invalidateQueries({ queryKey: ["single-order"] });
+        setReturnItem(null);
+        toast.success(res?.message);
+      } else if (!res?.success && res?.errorMessages?.length > 0) {
+        if (res?.errorMessages[0]?.path == "orderError") {
+          toast.error(res?.errorMessages[0]?.message);
+        }
+
+        res?.errorMessages?.forEach((err: TErrorMessage) => {
+          methods.setError(err.path, { type: "server", message: err.message });
+        });
+      }
+    }
 
     setSubmitLoading(null);
   };
@@ -280,12 +275,23 @@ console.log(isValid, "isValid");
                                 events: order?.events!,
                                 checkEvent: "approved",
                               }) &&
-                              eidtItem == (item.accessory as TAccessory)._id ? (
+                              editItem == (item.accessory as TAccessory)._id ? (
                                 <div>
                                   <span>Expected Qty:</span>
                                   <JUNumberInput
                                     name={`items.${index}.expectedQuantity`}
                                   />
+                                   {errors?.items &&
+                                      (errors as FieldValues)?.items[index]
+                                        ?.expectedQuantity && (
+                                        <p className="text-red-500">
+                                          {
+                                            (errors as FieldValues)?.items[
+                                              index
+                                            ]?.expectedQuantity?.message
+                                          }
+                                        </p>
+                                      )}
                                 </div>
                               ) : (
                                 <div className="flex gap-2">
@@ -312,6 +318,15 @@ console.log(isValid, "isValid");
                                     </Chip>
                                   </div>
                                 )}
+                                {isEventExists({
+                                events: order?.events!,
+                                checkEvent: "approved",
+                              }) && item.returnedQuantity > 0 && <div className="flex gap-2">
+                                  <span>Returned Qty:</span>
+                                  <Chip size="sm" color={item.providedQuantity === item.returnedQuantity ? "success" : "danger"} radius="md">
+                                    {item?.returnedQuantity}
+                                  </Chip>
+                                </div>}
                             </div>
                           </TableCell>
                           <TableCell>
@@ -325,11 +340,9 @@ console.log(isValid, "isValid");
                                   (item.accessory as TAccessory)?._id! ? (
                                   <div className="space-y-1">
                                     <JUSelect
-                                      options={[
+                                      options={
                               
-                                        ...item?.providedAccessoryCodes,
-                                      ]
-                                        .sort()
+                                       item?.providedAccessoryCodes.sort().filter(element=>!item?.returnedAllAccessoriesCodes.includes(element))
                                         .map((element) => ({
                                           value: element,
                                           label: element,
@@ -433,10 +446,14 @@ console.log(isValid, "isValid");
                                 (item.accessory as TAccessory)._id ? (
                                   <Button
                                     color="primary"
-                                    variant="flat"
+                                    variant="shadow"
                                     size="sm"
-                                    startContent={<EditIcon />}
-                                    onPress={()=>handleReturndSubmit(index, (item.accessory as TAccessory)._id!)}
+                                    startContent={<InputIcon  className="fill-white"/>}
+                                    isLoading={
+                                      isSubmitLoading?._id ===
+                                      (item.accessory as TAccessory)?._id!
+                                    }
+                                    onPress={()=>handleReturnedSubmit(index, (item.accessory as TAccessory)._id!)}
                                   >
                                     Return Submit
                                   </Button>
@@ -445,7 +462,7 @@ console.log(isValid, "isValid");
                                     color="primary"
                                     variant="flat"
                                     size="sm"
-                                    startContent={<EditIcon />}
+                                    startContent={<ArrowRightAltIcon />}
                                     onPress={() =>
                                       setReturnItem(
                                         (item.accessory as TAccessory)._id!
@@ -459,31 +476,29 @@ console.log(isValid, "isValid");
                                 events: order?.events!,
                                 checkEvent: "approved",
                               }) &&
-                                (eidtItem ==
+                                (editItem ==
                                 (item.accessory as TAccessory)._id ? (
                                   <Button
                                     color="primary"
+                                    variant="shadow"
                                     size="sm"
-                                    isDisabled={
-                                      watch(`items.${index}.isProvided`) ==
-                                      false
-                                    }
+                                    startContent={<CycleIcon className="fill-white"/>}
                                     isLoading={
                                       isSubmitLoading?._id ===
                                       (item.accessory as TAccessory)?._id!
                                     }
                                     onPress={() =>
-                                      handleSubmit(
+                                      handleUpdateExpectedQty(
                                         index,
                                         (item.accessory as TAccessory)._id!
                                       )
                                     }
                                   >
-                                    {item.isProvided ? "Update" : "Submit"}
+                                    Update
                                   </Button>
                                 ) : (
                                   <Button
-                                    isIconOnly
+                                    
                                     color="primary"
                                     variant="flat"
                                     size="sm"
@@ -493,7 +508,7 @@ console.log(isValid, "isValid");
                                         (item.accessory as TAccessory)._id!
                                       )
                                     }
-                                  ></Button>
+                                  >Edit</Button>
                                 ))}
                               <Button
                                 color="primary"
@@ -503,6 +518,23 @@ console.log(isValid, "isValid");
                               >
                                 Item Info
                               </Button>
+                    {
+                      (editItem == (item.accessory as TAccessory)._id || returnItem == (item.accessory as TAccessory)._id) && <Button
+                      
+                                color="default"
+                                variant="flat"
+                                size="sm"
+                                className="hover:secondary"
+                                startContent={<XmarkIcon />}
+                                onPress={() => {
+                                  setEditItem(null);
+                                  setReturnItem(null);
+                                  methods.resetField(`items.${index}`)
+                                }}
+                              >
+                              
+                              </Button>
+                    }
                             </div>
                           </TableCell>
                         </TableRow>
