@@ -2,7 +2,9 @@
 import {
  
   ImageIcon,
+  InfoIcon,
   MoreIcon,
+  PrintIcon,
   XmarkIcon,
 } from "@/src/components/icons";
 import { limitOptions, orderEventOptions } from "@/src/constents";
@@ -160,7 +162,7 @@ export default function MyOrdersPage() {
           <TableColumn key="status" width={240}>
             Status
           </TableColumn>
-          <TableColumn key="approval">Approval</TableColumn>
+          
           <TableColumn key="action">Action</TableColumn>
         </TableHeader>
         <TableBody
@@ -271,88 +273,34 @@ export default function MyOrdersPage() {
                   </Popover>
                 </div>
               </TableCell>
+             
               <TableCell>
-                {" "}
-                {/* <div className="flex items-center gap-2">
-                  <Chip
-                    color={
-                      item?.approvalDetails.isApproved ? "success" : "danger"
-                    }
-                    variant="flat"
-                    size="sm"
-                  >
-                    {item?.approvalDetails.isApproved ? "Approved" : "Pending"}
-                  </Chip>
-                  {!item?.approvalDetails.isApproved && (
-                    <Popover placement="bottom" showArrow={true}>
-                      <PopoverTrigger>
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          color="primary"
-                        >
-                          {" "}
-                          <MoreIcon />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <Listbox
-                          aria-label="Single selection example"
-                          variant="solid"
-                          disallowEmptySelection
-                          selectionMode="single"
-                          selectedKeys={[
-                            item?.approvalDetails.isApproved
-                              ? "Approved"
-                              : "Pending",
-                          ]}
-                          color="primary"
-                        >
-                          <ListboxItem
-                            key="Unblock"
-                            onPress={() => handleApproved(item._id!)}
-                          >
-                            Approved
-                          </ListboxItem>
-                        </Listbox>
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                </div> */}
-              </TableCell>
-              <TableCell>
-                ""
-                {/* <div className="relative flex items-center gap-2">
+             
+                <div className="space-y-2">
                   <Tooltip color="primary" content="Details" showArrow>
                     <Button
-                      isIconOnly
+                      
                       color="primary"
                       variant="flat"
                       size="sm"
-                      onPress={() => {
-                        setAccessoryId(item._id!), modalDetails.onOpen();
-                      }}
+                     startContent={   <InfoIcon />}
                     >
-                      <InfoIcon />
+                   Info
                     </Button>
                   </Tooltip>
 
-                  <Tooltip color="primary" content="Edit" showArrow>
+               
                     <Button
-                      isIconOnly
+                      
                       color="primary"
                       variant="flat"
                       size="sm"
-                      isDisabled={item.approvalDetails.isApproved}
-                      onPress={() => {
-                        setAccessoryId(item._id!), modalForm.onOpen();
-                      }}
+                     startContent={<PrintIcon className="fill-gray-500"/>}
                     >
-                      <EditIcon />
+                      Print
                     </Button>
-                  </Tooltip>
-                </div> */}
+              
+                </div>
               </TableCell>
             </TableRow>
           )}

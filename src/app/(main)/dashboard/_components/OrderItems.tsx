@@ -441,6 +441,9 @@ console.log(isValid, "isValid");
                                 isEventExists({
                                   events: order?.events!,
                                   checkEvent: "approved",
+                                }) && isEventExists({
+                                  events: order?.events!,
+                                  checkEvent: "delivered",
                                 }) &&
                                 (returnItem ==
                                 (item.accessory as TAccessory)._id ? (

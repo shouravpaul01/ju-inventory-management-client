@@ -1,12 +1,13 @@
 "use client";
 import {
- 
   ImageIcon,
+  InfoIcon,
   MoreIcon,
+  PrintIcon,
   XmarkIcon,
 } from "@/src/components/icons";
 import { limitOptions, orderEventOptions } from "@/src/constents";
-import { getAllOrders } from "@/src/hooks/order";
+import { getAllOrders, getSingleOrder } from "@/src/hooks/order";
 import { TQuery, TUser } from "@/src/types";
 import { Button } from "@heroui/button";
 import { DateRangePicker } from "@heroui/date-picker";
@@ -21,7 +22,7 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import JULoading from "@/src/components/ui/JULoading";
 import { Pagination } from "@heroui/pagination";
 import { Chip } from "@heroui/chip";
@@ -36,6 +37,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useDisclosure } from "@heroui/modal";
 import OrderItems from "./_components/OrderItems";
+import JUPrint from "@/src/components/ui/JUPrint";
+import { useReactToPrint } from "react-to-print";
+import PrintOrderINV from "./_components/PrintOrderINV";
 
 export default function ManageOrdersPage() {
   const searchParams = useSearchParams();
@@ -45,8 +49,13 @@ export default function ManageOrdersPage() {
   const [orderId, setOrderId] = useState("");
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState(5);
+  const [isPrinting, setIsPrinting] = useState(false);
+
   const queryClient = useQueryClient();
-  const modelOrderItems=useDisclosure()
+  const modelOrderItems = useDisclosure();
+  const contentRef = useRef<HTMLDivElement>(null);
+  const promiseResolveRef = useRef<HTMLDivElement | any>(null);
+
   const queryParams = useMemo(() => {
     const params: TQuery[] = [];
     if (searchTerm) {
@@ -57,6 +66,7 @@ export default function ManageOrdersPage() {
   const { data, isLoading: isOrdersLoading } = getAllOrders({
     query: queryParams,
   });
+  const { data: order, isLoading: isOrderLoading } = getSingleOrder(orderId);
   const loadingState = isOrdersLoading ? "loading" : "idle";
 
   console.log(data, "data");
@@ -79,6 +89,25 @@ export default function ManageOrdersPage() {
       }
     }
   };
+  useEffect(() => {
+    if (isPrinting && promiseResolveRef.current) {
+      promiseResolveRef.current();
+    }
+  }, [isPrinting]);
+  const reactToPrintFn = useReactToPrint({
+    contentRef,
+    onBeforePrint: () => {
+      return new Promise((resolve) => {
+        promiseResolveRef.current = resolve;
+        setIsPrinting(true);
+      });
+    },
+    onAfterPrint: () => {
+      // Reset the Promise resolve so we can print again
+      promiseResolveRef.current = null;
+      setIsPrinting(false);
+    },
+  });
   return (
     <div>
       <div className="flex border-b pb-2">
@@ -147,17 +176,19 @@ export default function ManageOrdersPage() {
         }
         classNames={{
           wrapper: "min-h-[222px] ",
+          
         }}
+        
       >
-        <TableHeader>
-          <TableColumn key="name" width={300}>
+        <TableHeader >
+          <TableColumn key="name" width={300} >
             Order ID
           </TableColumn>
           <TableColumn key="quantity">Order Items</TableColumn>
           <TableColumn key="status" width={240}>
             Status
           </TableColumn>
-          <TableColumn key="approval">Approval</TableColumn>
+
           <TableColumn key="action">Action</TableColumn>
         </TableHeader>
         <TableBody
@@ -169,52 +200,27 @@ export default function ManageOrdersPage() {
           {(item) => (
             <TableRow key={item._id!}>
               <TableCell>
-                <User
-                  classNames={{ description: "text-black" }}
-                  avatarProps={{
-                    radius: "lg",
-                    src: (item?.orderBy as TUser).faculty?.image,
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1">
+                    <span>INV:</span>
+                    <p className="text-sm font-bold">{item.invoiceId}</p>
+                  </div>
 
-                    fallback: <ImageIcon />,
-                  }}
-                  description={
-                    <div>
-                      <div className="flex items-center gap-1">
-                        <span>INV:</span>
-                        <p className="text-sm font-bold">{item.invoiceId}</p>
-                      </div>
-
-                      <div className="flex items-center gap-1">
-                        <span>Order D:</span>
-                        <Chip size="md">
-                          {dayjs(item.orderDate).format("MMM D, YYYY h:mm A")}
-                        </Chip>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span>Expected D:</span>
-                        <Chip size="md">
-                          {dayjs(item?.expectedDeliveryDateTime).format(
-                            "MMM D, YYYY h:mm A"
-                          )}
-                        </Chip>
-                      </div>
-                    </div>
-                  }
-                  name={
-                    <Tooltip
-                      content={<UserInfoTooltip user={item.orderBy as TUser} />}
-                      showArrow={true}
-                      classNames={{ content: "py-2" }}
-                    >
-                      <div className="flex items-center gap-1">
-                        <span> Name:</span>
-                        <p className="font-bold">
-                          {(item?.orderBy as TUser).faculty?.name}
-                        </p>
-                      </div>
-                    </Tooltip>
-                  }
-                />
+                  <div className="flex items-center gap-1">
+                    <span>Order D:</span>
+                    <Chip size="sm">
+                      {dayjs(item.orderDate).format("MMM D, YYYY h:mm A")}
+                    </Chip>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span>Expected D:</span>
+                    <Chip size="sm">
+                      {dayjs(item?.expectedDeliveryDateTime).format(
+                        "MMM D, YYYY h:mm A"
+                      )}
+                    </Chip>
+                  </div>
+                </div>
               </TableCell>
               <TableCell>
                 <Badge
@@ -224,8 +230,14 @@ export default function ManageOrdersPage() {
                   size="md"
                 >
                   <Tooltip content="Set Deadline" showArrow={true}>
-                    <Button color="primary" size="sm" onPress={()=>{setOrderId(item._id),modelOrderItems.onOpen()}}>
-                      Items
+                    <Button
+                      color="primary"
+                      size="sm"
+                      onPress={() => {
+                        setOrderId(item._id), modelOrderItems.onOpen();
+                      }}
+                    >
+                      Accessories
                     </Button>
                   </Tooltip>
                 </Badge>
@@ -300,94 +312,49 @@ export default function ManageOrdersPage() {
                   </Popover>
                 </div>
               </TableCell>
+
               <TableCell>
-                {" "}
-                {/* <div className="flex items-center gap-2">
-                  <Chip
-                    color={
-                      item?.approvalDetails.isApproved ? "success" : "danger"
-                    }
-                    variant="flat"
-                    size="sm"
-                  >
-                    {item?.approvalDetails.isApproved ? "Approved" : "Pending"}
-                  </Chip>
-                  {!item?.approvalDetails.isApproved && (
-                    <Popover placement="bottom" showArrow={true}>
-                      <PopoverTrigger>
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          color="primary"
-                        >
-                          {" "}
-                          <MoreIcon />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <Listbox
-                          aria-label="Single selection example"
-                          variant="solid"
-                          disallowEmptySelection
-                          selectionMode="single"
-                          selectedKeys={[
-                            item?.approvalDetails.isApproved
-                              ? "Approved"
-                              : "Pending",
-                          ]}
-                          color="primary"
-                        >
-                          <ListboxItem
-                            key="Unblock"
-                            onPress={() => handleApproved(item._id!)}
-                          >
-                            Approved
-                          </ListboxItem>
-                        </Listbox>
-                      </PopoverContent>
-                    </Popover>
-                  )}
-                </div> */}
-              </TableCell>
-              <TableCell>
-                ""
-                {/* <div className="relative flex items-center gap-2">
+                <div className="flex flex-col gap-2">
                   <Tooltip color="primary" content="Details" showArrow>
                     <Button
-                      isIconOnly
                       color="primary"
                       variant="flat"
                       size="sm"
-                      onPress={() => {
-                        setAccessoryId(item._id!), modalDetails.onOpen();
-                      }}
+                      startContent={<InfoIcon />}
                     >
-                      <InfoIcon />
+                      Info
                     </Button>
                   </Tooltip>
 
-                  <Tooltip color="primary" content="Edit" showArrow>
-                    <Button
-                      isIconOnly
-                      color="primary"
-                      variant="flat"
-                      size="sm"
-                      isDisabled={item.approvalDetails.isApproved}
-                      onPress={() => {
-                        setAccessoryId(item._id!), modalForm.onOpen();
-                      }}
-                    >
-                      <EditIcon />
-                    </Button>
-                  </Tooltip>
-                </div> */}
+                  <Button
+                    color="primary"
+                    variant="flat"
+                    size="sm"
+                    startContent={<PrintIcon className="fill-gray-500" />}
+                    isLoading={isPrinting}
+                    onPress={() => {
+                      setOrderId(item?._id);
+                      reactToPrintFn();
+                    }}
+                  >
+                    Print
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-      <OrderItems orderId={orderId} useDisclosure={modelOrderItems}/>
+      <OrderItems
+        order={order!}
+        isLoading={isOrderLoading}
+        useDisclosure={modelOrderItems}
+      />
+      <div className="printContent" ref={contentRef}>
+        <JUPrint>
+          <PrintOrderINV order={order!} />
+        </JUPrint>
+      </div>
     </div>
   );
 }

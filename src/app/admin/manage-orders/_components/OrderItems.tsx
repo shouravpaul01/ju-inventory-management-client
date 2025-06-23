@@ -2,7 +2,6 @@
 import JUCheckbox from "@/src/components/form/JUCheckbox";
 import JUDatePicker from "@/src/components/form/JUDatePicker";
 import JUForm from "@/src/components/form/JUForm";
-import JUInput from "@/src/components/form/JUInput";
 import JUNumberInput from "@/src/components/form/JUNumberInput";
 import JUSelect from "@/src/components/form/JUSelect";
 import {
@@ -11,18 +10,18 @@ import {
   InfoIcon,
   MoreHorzIcon,
   MoreIcon,
+  XmarkIcon,
 } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
 import { getSingleOrder } from "@/src/hooks/order";
 import { updateOrderItemsReq } from "@/src/services/order";
-import { TAccessory, TErrorMessage } from "@/src/types";
+import { TAccessory, TErrorMessage, TOrder, TOrderItem } from "@/src/types";
 import isEventExists from "@/src/utils/isEventExists";
 import { orderedItemSchemaValidation } from "@/src/validations/order.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Avatar } from "@heroui/avatar";
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
-import { Input } from "@heroui/input";
 import {
   Modal,
   ModalBody,
@@ -45,30 +44,35 @@ import { Tooltip } from "@heroui/tooltip";
 import { User } from "@heroui/user";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useEffect, useState } from "react";
-import { FieldValues,  useForm } from "react-hook-form";
+import { useEffect, useRef, useState } from "react";
+import { FieldValues, useForm } from "react-hook-form";
 import { toast } from "sonner";
-import {  parseDate } from "@internationalized/date";
+import { parseDate } from "@internationalized/date";
+
 
 export default function OrderItems({
   useDisclosure,
-  orderId,
+  order,
+  isLoading: isOrderLoading,
 }: {
   useDisclosure: UseDisclosureProps | any;
-  orderId: string;
+  order: TOrder | null;
+  isLoading:boolean
 }) {
   const queryClient = useQueryClient();
   const [isSubmitLoading, setSubmitLoading] = useState<any>(null);
-  const [eidtItem, setEditItem] = useState<string | null>(null);
+  const [editItem, setEditItem] = useState<string | null>(null);
+  
   const methods = useForm({
     resolver: zodResolver(orderedItemSchemaValidation),
   });
-  const { data: order, isLoading: isOrderLoading } = getSingleOrder(orderId);
-
-  const {
+   const {
     watch,
     formState: { errors },
   } = methods;
+  // const { data: order, isLoading: isOrderLoading } = getSingleOrder(orderId);
+
+ 
   useEffect(() => {
     if (order) {
       const defaultValues = order.items.map((item) => ({
@@ -82,10 +86,12 @@ export default function OrderItems({
           value: element,
           label: element,
         })),
-         returnDeadline:parseDate(dayjs(item.returnDeadline as any).format('YYYY-MM-DD')) ,
+        returnDeadline: parseDate(
+          dayjs(item.returnDeadline as any).format("YYYY-MM-DD")
+        ),
         isProvided: item.isProvided,
       }));
-      
+
       methods.reset({ items: defaultValues });
     }
     if (!useDisclosure.isOpen) {
@@ -106,7 +112,8 @@ export default function OrderItems({
       if (rowData?.providedAccessoryCodes && rowData?.returnDeadline) {
         rowData.providedAccessoryCodes = rowData.providedAccessoryCodes
           ?.split(",")
-          .map((code: any) => code.trim()).sort();
+          .map((code: any) => code.trim())
+          .sort();
         rowData.returnDeadline = dayjs(rowData.returnDeadline).format(
           "MMM D, YYYY"
         );
@@ -132,6 +139,7 @@ export default function OrderItems({
   };
 
   return (
+    <>
     <Modal
       isOpen={useDisclosure.isOpen}
       onOpenChange={useDisclosure.onOpenChange}
@@ -187,19 +195,24 @@ export default function OrderItems({
                       order.items.map((item, index) => (
                         <TableRow key={index}>
                           <TableCell>
-                            <Tooltip
-                              content={
-                                item.isProvided ? "Already provided." : ""
-                              }
-                            >
-                              <JUCheckbox
-                                name={`items.${index}.isProvided`}
-                                checkboxProps={{
-                                  isReadOnly: item.isProvided,
-                                  defaultSelected: item.isProvided,
-                                }}
-                              />
-                            </Tooltip>
+                            {isEventExists({
+                              events: order?.events!,
+                              checkEvent: "approved",
+                            }) && (
+                              <Tooltip
+                                content={
+                                  item.isProvided ? "Already provided." : ""
+                                }
+                              >
+                                <JUCheckbox
+                                  name={`items.${index}.isProvided`}
+                                  checkboxProps={{
+                                    isReadOnly: item.isProvided,
+                                    defaultSelected: item.isProvided,
+                                  }}
+                                />
+                              </Tooltip>
+                            )}
                           </TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
@@ -247,7 +260,7 @@ export default function OrderItems({
                               }) && (
                                 <div className="space-y-1">
                                   {item?.providedQuantity &&
-                                    eidtItem !==
+                                    editItem !==
                                       (item.accessory as TAccessory)._id && (
                                       <div className=" flex gap-1">
                                         <span>Provided Qty:</span>
@@ -262,7 +275,7 @@ export default function OrderItems({
                                       </div>
                                     )}
                                   {(!item.isProvided ||
-                                    eidtItem ==
+                                    editItem ==
                                       (item.accessory as TAccessory)._id) &&
                                     watch(`items.${index}.isProvided`) && (
                                       <div>
@@ -294,7 +307,7 @@ export default function OrderItems({
                                 checkEvent: "approved",
                               }) &&
                                 (!item.isProvided ||
-                                  eidtItem ==
+                                  editItem ==
                                     (item.accessory as TAccessory)._id) &&
                                 watch(`items.${index}.isProvided`) &&
                                 ((item.accessory as TAccessory)
@@ -305,10 +318,12 @@ export default function OrderItems({
                                         ...(item.accessory as TAccessory)
                                           .codeDetails.currentCodes,
                                         ...item?.providedAccessoryCodes,
-                                      ].sort().map((element) => ({
-                                        value: element,
-                                        label: element,
-                                      }))}
+                                      ]
+                                        .sort()
+                                        .map((element) => ({
+                                          value: element,
+                                          label: element,
+                                        }))}
                                       name={`items.${index}.providedAccessoryCodes`}
                                       selectProps={{
                                         className: "max-w-[300px]",
@@ -345,7 +360,6 @@ export default function OrderItems({
                                         labelPlacement: "outside",
                                         variant: "bordered",
 
-                                       
                                         isDisabled:
                                           methods.watch(
                                             `items.${index}.isProvided`
@@ -373,7 +387,7 @@ export default function OrderItems({
                                   </p>
                                 ))}
                               {item?.providedAccessoryCodes?.length > 0 &&
-                                eidtItem !==
+                                editItem !==
                                   (item.accessory as TAccessory)._id && (
                                   <div>
                                     <div className="space-y-1">
@@ -446,9 +460,9 @@ export default function OrderItems({
                             </div>
                           </TableCell>
                           <TableCell>
-                            <div className="flex gap-1">
+                            <div className="flex flex-col gap-1">
                               {!item.isProvided ||
-                              eidtItem == (item.accessory as TAccessory)._id ? (
+                              editItem == (item.accessory as TAccessory)._id ? (
                                 <Button
                                   color="primary"
                                   size="sm"
@@ -470,7 +484,6 @@ export default function OrderItems({
                                 </Button>
                               ) : (
                                 <Button
-                                  isIconOnly
                                   color="primary"
                                   variant="flat"
                                   size="sm"
@@ -480,7 +493,9 @@ export default function OrderItems({
                                       (item.accessory as TAccessory)._id!
                                     )
                                   }
-                                ></Button>
+                                >
+                                  Edit
+                                </Button>
                               )}
                               <Button
                                 color="primary"
@@ -490,6 +505,21 @@ export default function OrderItems({
                               >
                                 Item Info
                               </Button>
+                              {editItem ==
+                                (item.accessory as TAccessory)._id && (
+                                <Button
+                                  color="default"
+                                  variant="flat"
+                                  size="sm"
+                                  className="hover:secondary"
+                                  startContent={<XmarkIcon />}
+                                  onPress={() => {
+                                    setEditItem(null);
+
+                                    methods.resetField(`items.${index}`);
+                                  }}
+                                ></Button>
+                              )}
                             </div>
                           </TableCell>
                         </TableRow>
@@ -505,10 +535,12 @@ export default function OrderItems({
                 </Table>
               </ModalBody>
             )}
-            <ModalFooter> </ModalFooter>
+            
           </JUForm>
         )}
       </ModalContent>
     </Modal>
+   
+    </>
   );
 }
