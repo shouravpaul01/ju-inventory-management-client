@@ -8,7 +8,7 @@ import {
 } from "@/src/components/icons";
 import { limitOptions, orderEventOptions } from "@/src/constents";
 import { getAllOrders, getSingleOrder } from "@/src/hooks/order";
-import { TQuery, TUser } from "@/src/types";
+import { TAccessory, TQuery, TUser } from "@/src/types";
 import { Button } from "@heroui/button";
 import { DateRangePicker } from "@heroui/date-picker";
 import { Select, SelectItem } from "@heroui/select";
@@ -27,8 +27,6 @@ import JULoading from "@/src/components/ui/JULoading";
 import { Pagination } from "@heroui/pagination";
 import { Chip } from "@heroui/chip";
 import dayjs from "dayjs";
-import { User } from "@heroui/user";
-import UserInfoTooltip from "./_components/UserInfoTooltip";
 import { Badge } from "@heroui/badge";
 import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import { Listbox, ListboxItem } from "@heroui/listbox";
@@ -36,10 +34,11 @@ import { updateEventStatusReq } from "@/src/services/order";
 import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useDisclosure } from "@heroui/modal";
-import OrderItems from "./_components/OrderItems";
+import OrderAccessoriesModal from "./_components/OrderAccessoriesModal";
 import JUPrint from "@/src/components/ui/JUPrint";
 import { useReactToPrint } from "react-to-print";
 import PrintOrderINV from "./_components/PrintOrderINV";
+import ReturnableAccessoriesModal from "./_components/ReturnableAccessoriesModal";
 
 export default function ManageOrdersPage() {
   const searchParams = useSearchParams();
@@ -52,7 +51,8 @@ export default function ManageOrdersPage() {
   const [isPrinting, setIsPrinting] = useState(false);
 
   const queryClient = useQueryClient();
-  const modelOrderItems = useDisclosure();
+  const modelOrderAccessories = useDisclosure();
+  const modelReturnableAccessories = useDisclosure();
   const contentRef = useRef<HTMLDivElement>(null);
   const promiseResolveRef = useRef<HTMLDivElement | any>(null);
 
@@ -162,6 +162,7 @@ export default function ManageOrdersPage() {
       </div>
       <Table
         aria-label="Example table with client side pagination"
+        removeWrapper
         shadow="none"
         bottomContent={
           <div className=" w-full ">
@@ -176,15 +177,14 @@ export default function ManageOrdersPage() {
         }
         classNames={{
           wrapper: "min-h-[222px] ",
-          
         }}
-        
       >
-        <TableHeader >
-          <TableColumn key="name" width={300} >
+        <TableHeader>
+          <TableColumn key="name" width={300}>
             Order ID
           </TableColumn>
-          <TableColumn key="quantity">Order Items</TableColumn>
+          <TableColumn key="Accessories">Accessories</TableColumn>
+          <TableColumn key="returnedQuantity">Returned Accessories</TableColumn>
           <TableColumn key="status" width={240}>
             Status
           </TableColumn>
@@ -234,10 +234,30 @@ export default function ManageOrdersPage() {
                       color="primary"
                       size="sm"
                       onPress={() => {
-                        setOrderId(item._id), modelOrderItems.onOpen();
+                        setOrderId(item._id), modelOrderAccessories.onOpen();
                       }}
                     >
                       Accessories
+                    </Button>
+                  </Tooltip>
+                </Badge>
+              </TableCell>
+                <TableCell>
+                <Badge
+                  color="danger"
+                  content={item.items?.filter(item => (item.accessory as TAccessory).isItReturnable==true).length || 0}
+                  shape="circle"
+                  size="md"
+                >
+                  <Tooltip content="Returned Accessories" showArrow={true}>
+                    <Button
+                      color="primary"
+                      size="sm"
+                      onPress={() => {
+                        setOrderId(item._id), modelReturnableAccessories.onOpen();
+                      }}
+                    >
+                      Returnable Accessories
                     </Button>
                   </Tooltip>
                 </Badge>
@@ -345,13 +365,18 @@ export default function ManageOrdersPage() {
           )}
         </TableBody>
       </Table>
-      <OrderItems
+      <OrderAccessoriesModal
         order={order!}
         isLoading={isOrderLoading}
-        useDisclosure={modelOrderItems}
+        useDisclosure={modelOrderAccessories}
       />
-      <div className="printContent" ref={contentRef}>
-        <JUPrint>
+      <ReturnableAccessoriesModal
+        order={order!}
+        isLoading={isOrderLoading}
+        useDisclosure={modelReturnableAccessories}
+      />
+      <div className=" hidden">
+        <JUPrint innerRef={contentRef}>
           <PrintOrderINV order={order!} />
         </JUPrint>
       </div>

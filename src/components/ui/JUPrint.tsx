@@ -1,9 +1,9 @@
 import Image from "next/image";
-import { ReactNode } from "react";
+import { ReactNode, RefObject } from "react";
 
-export default function JUPrint({children}: {children?: ReactNode}) {
+export default function JUPrint({innerRef, children}: {children?: ReactNode, innerRef: RefObject<HTMLDivElement>}) {
   return (
-    <div className="p-24">
+    <div className="p-24" ref={innerRef}>
       <div className="border-b border-gray-300 pb-3">
         <div className="flex items-end  gap-3  ">
           <Image
@@ -21,7 +21,7 @@ export default function JUPrint({children}: {children?: ReactNode}) {
           </div>
         </div>
       </div>
-      <div className="mt-5">
+      <div className="mt-4">
         {children}
       </div>
     </div>

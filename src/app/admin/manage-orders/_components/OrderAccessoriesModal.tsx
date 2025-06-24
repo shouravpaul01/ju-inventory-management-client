@@ -9,13 +9,13 @@ import {
   ImageIcon,
   InfoIcon,
   MoreHorzIcon,
-  MoreIcon,
+
   XmarkIcon,
 } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
-import { getSingleOrder } from "@/src/hooks/order";
+
 import { updateOrderItemsReq } from "@/src/services/order";
-import { TAccessory, TErrorMessage, TOrder, TOrderItem } from "@/src/types";
+import { TAccessory, TErrorMessage, TOrder } from "@/src/types";
 import isEventExists from "@/src/utils/isEventExists";
 import { orderedItemSchemaValidation } from "@/src/validations/order.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -26,7 +26,6 @@ import {
   Modal,
   ModalBody,
   ModalContent,
-  ModalFooter,
   ModalHeader,
   UseDisclosureProps,
 } from "@heroui/modal";
@@ -39,18 +38,16 @@ import {
   TableHeader,
   TableRow,
 } from "@heroui/table";
-import { code, divider } from "@heroui/theme";
 import { Tooltip } from "@heroui/tooltip";
-import { User } from "@heroui/user";
 import { useQueryClient } from "@tanstack/react-query";
 import dayjs from "dayjs";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { FieldValues, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { parseDate } from "@internationalized/date";
 
 
-export default function OrderItems({
+export default function OrderAccessoriesModal({
   useDisclosure,
   order,
   isLoading: isOrderLoading,
@@ -70,7 +67,7 @@ export default function OrderItems({
     watch,
     formState: { errors },
   } = methods;
-  // const { data: order, isLoading: isOrderLoading } = getSingleOrder(orderId);
+
 
  
   useEffect(() => {
@@ -155,7 +152,7 @@ export default function OrderItems({
                   <div className="h-3 w-2/5 rounded-lg bg-default-200"></div>
                 </Skeleton>
               ) : (
-                "Order Items"
+                "Order Accessories"
               )}
             </ModalHeader>
             {isOrderLoading ? (
