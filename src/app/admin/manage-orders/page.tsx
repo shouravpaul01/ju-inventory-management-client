@@ -243,7 +243,8 @@ export default function ManageOrdersPage() {
                 </Badge>
               </TableCell>
                 <TableCell>
-                <Badge
+                  {
+                    item.items?.filter(item => (item.accessory as TAccessory).isItReturnable==true).length > 0 ?  <Badge
                   color="danger"
                   content={item.items?.filter(item => (item.accessory as TAccessory).isItReturnable==true).length || 0}
                   shape="circle"
@@ -260,7 +261,9 @@ export default function ManageOrdersPage() {
                       Returnable Accessories
                     </Button>
                   </Tooltip>
-                </Badge>
+                </Badge>: <p className="text-gray-500 text-center">N/A</p>
+                  }
+              
               </TableCell>
               <TableCell>
                 <div className="flex flex-wrap items-center gap-1">

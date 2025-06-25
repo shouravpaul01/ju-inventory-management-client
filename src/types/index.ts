@@ -153,15 +153,18 @@ export type TAccessoryCartItem = {
 
 
 export type TReturnDetails = {
-  orderItem: string;
+  _id?: string;
+  accessory: string;
   quantity: number;
   returnedAccessoriesCodes: string[];
   returnedAt: Date;
   isReturnedOnTime: boolean;
-  returnReceived: string;
+  isReturnReceived:boolean;
+  returnReceivedBy: string;
 } 
 
 export type TOrderItem = {
+    _id?: string;
   accessory: TAccessory | string;
   expectedQuantity: number;
   providedQuantity: number;

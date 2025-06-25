@@ -120,3 +120,15 @@ export const returnedAccessoriesCodesReq = async(orderId: string, payload: Field
     return error?.response?.data;
   }
 }
+export const returnedAccessoriesReceivedReq = async(orderId: string, accessoryId: string, returnedId: string, payload:FieldValues) => {
+  try {
+    const res = await axiosInstance.patch(
+      `/orders/returned-accessories-received/${orderId}/${accessoryId}/${returnedId}`, payload
+    );
+
+    return res.data;
+  } catch (error: any) {
+    console.log(error, "error");
+    return error?.response?.data;
+  }
+}
