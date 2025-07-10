@@ -849,14 +849,33 @@ export const CheckIcon: React.FC<IconSvgProps> = ({
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
-        height={size || height}
+      height={size || height}
       width={size || width}
       {...props}
       viewBox="0 -960 960 960"
-     
       fill="#1f1f1f"
     >
       <path d="M382-240 154-468l57-57 171 171 367-367 57 57-424 424Z" />
+    </svg>
+  );
+};
+export const ArrowLeftIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+     height={size || height}
+      width={size || width}
+      {...props}
+      viewBox="0 -960 960 960"
+      
+      fill="#1f1f1f"
+    >
+      <path d="M400-240 160-480l240-240 56 58-142 142h486v80H314l142 142-56 58Z" />
     </svg>
   );
 };

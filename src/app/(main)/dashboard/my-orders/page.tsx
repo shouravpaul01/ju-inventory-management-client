@@ -9,7 +9,7 @@ import {
 } from "@/src/components/icons";
 import { limitOptions, orderEventOptions } from "@/src/constents";
 import { getAllOrders, useGetAllUserOrders } from "@/src/hooks/order";
-import { TQuery, TUser } from "@/src/types";
+import { TAccessory, TQuery, TUser } from "@/src/types";
 import { Button } from "@heroui/button";
 import { DateRangePicker } from "@heroui/date-picker";
 import { Select, SelectItem } from "@heroui/select";
@@ -38,8 +38,9 @@ import { useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { useDisclosure } from "@heroui/modal";
 import { useGetCurrentUser } from "@/src/hooks/Auth";
-import OrderItems from "../_components/OrderItems";
-// import OrderItems from "./_components/OrderItems";
+import Link from "next/link";
+import HeadingSection from "@/src/components/ui/HeadingSection";
+
 
 export default function MyOrdersPage() {
   const searchParams = useSearchParams();
@@ -51,6 +52,7 @@ export default function MyOrdersPage() {
   const [limit, setLimit] = useState(5);
   const queryClient = useQueryClient();
   const modelOrderItems=useDisclosure()
+  const modalReturnAccessories=useDisclosure()
   const queryParams = useMemo(() => {
     const params: TQuery[] = [];
     if (searchTerm) {
@@ -86,9 +88,7 @@ export default function MyOrdersPage() {
   };
   return (
     <div>
-      <div className="flex border-b pb-2">
-        <p className="text-lg font-bold flex-1">Manage Orders</p>
-      </div>
+     <HeadingSection title="Manage Orders"/>
       <div className="flex flex-col md:flex-row  items-center justify-end gap-2 my-4">
         <DateRangePicker
           className="max-w-[250px] "
@@ -158,7 +158,8 @@ export default function MyOrdersPage() {
           <TableColumn key="name" width={300}>
             Order ID
           </TableColumn>
-          <TableColumn key="quantity">Order Items</TableColumn>
+          <TableColumn key="quantity">Order - Returnable Accessories</TableColumn>
+          
           <TableColumn key="status" width={240}>
             Status
           </TableColumn>
@@ -171,25 +172,25 @@ export default function MyOrdersPage() {
           loadingState={loadingState}
           emptyContent={<p className="">Data not found.</p>}
         >
-          {(item) => (
-            <TableRow key={item._id!}>
+          {(order) => (
+            <TableRow key={order._id!}>
               <TableCell>
                <div className="space-y-1">
                       <div className="flex items-center gap-1">
                         <span>INV:</span>
-                        <p className="text-sm font-bold">{item.invoiceId}</p>
+                        <p className="text-sm font-bold">{order.invoiceId}</p>
                       </div>
 
                       <div className="flex items-center gap-1">
                         <span>Order D:</span>
                         <Chip size="md">
-                          {dayjs(item.orderDate).format("MMM D, YYYY h:mm A")}
+                          {dayjs(order.orderDate).format("MMM D, YYYY h:mm A")}
                         </Chip>
                       </div>
                       <div className="flex items-center gap-1">
                         <span>Expected D:</span>
                         <Chip size="md">
-                          {dayjs(item?.expectedDeliveryDateTime).format(
+                          {dayjs(order?.expectedDeliveryDateTime).format(
                             "MMM D, YYYY h:mm A"
                           )}
                         </Chip>
@@ -197,18 +198,35 @@ export default function MyOrdersPage() {
                     </div>
               </TableCell>
               <TableCell>
-                <Badge
+                <div className="flex gap-2">
+                  <Badge
                   color="danger"
-                  content={item.items?.length || 0}
+                  content={order.items?.length || 0}
                   shape="circle"
-                  size="md"
+                  size="sm"
                 >
                   <Tooltip content="View Accessories" showArrow={true}>
-                    <Button color="primary" size="sm" onPress={()=>{setOrderId(item._id),modelOrderItems.onOpen()}}>
+                    <Button as={Link} href={`/dashboard/my-orders/${order?._id}`} color="primary" size="sm" >
                       Accessories
                     </Button>
                   </Tooltip>
                 </Badge>
+                  {
+                    order?.items?.filter(item=>(item.accessory as TAccessory)?.isItReturnable)?.length > 0 && <Badge
+                  color="danger"
+                  content={order?.items?.filter(item=>(item.accessory as TAccessory)?.isItReturnable)?.length || 0}
+                  shape="circle"
+                  size="sm"
+                >
+                  <Tooltip content="View Accessories" showArrow={true}>
+                    <Button color="primary" size="sm" onPress={()=>{setOrderId(order._id),modalReturnAccessories.onOpen()}}>
+                     Returnable Accessories
+                    </Button>
+                  </Tooltip>
+                </Badge>
+                  }
+                </div>
+             
               </TableCell>
               <TableCell>
                 <div className="flex flex-wrap items-center gap-1">
@@ -216,7 +234,7 @@ export default function MyOrdersPage() {
                     <div key={index} className="flex  gap-1">
                       <Chip
                         color={
-                          item?.events
+                          order?.events
                             ?.map((element) => element.event)
                             .includes(event.value as any)
                             ? "success"
@@ -247,15 +265,15 @@ export default function MyOrdersPage() {
                         variant="solid"
                         disallowEmptySelection
                         selectionMode="single"
-                        selectedKeys={item?.events?.map((event) => event.event)}
-                        disabledKeys={item?.events?.map((event) => event.event)}
+                        selectedKeys={order?.events?.map((event) => event.event)}
+                        disabledKeys={order?.events?.map((event) => event.event)}
                         color="primary"
                       >
                        
                         <ListboxItem
                           key="received"
                           onPress={() =>
-                            handleEventStatus(item._id, "received")
+                            handleEventStatus(order._id, "received")
                           }
                         >
                           Received
@@ -263,7 +281,7 @@ export default function MyOrdersPage() {
                         <ListboxItem
                           key="Cancelled"
                           onPress={() =>
-                            handleEventStatus(item._id, "Cancelled")
+                            handleEventStatus(order._id, "Cancelled")
                           }
                         >
                           Cancelled
@@ -306,7 +324,7 @@ export default function MyOrdersPage() {
           )}
         </TableBody>
       </Table>
-      <OrderItems orderId={orderId} useDisclosure={modelOrderItems}/>
+    
     </div>
   );
 }
