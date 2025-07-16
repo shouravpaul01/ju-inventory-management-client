@@ -19,7 +19,7 @@ import {
   ImageIcon,
   XmarkIcon,
 } from "@/src/components/icons";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { TAccessoryCartItem, TQuery } from "@/src/types";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import JUSelect from "@/src/components/form/JUSelect";
@@ -69,7 +69,17 @@ const Distributepage = () => {
     watch,
     formState: { errors },
   } = methods;
-  console.log(cart);
+   useEffect(() => {
+     if (cart) {
+       const defaultValues = cart.map((item) => ({
+         distributeAccessories: item._id,
+         distributedQuantity: item.expectedQuantity,
+         
+       }));
+ 
+       methods.reset({ items: defaultValues });
+     }
+   }, [distributeAccessories]);
   const handleQuantityChange = (id: string, newQuantity: number) => {
     updateOrderQuantity({ id, newQuantity });
   };
@@ -122,7 +132,7 @@ const Distributepage = () => {
                   <TableCell>
                     <div>
                       <JUNumberInput
-                        name={`items.${index}.expectedQuantity`}
+                        name={`items.${index}.distributedQuantity`}
                         onChange={(value: any) =>
                           handleQuantityChange(item._id!, value)
                         }

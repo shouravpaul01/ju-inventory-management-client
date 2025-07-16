@@ -106,8 +106,8 @@ export default function OrderAccessoriesModal({
     if (isValid) {
       const rowData = methods.getValues(`items.${index}`);
       console.log(rowData, "before");
-      if (rowData?.providedAccessoryCodes && rowData?.returnDeadline) {
-        rowData.providedAccessoryCodes = rowData.providedAccessoryCodes
+      if (rowData?.providedAccessoryCodes.length>0 && rowData?.returnDeadline) {
+        rowData.providedAccessoryCodes = rowData?.providedAccessoryCodes
           ?.split(",")
           .map((code: any) => code.trim())
           .sort();

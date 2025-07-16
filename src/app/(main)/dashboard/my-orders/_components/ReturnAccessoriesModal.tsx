@@ -85,7 +85,7 @@ export default function ReturnAccessoriesModal({
               Return Accessories{" "}
             </ModalHeader>
             <ModalBody>
-              <JUForm methods={methods} onSubmit={() => handleReturnedSubmit}>
+           { accessory?.providedQuantity>accessory?.returnedQuantity &&  <JUForm methods={methods} onSubmit={() => handleReturnedSubmit}>
                 <div className="w-full space-y-2">
                     <div className="space-y-1">
                   <JUSelect
@@ -125,7 +125,7 @@ export default function ReturnAccessoriesModal({
                 </div>
                 <Button type="submit" color="primary" size="sm">Submit</Button>
                 </div>
-              </JUForm>
+              </JUForm>}
               <Table
         aria-label="Example table with client side pagination"
         shadow="none"

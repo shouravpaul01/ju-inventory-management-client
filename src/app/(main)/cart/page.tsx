@@ -24,6 +24,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import { getAllAccessories } from "@/src/hooks/Accessory";
 
 export default function CartPage() {
   const queryClient = useQueryClient();
@@ -39,10 +40,12 @@ export default function CartPage() {
     removeFromCart,
     removeAllFromCart,
   } = useCart();
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSelectedDistributeOption, setIsSelectedDistributeOption] =
     useState<boolean>(false);
 
+    
   const selectedItems = useMemo(
     () => cart.filter((item) => item.isSelected).map((item) => item._id),
     [cart]
@@ -74,7 +77,7 @@ export default function CartPage() {
 
       methods.reset({ items: defaultValues });
     }
-  }, [cart]);
+  }, [cart,isSelectedDistributeOption]);
   const handleQuantityChange = (id: string, newQuantity: number) => {
     updateOrderQuantity({ id, newQuantity });
   };
@@ -191,7 +194,7 @@ export default function CartPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={3} className="text-center">
+                <TableCell colSpan={4} className="text-center">
                   No items found.
                 </TableCell>
               </TableRow>

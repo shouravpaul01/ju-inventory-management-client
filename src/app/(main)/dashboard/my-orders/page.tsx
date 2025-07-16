@@ -1,6 +1,5 @@
 "use client";
 import {
- 
   ImageIcon,
   InfoIcon,
   MoreIcon,
@@ -41,7 +40,6 @@ import { useGetCurrentUser } from "@/src/hooks/Auth";
 import Link from "next/link";
 import HeadingSection from "@/src/components/ui/HeadingSection";
 
-
 export default function MyOrdersPage() {
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("search");
@@ -51,8 +49,8 @@ export default function MyOrdersPage() {
   const [page, setPage] = useState<number>(1);
   const [limit, setLimit] = useState(5);
   const queryClient = useQueryClient();
-  const modelOrderItems=useDisclosure()
-  const modalReturnAccessories=useDisclosure()
+  const modelOrderItems = useDisclosure();
+  const modalReturnAccessories = useDisclosure();
   const queryParams = useMemo(() => {
     const params: TQuery[] = [];
     if (searchTerm) {
@@ -60,8 +58,9 @@ export default function MyOrdersPage() {
     }
     return params;
   }, [page, searchParams]);
-  const {data:user}=useGetCurrentUser()
-  const { data, isLoading: isOrdersLoading } = useGetAllUserOrders({userId:user?._id!,
+  const { data: user } = useGetCurrentUser();
+  const { data, isLoading: isOrdersLoading } = useGetAllUserOrders({
+    userId: user?._id!,
     query: queryParams,
   });
   const loadingState = isOrdersLoading ? "loading" : "idle";
@@ -88,7 +87,7 @@ export default function MyOrdersPage() {
   };
   return (
     <div>
-     <HeadingSection title="Manage Orders"/>
+      <HeadingSection title="Manage Orders" />
       <div className="flex flex-col md:flex-row  items-center justify-end gap-2 my-4">
         <DateRangePicker
           className="max-w-[250px] "
@@ -158,12 +157,14 @@ export default function MyOrdersPage() {
           <TableColumn key="name" width={300}>
             Order ID
           </TableColumn>
-          <TableColumn key="quantity">Order - Returnable Accessories</TableColumn>
-          
+          <TableColumn key="quantity">
+             Accessories
+          </TableColumn>
+
           <TableColumn key="status" width={240}>
             Status
           </TableColumn>
-          
+
           <TableColumn key="action">Action</TableColumn>
         </TableHeader>
         <TableBody
@@ -175,58 +176,67 @@ export default function MyOrdersPage() {
           {(order) => (
             <TableRow key={order._id!}>
               <TableCell>
-               <div className="space-y-1">
-                      <div className="flex items-center gap-1">
-                        <span>INV:</span>
-                        <p className="text-sm font-bold">{order.invoiceId}</p>
-                      </div>
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1">
+                    <span>INV:</span>
+                    <p className="text-sm font-bold">{order.invoiceId}</p>
+                  </div>
 
-                      <div className="flex items-center gap-1">
-                        <span>Order D:</span>
-                        <Chip size="md">
-                          {dayjs(order.orderDate).format("MMM D, YYYY h:mm A")}
-                        </Chip>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <span>Expected D:</span>
-                        <Chip size="md">
-                          {dayjs(order?.expectedDeliveryDateTime).format(
-                            "MMM D, YYYY h:mm A"
-                          )}
-                        </Chip>
-                      </div>
-                    </div>
+                  <div className="flex items-center gap-1">
+                    <span>Order D:</span>
+                    <Chip size="md">
+                      {dayjs(order.orderDate).format("MMM D, YYYY h:mm A")}
+                    </Chip>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <span>Expected D:</span>
+                    <Chip size="md">
+                      {dayjs(order?.expectedDeliveryDateTime).format(
+                        "MMM D, YYYY h:mm A"
+                      )}
+                    </Chip>
+                  </div>
+                </div>
               </TableCell>
               <TableCell>
-                <div className="flex gap-2">
-                  <Badge
+                <Badge
                   color="danger"
                   content={order.items?.length || 0}
                   shape="circle"
                   size="sm"
                 >
-                  <Tooltip content="View Accessories" showArrow={true}>
-                    <Button as={Link} href={`/dashboard/my-orders/${order?._id}`} color="primary" size="sm" >
+                  <Tooltip
+                    content={
+                      <div className="space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span>Total Accessories:</span>
+                          <Chip size="sm" radius="full" color="success">
+                            {order.items?.length || 0}
+                          </Chip>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span>Returnable Accessories:</span>
+                          <Chip size="sm" radius="full" color="success">
+                            {order.items?.filter(
+                              (item) =>
+                                (item.accessory as TAccessory)?.isItReturnable
+                            ).length || 0}
+                          </Chip>
+                        </div>
+                      </div>
+                    }
+                    showArrow={true}
+                  >
+                    <Button
+                      as={Link}
+                      href={`/dashboard/my-orders/${order?._id}`}
+                      color="primary"
+                      size="sm"
+                    >
                       Accessories
                     </Button>
                   </Tooltip>
                 </Badge>
-                  {
-                    order?.items?.filter(item=>(item.accessory as TAccessory)?.isItReturnable)?.length > 0 && <Badge
-                  color="danger"
-                  content={order?.items?.filter(item=>(item.accessory as TAccessory)?.isItReturnable)?.length || 0}
-                  shape="circle"
-                  size="sm"
-                >
-                  <Tooltip content="View Accessories" showArrow={true}>
-                    <Button color="primary" size="sm" onPress={()=>{setOrderId(order._id),modalReturnAccessories.onOpen()}}>
-                     Returnable Accessories
-                    </Button>
-                  </Tooltip>
-                </Badge>
-                  }
-                </div>
-             
               </TableCell>
               <TableCell>
                 <div className="flex flex-wrap items-center gap-1">
@@ -265,11 +275,14 @@ export default function MyOrdersPage() {
                         variant="solid"
                         disallowEmptySelection
                         selectionMode="single"
-                        selectedKeys={order?.events?.map((event) => event.event)}
-                        disabledKeys={order?.events?.map((event) => event.event)}
+                        selectedKeys={order?.events?.map(
+                          (event) => event.event
+                        )}
+                        disabledKeys={order?.events?.map(
+                          (event) => event.event
+                        )}
                         color="primary"
                       >
-                       
                         <ListboxItem
                           key="received"
                           onPress={() =>
@@ -291,40 +304,34 @@ export default function MyOrdersPage() {
                   </Popover>
                 </div>
               </TableCell>
-             
+
               <TableCell>
-             
                 <div className="space-y-2">
                   <Tooltip color="primary" content="Details" showArrow>
                     <Button
-                      
                       color="primary"
                       variant="flat"
                       size="sm"
-                     startContent={   <InfoIcon />}
+                      startContent={<InfoIcon />}
                     >
-                   Info
+                      Info
                     </Button>
                   </Tooltip>
 
-               
-                    <Button
-                      
-                      color="primary"
-                      variant="flat"
-                      size="sm"
-                     startContent={<PrintIcon className="fill-gray-500"/>}
-                    >
-                      Print
-                    </Button>
-              
+                  <Button
+                    color="primary"
+                    variant="flat"
+                    size="sm"
+                    startContent={<PrintIcon className="fill-gray-500" />}
+                  >
+                    Print
+                  </Button>
                 </div>
               </TableCell>
             </TableRow>
           )}
         </TableBody>
       </Table>
-    
     </div>
   );
 }
