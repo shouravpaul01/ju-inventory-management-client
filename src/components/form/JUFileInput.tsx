@@ -4,12 +4,13 @@ import { Controller, useFormContext } from "react-hook-form";
 
 type TProps = {
   name: string;
+  labelName?:string;
   className?: string;
   multiple?: boolean;
   onPreview?: (previews: string[]) => void; // Callback to send previews to parent
 };
 
-export default function JUFileInput({ name, className, multiple = false, onPreview }: TProps) {
+export default function JUFileInput({ name,labelName, className, multiple = false, onPreview }: TProps) {
   const {
     control,
     setValue,
@@ -37,7 +38,8 @@ export default function JUFileInput({ name, className, multiple = false, onPrevi
       control={control}
       defaultValue={multiple ? [] : null}
       render={({ field }) => (
-        <div>
+        <div className="space-y-1">
+          {labelName && <label >{labelName}</label>}
           <label htmlFor="file-input">
             <div
               className={`w-full h-14 flex items-center border-2 rounded-xl hover:border-gray-400 ${className}`}

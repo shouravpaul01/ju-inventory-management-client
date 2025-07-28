@@ -77,7 +77,7 @@ export default function CartPage() {
 
       methods.reset({ items: defaultValues });
     }
-  }, [cart,isSelectedDistributeOption]);
+  }, [cart]);
   const handleQuantityChange = (id: string, newQuantity: number) => {
     updateOrderQuantity({ id, newQuantity });
   };

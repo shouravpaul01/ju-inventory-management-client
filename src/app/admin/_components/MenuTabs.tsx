@@ -6,6 +6,7 @@ import {
   HomeIcon,
   HubIcon,
   ReturnedIcon,
+  RoomIcon,
   WidgetIcon,
 } from "@/src/components/icons";
 import { Tab, Tabs } from "@heroui/tabs";
@@ -50,7 +51,17 @@ export default function MenuTabs() {
           </div>
         }
       />
-
+      <Tab
+        key="/admin/manage-rooms"
+        href="/admin/manage-rooms"
+        as={Link}
+        title={
+          <div className="flex items-center space-x-2">
+            <RoomIcon />
+            <span>Manage Rooms</span>
+          </div>
+        }
+      />
       <Tab
         key="/admin/manage-categories"
         href="/admin/manage-categories"
@@ -81,9 +92,9 @@ export default function MenuTabs() {
           </div>
         }
       />
-      
+
       <Tab
-       key="/admin/manage-orders"
+        key="/admin/manage-orders"
         href="/admin/manage-orders"
         title={
           <div className="flex items-center space-x-2">

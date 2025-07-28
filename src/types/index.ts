@@ -195,3 +195,43 @@ export type TOrder = {
   createdAt: Date;
   updatedAt: Date;
 } 
+
+export const  locationTypeOptions=[
+  { value: "classroom", label: "Classroom" },
+  { value: "office", label: "Office" },
+  { value: "lab", label: "Lab" },
+  { value: "storage", label: "Storage" },
+  { value: "event_venue", label: "Event Venue" },
+  { value: "library", label: "Library" },
+  { value: "canteen", label: "Canteen" },
+  { value: "other", label: "Other" },
+]
+
+export const roomTypeOptions=[
+  { value: "Classroom", label: "Classroom" },
+  { value: "Lecture Hall", label: "Lecture Hall" },
+  { value: "Laboratory", label: "Laboratory" },
+  { value: "Office", label: "Office" },
+  { value: "Conference", label: "Conference" },
+  { value: "Storage", label: "Storage" },
+  { value: "Server Room", label: "Server Room" },
+  { value: "Library", label: "Library" },
+  { value: "Workshop", label: "Workshop" },
+  { value: "Other", label: "Other" },
+]
+export const departmentOptions=[
+  { value: "Computer Science and Engineering", label: "Computer Science and Engineering"},
+  
+]
+export const roomFeaturesOptions = [
+  { value: "Projector", label: "Projector" },
+  { value: "Whiteboard", label: "Whiteboard" },
+  { value: "Smart Board", label: "Smart Board" },
+  { value: "Sound System", label: "Sound System" },
+  { value: "AC", label: "AC" },
+  { value: "Heating", label: "Heating" },
+  { value: "WiFi", label: "WiFi" },
+  { value: "Disabled Access", label: "Disabled Access" },
+  { value: "Video Conferencing", label: "Video Conferencing" },
+  { value: "Furniture", label: "Furniture" },
+]

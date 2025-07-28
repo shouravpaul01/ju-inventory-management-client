@@ -20,7 +20,7 @@ import {
   XmarkIcon,
 } from "@/src/components/icons";
 import { useEffect, useMemo, useState } from "react";
-import { TAccessoryCartItem, TQuery } from "@/src/types";
+import { locationTypeOptions, TAccessoryCartItem, TQuery } from "@/src/types";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import JUSelect from "@/src/components/form/JUSelect";
 import { string } from "zod";
@@ -199,6 +199,9 @@ const Distributepage = () => {
           <div>
             <label className="text-base font-semibold">Distribute For:</label>
             <JUInput name="distri" inputProps={{className:"max-w-lg" ,placeholder:"Name"}}/>
+          </div>
+          <div>
+            <JUSelect selectProps={{label: "Location Type"}} options={locationTypeOptions} name="locationType"/>
           </div>
         </div>
         {cart.length > 0 && (
