@@ -4,7 +4,7 @@ import JUInput from "@/src/components/form/JUInput";
 import JULoading from "@/src/components/ui/JULoading";
 import { getSingleCategory } from "@/src/hooks/Category";
 import { createCategoryReq, updateCategoryReq } from "@/src/services/Category";
-import { departmentOptions, roomTypeOptions, TErrorMessage } from "@/src/types";
+import { departmentOptions, roomFeaturesOptions, roomTypeOptions,  } from "@/src/constents";
 import { categoryValidation } from "@/src/validations/category.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/button";
@@ -24,41 +24,55 @@ import { toast } from "sonner";
 import JUSelect from "@/src/components/form/JUSelect";
 import JUFileInput from "@/src/components/form/JUFileInput";
 import JUTextEditor from "@/src/components/form/JUTextEditor";
+import JUTextarea from "@/src/components/form/JUTextarea";
+import { createRoomReq } from "@/src/services/Rooms";
+import { roomSchemaValidation } from "@/src/validations/room.validation";
+import { TErrorMessage } from "@/src/types";
 
 interface IProps {
   useDisclosure: UseDisclosureProps | any;
-  categoryId: string;
+  roomId: string;
 }
 export default function CreateUpdateRoomsModal({
   useDisclosure,
-  categoryId,
+  roomId,
 }: IProps) {
   const queryClient = useQueryClient();
-  const methods = useForm({ resolver: zodResolver(categoryValidation) });
+  const methods = useForm({ resolver: zodResolver(roomSchemaValidation) });
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { data: category, isLoading: isCategoryLoading } = getSingleCategory(
-    categoryId!
+    roomId!
   );
 
   useEffect(() => {
-    if (categoryId) {
+    if (roomId) {
       methods.reset({ name: category?.name });
     }
-  }, [categoryId, category]);
+  }, [roomId, category]);
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
+    console.log(data,"room")
+    const formData=new FormData()
+    if (data?.images?.length > 0) {
+      data.images.forEach((image: File) => {
+        formData.append("images", image);
+      }); 
+      
+    }
+    formData.append("data",JSON.stringify(data))
     setIsLoading(true);
-    const res = categoryId
-      ? await updateCategoryReq(categoryId, data)
-      : await createCategoryReq(data);
-
+    // const res = roomId
+    //   ? await updateCategoryReq(roomId, data)
+    //   : await createRoomReq(data);
+    const res=await createRoomReq(formData)
+console.log(res,"res")
     if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["single-category"] });
+      // queryClient.invalidateQueries({ queryKey: ["categories"] });
+      // queryClient.invalidateQueries({ queryKey: ["single-category"] });
       toast.success(res?.message);
-      !categoryId && methods.reset();
+      !roomId && methods.reset();
     } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "categoryError") {
+      if (res?.errorMessages[0]?.path == "roomError") {
         toast.error(res?.errorMessages[0]?.message);
         return;
       }
@@ -86,7 +100,7 @@ export default function CreateUpdateRoomsModal({
                 <Skeleton className="w-2/5 rounded-lg">
                   <div className="h-3 w-2/5 rounded-lg bg-default-200"></div>
                 </Skeleton>
-              ) : categoryId ? (
+              ) : roomId ? (
                 "Update Room Info"
               ) : (
                 "Create Room"
@@ -97,7 +111,7 @@ export default function CreateUpdateRoomsModal({
             ) : (
               <JUForm onSubmit={handleCreateUpdate} methods={methods}>
                 <ModalBody>
-                  <div className="space-y-1">
+                  <div className="space-y-2">
                     <div className="flex flex-col md:flex-row gap-4">
                       <JUInput
                         name="roomNo"
@@ -133,22 +147,30 @@ export default function CreateUpdateRoomsModal({
                           type: "text",
                         }}
                       />
-                      <JUSelect
+                     
+                     <JUInput
+                        name="capacity"
+                        inputProps={{
+                          label: "Capacity",
+                          type: "number",
+
+                        }}
+                        registerOptions={{valueAsNumber:true}}
+                      />
+                    </div>
+                     <JUSelect
                         selectProps={{ label: "Features",selectionMode:"multiple" }}
                         name="features"
-                        options={roomTypeOptions}
+                        options={roomFeaturesOptions}
                       />
-                     
-                    </div>
-                    <div>
                         <JUFileInput labelName="Images"  name="images" multiple/>
-                        {/* <JUTextEditor label="Description" name="description"/> */}
-                    </div>
+                        <JUTextarea textareaProps={{label:"Description"}} name="description"/>
+                   
                   </div>
                 </ModalBody>
                 <ModalFooter>
                   <Button type="submit" color="primary" isLoading={isLoading}>
-                    {categoryId ? "Update" : "Submit"}
+                    {roomId ? "Update" : "Submit"}
                   </Button>
                 </ModalFooter>
               </JUForm>

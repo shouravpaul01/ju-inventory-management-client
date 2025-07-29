@@ -2,11 +2,11 @@
 
 import dynamic from "next/dynamic";
 import { Controller, useFormContext } from "react-hook-form";
-import ReactQuill from "react-quill";
+// import ReactQuill from "react-quill";
 
-import "react-quill/dist/quill.snow.css"; // Import Quill styles
+import 'react-quill/dist/quill.snow.css'; // Import Quill styles
 
-// const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
+const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
 
 type TProps = {
   name: string;
@@ -65,7 +65,7 @@ export default function JUTextEditor({ name,label, placeholder }: TProps) {
         defaultValue=""
         render={({ field }) => (
          
-           <ReactQuill
+           <QuillEditor
             value={field.value}
             onChange={field.onChange}
             modules={modules}

@@ -4,10 +4,12 @@ import { Button } from "@heroui/button";
 import { useDisclosure } from "@heroui/modal";
 import Link from "next/link";
 import CreateUpdateRoomsModal from "./_components/CreateUpdateRoomsModal";
+import { useState } from "react";
 
 
 export default function page() {
      const modalForm = useDisclosure();
+     const [roomId,setRoomId]=useState("")
   return (
     <div>
        <div className="flex border-b pb-2">
@@ -26,7 +28,7 @@ export default function page() {
           </Button>
         </div>
       </div>{" "}
-      <CreateUpdateRoomsModal categoryId="d" useDisclosure={modalForm}/>
+      <CreateUpdateRoomsModal roomId={roomId} useDisclosure={modalForm}/>
     </div>
   )
 }

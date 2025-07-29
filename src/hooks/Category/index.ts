@@ -4,7 +4,7 @@ import {
   getCategoriesWithSubCategoriesReq,
   getSingleCategotyReq,
 } from "@/src/services/Category";
-import { TCategory, TErrorMessage, TQuery } from "@/src/types";
+import {  TQuery } from "@/src/types";
 import { useQuery } from "@tanstack/react-query";
 
 export const getAllCategories = ({ query }: { query: TQuery[] }) => {
