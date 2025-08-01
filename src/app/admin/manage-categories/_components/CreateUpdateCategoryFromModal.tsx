@@ -38,10 +38,13 @@ export default function CreateUpdateCategoryFromModal({
   );
 
   useEffect(() => {
+   
     if (categoryId) {
       methods.reset({ name: category?.name });
+    }else{
+      methods.reset({})
     }
-  }, [categoryId, category]);
+  }, [categoryId,useDisclosure]);
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
     const res = categoryId

@@ -58,7 +58,7 @@
   "next": "^15.1.6",
   "quill": "^2.0.3",
   "react-quill": "^2.0.0",
-  "react-quill-v2": "^2.0.2",
+  "react-quill-new": "^3.6.0",
   "react-to-print": "^3.1.0",
   "sonner": "^1.7.0",
   "sweetalert2": "^11.14.5",

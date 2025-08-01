@@ -1,4 +1,4 @@
-import { axiosInstance } from "@/src/lib/AxiosInstence";
+
 import {
   getAllCategoriesReq,
   getCategoriesWithSubCategoriesReq,

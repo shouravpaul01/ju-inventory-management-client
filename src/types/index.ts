@@ -197,6 +197,7 @@ export type TOrder = {
 } 
 
 export type TRoom = {
+  _id:string;
   roomNo: string;
   department: string;
   building: string;

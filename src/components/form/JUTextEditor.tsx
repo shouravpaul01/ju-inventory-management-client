@@ -3,17 +3,17 @@
 import dynamic from "next/dynamic";
 import { Controller, useFormContext } from "react-hook-form";
 // import ReactQuill from "react-quill";
+// import ReactQuill from 'react-quill';
+import "react-quill/dist/quill.snow.css"; // Import Quill styles
 
-import 'react-quill/dist/quill.snow.css'; // Import Quill styles
-
-const QuillEditor = dynamic(() => import("react-quill"), { ssr: false });
+const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
 type TProps = {
   name: string;
-  label:string;
+  label: string;
   placeholder?: string;
 };
-export default function JUTextEditor({ name,label, placeholder }: TProps) {
+export default function JUTextEditor({ name, label, placeholder }: TProps) {
   const {
     control,
     formState: { errors },
@@ -24,11 +24,11 @@ export default function JUTextEditor({ name,label, placeholder }: TProps) {
       [{ font: [] }],
       [{ header: [1, 2, 3, false] }],
       ["bold", "italic", "underline", "strike", "blockquote"],
-      [{ list: "ordered" }, { list: "bullet" }],
+      [{ list: "ordered" }, { list: "bullet" }, { list: "check" }],
       [{ script: "sub" }, { script: "super" }],
       [{ indent: "-1" }, { indent: "+1" }],
       [{ direction: "rtl" }],
-      ["link"],
+      ["link", "image"],
       [{ align: [] }],
       [{ color: [] }, { background: [] }],
       ["code-block"],
@@ -45,11 +45,13 @@ export default function JUTextEditor({ name,label, placeholder }: TProps) {
     "strike",
     "blockquote",
     "list",
-    "bullet",
+
     "script",
-    "bullet",
+
     "indent",
+    "direction",
     "link",
+    "image",
     "align",
     "color",
     "background",
@@ -64,16 +66,13 @@ export default function JUTextEditor({ name,label, placeholder }: TProps) {
         control={control}
         defaultValue=""
         render={({ field }) => (
-         
-           <QuillEditor
+          <ReactQuill
             value={field.value}
             onChange={field.onChange}
             modules={modules}
             formats={formats}
             placeholder={placeholder || "Start typing..."}
-           
           />
-      
         )}
       />
       {errors[name] && (

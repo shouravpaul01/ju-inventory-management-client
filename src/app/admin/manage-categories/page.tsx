@@ -87,7 +87,7 @@ export default function ManageCategories() {
     }
   };
   return (
-    <div>
+    <div className="space-y-4">
       <div className="flex border-b pb-2">
         <p className="text-lg font-bold flex-1">Manage Categories</p>
         <div>
@@ -107,6 +107,7 @@ export default function ManageCategories() {
       </div>{" "}
       <Table
         aria-label="Example table with client side pagination"
+        removeWrapper
         shadow="none"
         bottomContent={
           <div className=" w-full ">
