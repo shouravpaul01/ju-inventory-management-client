@@ -12,8 +12,19 @@ export const roomSchemaValidation = z
     roomNo: z
       .string({ required_error: "Room number is required" })
       .nonempty("Room number is required")
-      .max(5, "Room number must be at most 5 characters")
-      .regex(/\d/, "Room number must include at least one number"),
+      .min(
+        4,
+        "Room number must be at least 4 characters (3 digits + 1-3 letters)"
+      )
+      .max(
+        6,
+        "Room number must be at most 6 characters (3 digits + 1-3 letters)"
+      )
+      .toUpperCase()
+      .regex(
+        /^\d{3}[A-Z]{1,3}$/,
+        "Room number must be 3 digits followed by 1 to 3 uppercase letters (e.g., 222W, 302DD, 501AEE)"
+      ),
 
     department: z
       .string({ required_error: "Department number is required" })
@@ -25,8 +36,13 @@ export const roomSchemaValidation = z
 
     floor: z
       .string({ required_error: "Floor number is required" })
-      .nonempty("Floor number is required")
-      .max(3, "Floor must be at most 3 characters"),
+      .min(2, "Floor must be at least 2 characters (digit(s) + letter(s))")
+      .max(4, "Floor must be at most 4 characters (digit(s) + letter(s))")
+      .toUpperCase()
+      .regex(
+        /^\d{1,2}[A-Z]{1,2}$/,
+        "Floor must be 1-2 digits followed by 1-2 uppercase letters (e.g., 2A, 10BB)"
+      ),
 
     roomType: z
       .string({ required_error: "Room type is required" })
@@ -40,30 +56,43 @@ export const roomSchemaValidation = z
       .int("Capacity must be an integer")
       .positive("Capacity must be positive"),
 
-    images: z
-      .array(z.instanceof(File),{required_error:"Images is required."})
-      .nonempty("Images is required.")
-      .min(1, "At least one file is required")
-      .max(3, "Maximum 3 files allowed")
-      .refine(
-        (files) => files.every((file) => file.size <= MAX_FILE_SIZE),
-        "Each file must be less than 5MB"
-      ).refine(
-        (files) => files.every((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
-        "Only .jpg, .jpeg, .png  formats are supported"
-      ),
+    // images: z
+    //   .array(z.instanceof(File),{required_error:"Images is required."})
+    //   .nonempty("Images is required.")
+    //   .min(1, "At least one file is required")
+    //   .max(3, "Maximum 3 files allowed")
+    //   .refine(
+    //     (files) => files.every((file) => file.size <= MAX_FILE_SIZE),
+    //     "Each file must be less than 5MB"
+    //   ).refine(
+    //     (files) => files.every((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),
+    //     "Only .jpg, .jpeg, .png  formats are supported"
+    //   ),
 
-    description: z.string().optional(),
+    // description: z.string().optional(),
 
-    features:z
-    .string({required_error:"Features are required"})
-    .nonempty("Features are required")
-    .transform((val) =>
-      val.split(",").map((item) => item.trim()).filter((item) => item !== "")
-    )
-    .refine((arr) => arr.length > 0, {
-      message: "At least one feature must be provided",
-    })
+    features: z
+      .union([
+        z
+          .string({ required_error: "Features is required." })
+          .nonempty("Features is required."),
+        z.array(
+          z
+            .string({ required_error: "Features is required." })
+            .nonempty("Features is required.")
+        ),
+      ])
+      .transform((val) =>
+        typeof val === "string"
+          ? val
+              .split(",")
+              .map((item) => item.trim())
+              .filter((item) => item !== "")
+          : val
+      )
+      .refine((arr) => arr.length > 0, {
+        message: "At least one feature must be provided",
+      }),
   })
   .superRefine((data, ctx) => {
     const requiredTypes = ["Classroom", "Lecture Hall", "Conference"];

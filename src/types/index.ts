@@ -24,7 +24,7 @@ export type TUser = {
   needChangePassword?: boolean;
   role: "Admin" | "Faculty";
   userAccess: string[];
-  isApproved: boolean;
+  approvalDetails: TApprovalDetails;
   isBlocked: boolean;
   isDeleted: boolean;
 };
@@ -196,29 +196,58 @@ export type TOrder = {
   updatedAt: Date;
 } 
 
-export type TRoom = {
+
+export type TRoomEventHistory = {
   _id:string;
+  eventType: "created" | "updated" | "approved" | "activated" | "deactivated" | "distributed";
+  performedBy: TFaculty | string;
+  performedAt?: Date;
+  comments?: string;
+};
+
+
+
+export type TRoom = {
+  _id?: string;
   roomNo: string;
-  department: string;
-  building: string;
+  building?: string;
   floor: string;
-  roomType: string;
+  roomType:
+    | "Classroom"
+    | "Teacher Room"
+    | "Lecture Hall"
+    | "Laboratory"
+    | "Office"
+    | "Conference"
+    | "Storage"
+    | "Server Room"
+    | "Library"
+    | "Workshop"
+    | "Other";
   capacity?: number;
   images?: string[];
+  department?: string;
+  assignedRoom?: TFaculty | string;
   description?: string;
-
-  features: string[];
-  equipment: {
-    accessories: {
-      accessory: TAccessory | string;
-      quantity: number;
-      codes: string[];
-    }[];
-    totalQuantity: number;
-  }[];
-  isActive: boolean;
-  createdBy: TUser | string;
-  approvalDetails: TApprovalDetails;
-  createdAt: Date;
-  updatedAt: Date;
+  features: (
+    | "Projector"
+    | "Whiteboard"
+    | "Smart Board"
+    | "Sound System"
+    | "AC"
+    | "Heating"
+    | "WiFi"
+    | "Disabled Access"
+    | "Video Conferencing"
+    | "Furniture"
+  )[];
+  distributedAccessoriesDetails:string[];
+  
+  isActive?: boolean;
+  isApproved?: boolean;
+  isDeleted?:boolean;
+  eventsHistory?: TRoomEventHistory[];
+  createdAt?: Date;
+  updatedAt?: Date;
 };
+

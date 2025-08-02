@@ -32,6 +32,7 @@ import {
   deleteUserReq,
   restoreUserReq,
   updateBlockedStatusReq,
+  updateUserApprovedStatus,
   updateUserRoleReq,
 } from "@/src/services/User";
 import { toast } from "sonner";
@@ -45,7 +46,7 @@ import { TQuery } from "@/src/types";
 export default function ManageUsers() {
   const searchParams = useSearchParams();
   const tab = searchParams.get("tab");
-  const searchTerm=searchParams.get("search")
+  const searchTerm = searchParams.get("search");
   const modalForm = useDisclosure();
   const queryClient = useQueryClient();
   const [page, setPage] = useState<number>(1);
@@ -56,7 +57,7 @@ export default function ManageUsers() {
     }
   }, [modalForm.isOpen]);
   const queryParams = useMemo(() => {
-    const params:TQuery[] = [
+    const params: TQuery[] = [
       { name: "page", value: page },
       { name: "isDeleted", value: tab === "trash" },
     ];
@@ -66,7 +67,7 @@ export default function ManageUsers() {
     return params;
   }, [page, tab, searchParams]);
   const { data, isLoading } = getAllUsers({
-    query:queryParams,
+    query: queryParams,
   });
 
   const loadingState = isLoading ? "loading" : "idle";
@@ -136,6 +137,17 @@ export default function ManageUsers() {
       }
     }
   };
+  const handleApproved = async (userId: string) => {
+    const res = await updateUserApprovedStatus(userId);
+    if (res?.success) {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      toast.success(res?.message);
+    } else if (!res?.success && res?.errorMessages?.length > 0) {
+      if (res?.errorMessages[0]?.path == "userError") {
+        toast.error(res?.errorMessages[0]?.message);
+      }
+    }
+  };
   return (
     <div>
       <div className="flex border-b pb-2">
@@ -196,6 +208,7 @@ export default function ManageUsers() {
             <TableColumn key="name">NAME</TableColumn>
             <TableColumn key="role">ROLE</TableColumn>
             <TableColumn key="status">STATUS</TableColumn>
+            <TableColumn key="approval">Approval</TableColumn>
             <TableColumn key="action">Action</TableColumn>
           </TableHeader>
           <TableBody
@@ -268,6 +281,7 @@ export default function ManageUsers() {
                     )}
                   </div>
                 </TableCell>
+                
                 <TableCell>
                   {" "}
                   <div className="flex items-center gap-2">
@@ -320,6 +334,58 @@ export default function ManageUsers() {
                               }
                             >
                               Unblock
+                            </ListboxItem>
+                          </Listbox>
+                        </PopoverContent>
+                      </Popover>
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell>
+                  {" "}
+                  <div className="flex items-center gap-2">
+                    <Chip
+                      color={
+                        item?.approvalDetails?.isApproved ? "success" : "danger"
+                      }
+                      variant="flat"
+                      size="sm"
+                    >
+                      {item?.approvalDetails?.isApproved
+                        ? "Approved"
+                        : "Pending"}
+                    </Chip>
+                    {!item?.approvalDetails?.isApproved && (
+                      <Popover placement="bottom" showArrow={true}>
+                        <PopoverTrigger>
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            variant="light"
+                            color="primary"
+                          >
+                            {" "}
+                            <MoreIcon />
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent>
+                          <Listbox
+                            aria-label="Single selection example"
+                            variant="solid"
+                            disallowEmptySelection
+                            selectionMode="single"
+                            selectedKeys={[
+                              item?.approvalDetails?.isApproved
+                                ? "Approved"
+                                : "Pending",
+                            ]}
+                            color="primary"
+                          >
+                            <ListboxItem
+                              key="Unblock"
+                              onPress={() => handleApproved(item.userId)}
+                            >
+                              Approved
                             </ListboxItem>
                           </Listbox>
                         </PopoverContent>

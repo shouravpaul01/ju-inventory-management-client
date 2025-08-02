@@ -20,7 +20,7 @@ import {
   XmarkIcon,
 } from "@/src/components/icons";
 import { useEffect, useMemo, useState } from "react";
-import { locationTypeOptions, TAccessoryCartItem, TQuery } from "@/src/types";
+import {  TAccessoryCartItem, TQuery } from "@/src/types";
 import { getAllAccessories } from "@/src/hooks/Accessory";
 import JUSelect from "@/src/components/form/JUSelect";
 import { string } from "zod";
@@ -28,6 +28,11 @@ import { Avatar } from "@heroui/avatar";
 import JULoading from "@/src/components/ui/JULoading";
 import { useRouter } from "next/navigation";
 import JUInput from "@/src/components/form/JUInput";
+import { departmentOptions, locationTypeOptions, roomTypeOptions } from "@/src/constents";
+import { getAllUsers } from "@/src/hooks/User";
+import { getAllFaculties } from "@/src/hooks/Faculty";
+import { getAllRooms } from "@/src/hooks/Room";
+import JUTextEditor from "@/src/components/form/JUTextEditor";
 
 const Distributepage = () => {
   const router = useRouter();
@@ -63,7 +68,21 @@ const Distributepage = () => {
         };
       });
   }, [cart, accessories]);
-  console.log(distributeAccessories, "accs");
+  const {data:faculties}=getAllFaculties({query:[]})
+  const facultiesOptions = useMemo(() => {
+    if (!faculties) return [];
+
+    return faculties?.data?.map(faculty=>({value:faculty._id,label:faculty.name}))
+      
+  }, [faculties]);
+  const {data:rooms}=getAllRooms({query:[{name:"isActive",value:true}]})
+  const roomsOptions = useMemo(() => {
+    if (!rooms) return [];
+
+    return rooms?.data?.map(room=>({value:room._id,label:`R: ${room.roomNo} - F: ${room.floor}`}))
+      
+  }, [rooms]);
+  console.log(faculties,facultiesOptions, "accs");
   const methods = useForm({});
   const {
     watch,
@@ -101,7 +120,7 @@ const Distributepage = () => {
             <TableColumn width={450}>NAME</TableColumn>
 
             <TableColumn>Provide Quantity</TableColumn>
-            <TableColumn width={350}>Provide Accessories code</TableColumn>
+           
             <TableColumn width={200}>Action</TableColumn>
           </TableHeader>
           {distributeAccessories && distributeAccessories?.length > 0 ? (
@@ -149,30 +168,7 @@ const Distributepage = () => {
                         )}
                     </div>
                   </TableCell>
-                  <TableCell>
-                    {item.isItReturnable ? (
-                      <JUSelect
-                        options={item?.currentCodes!?.sort().map((element) => ({
-                          value: element,
-                          label: element,
-                        }))}
-                        name={`items.${index}.providedAccessoryCodes`}
-                        selectProps={{
-                          className: "max-w-[300px]",
-                          selectionMode: "multiple",
-                          labelPlacement: "outside",
-                          placeholder: "Select Codes",
-
-                          classNames: { label: "text-sm" },
-                        }}
-                      />
-                    ) : (
-                      <p className="text-slate-600">
-                        The order item is non-returnable, so the return deadline
-                        and codes will not be provided.
-                      </p>
-                    )}
-                  </TableCell>
+                  
                   <TableCell>
                     <Button
                       isIconOnly
@@ -195,17 +191,28 @@ const Distributepage = () => {
             </TableBody>
           )}
         </Table>
-        <div>
-          <div>
+        <div className="space-y-2">
+         
             <label className="text-base font-semibold">Distribute For:</label>
-            <JUInput name="distri" inputProps={{className:"max-w-lg" ,placeholder:"Name"}}/>
+            
+          
+          <div className="flex flex-col md:flex-row gap-3">
+            <JUSelect selectProps={{label: "Location Type"}} options={roomTypeOptions} name="locationType"/>
+            <JUSelect selectProps={{label: "Faculty Member"}} options={facultiesOptions} name="facultyMember"/>
+            <JUSelect selectProps={{label: "Department"}} options={departmentOptions} name="department"/>
+
           </div>
-          <div>
-            <JUSelect selectProps={{label: "Location Type"}} options={locationTypeOptions} name="locationType"/>
+          <div className="flex flex-col md:flex-row gap-3">
+          <JUSelect selectProps={{label: "Room No", className:"w-full md:w-[30%]"}} options={roomsOptions} name="roomNo"/>
+          <JUInput name="Palce" inputProps={{label:"Place",className:"w-full md:w-[70%]" }}/>
+        
+          
+          
           </div>
+          <JUTextEditor label="Description" name="description" className="h-44"/>
         </div>
         {cart.length > 0 && (
-          <div className="flex gap-3 justify-end mx-6 my-6">
+          <div className="flex justify-end  my-16">
             <Button
               href="/distribute"
               size="sm"

@@ -7,9 +7,7 @@ import { getSingleUser } from "@/src/hooks/User";
 import { createFacultyReq } from "@/src/services/Faculty";
 import { updateUserReq } from "@/src/services/User";
 import { TErrorMessage } from "@/src/types";
-import {
-  facultyValidation,
-} from "@/src/validations/faculty.validation";
+import { facultyValidation } from "@/src/validations/faculty.validation";
 import { Button } from "@heroui/button";
 import {
   Modal,
@@ -20,8 +18,9 @@ import {
   UseDisclosureProps,
 } from "@heroui/modal";
 import { useQueryClient } from "@tanstack/react-query";
-import { useMemo, useState } from "react";
-import { FieldValues, SubmitHandler } from "react-hook-form";
+import { m } from "framer-motion";
+import { useEffect, useMemo, useState } from "react";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 
 interface IProps {
@@ -34,47 +33,55 @@ export default function CreateUpdateUserFromModal({
 }: IProps) {
   const queryClient = useQueryClient();
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [validationErrors, setValidationErrors] = useState<TErrorMessage[]>([]);
-  const [isResetForm, setIsResetForm] = useState<boolean>(false);
+  const methods = useForm({});
   const { data: singleUser, isLoading: isSingleUserLoading } = getSingleUser(
     userId!
   );
 
-  const defaultValues = useMemo(() => {
-    if (!userId) return {};
-    return {
-      userId: singleUser?.userId || "",
-      name: singleUser?.faculty?.name || "",
-      roomNo: singleUser?.faculty?.roomNo || "",
-      email: singleUser?.email || "",
-      designation: singleUser?.faculty?.designation || "",
-    };
-  }, [userId, singleUser]);
-  const handleCreateFaculty: SubmitHandler<FieldValues> = async (data) => {
-    setIsLoading(true);
-    const updateData = {
-      userId,
-      data,
-    };
-   
-    const res = userId
-      ? await updateUserReq(updateData)
-      : await createFacultyReq(data);
-     
-    if (res?.success) {
-      
-      queryClient.invalidateQueries({ queryKey: ["users"] });
-      queryClient.invalidateQueries({ queryKey: ["single-user"] });
-      toast.success(res?.message);
-      !userId && setIsResetForm(true);
-    } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "facultyError") {
-        toast.error(res?.errorMessages[0]?.message);
-      }
-      setValidationErrors(res?.errorMessages);
+  useEffect(() => {
+    if (userId) {
+      methods.reset({
+        userId: singleUser?.userId || "",
+        name: singleUser?.faculty?.name || "",
+        roomNo: singleUser?.faculty?.roomNo || "",
+        email: singleUser?.email || "",
+        designation: singleUser?.faculty?.designation || "",
+      });
+    } else {
+      methods.reset({});
     }
+  }, [userId, useDisclosure]);
+  const handleCreateFaculty: SubmitHandler<FieldValues> = async (data) => {
+    try {
+      setIsLoading(true);
+      const updateData = {
+        userId,
+        data,
+      };
 
-    setIsLoading(false);
+      const res = userId
+        ? await updateUserReq(updateData)
+        : await createFacultyReq(data);
+
+      if (res?.success) {
+        queryClient.invalidateQueries({ queryKey: ["users"] });
+        queryClient.invalidateQueries({ queryKey: ["single-user"] });
+        toast.success(res?.message);
+        !userId && methods.reset({});
+      } else if (!res?.success && res?.errorMessages?.length > 0) {
+        if (res?.errorMessages[0]?.path == "facultyError") {
+          toast.error(res?.errorMessages[0]?.message);
+        }
+        res?.errorMessages?.forEach((err: TErrorMessage) => {
+          methods.setError(err.path, { type: "server", message: err.message });
+        });
+      }
+    } catch (error) {
+      console.error("Faculty operation failed:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
   return (
     <Modal
@@ -89,17 +96,9 @@ export default function CreateUpdateUserFromModal({
             {isSingleUserLoading ? (
               <JULoading className="h-[300px]" />
             ) : (
-              <JUForm
-                onSubmit={handleCreateFaculty}
-                validation={
-                  facultyValidation
-                }
-                errors={validationErrors}
-                reset={isResetForm}
-                defaultValues={defaultValues}
-              >
+              <JUForm onSubmit={handleCreateFaculty} methods={methods}>
                 <ModalHeader className="flex flex-col gap-1">
-                  {userId?"Update Faculty":"Create Faculty"}
+                  {userId ? "Update Faculty" : "Create Faculty"}
                 </ModalHeader>
                 <ModalBody>
                   <div className="space-y-3">

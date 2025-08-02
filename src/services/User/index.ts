@@ -50,6 +50,16 @@ export const updateUserReq = async (payload: FieldValues) => {
     return error?.response?.data;
   }
 };
+export const updateUserApprovedStatus = async (userId: string) => {
+  try {
+    const res = await axiosInstance.patch(
+      `/users/update-approved-status/${userId}`
+    );
+    return res.data;
+  } catch (error: any) {
+    return error?.response?.data;
+  }
+};
 export const updateBlockedStatusReq = async (
   userId: string,
   isBlocked: boolean

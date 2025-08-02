@@ -28,6 +28,8 @@ import {
   updateRoomApprovedStatus,
 } from "@/src/services/Rooms";
 import { toast } from "sonner";
+import { Switch } from "@heroui/switch";
+import HeadingSection from "@/src/components/ui/HeadingSection";
 
 export default function page() {
   const searchParams = useSearchParams();
@@ -44,55 +46,55 @@ export default function page() {
     }
     return params;
   }, [page, searchParams]);
-  const { data, isLoading } = getAllRooms({
+  const { data, isLoading, refetch } = getAllRooms({
     query: queryParams,
   });
   const loadingState = isLoading ? "loading" : "idle";
   useEffect(() => {
     if (!modalForm.isOpen) {
-      console.log("1s")
+      console.log("1s");
       setRoomId("");
     }
   }, [!modalForm.isOpen]);
   const handleActiveOrInactive = async (roomId: string, isActive: boolean) => {
     const res = await updateRoomActiveStatus(roomId, isActive);
+
     if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["rooms"] });
       toast.success(res?.message);
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "roomError") {
         toast.error(res?.errorMessages[0]?.message);
       }
     }
+    queryClient.invalidateQueries({ queryKey: ["rooms"] });
   };
   const handleApproved = async (roomId: string) => {
     const res = await updateRoomApprovedStatus(roomId);
     if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["rooms"] });
       toast.success(res?.message);
     } else if (!res?.success && res?.errorMessages?.length > 0) {
       if (res?.errorMessages[0]?.path == "roomError") {
         toast.error(res?.errorMessages[0]?.message);
       }
     }
+    queryClient.invalidateQueries({ queryKey: ["rooms"] });
   };
   return (
     <div className="space-y-4">
-      <div className="flex border-b pb-2">
-        <p className="text-lg font-bold flex-1">Manage Rooms</p>
-        <div>
-          <Button
+    
+      <HeadingSection title="Manage rooms" > 
+        <>
+        <Button
             size="sm"
             color="primary"
-            variant="ghost"
             onPress={() => modalForm.onOpen()}
-            startContent={<AddIcon className="size-5 " />}
+            startContent={<AddIcon className="size-5 fill-white" />}
           >
             {" "}
             Add
           </Button>
-        </div>
-      </div>
+        </>
+      </HeadingSection>
       <Table
         aria-label="Example table with client side pagination"
         removeWrapper
@@ -181,52 +183,26 @@ export default function page() {
                     {item?.isActive ? "Active" : "Inactive"}
                   </Chip>
 
-                  {item?.approvalDetails?.isApproved && (
-                    <Popover placement="bottom" showArrow={true}>
-                      <PopoverTrigger>
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          color="primary"
-                        >
-                          {" "}
-                          <MoreIcon />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <Listbox
-                          aria-label="Single selection example"
-                          variant="solid"
-                          disallowEmptySelection
-                          selectionMode="single"
-                          selectedKeys={[
-                            item?.isActive ? "Active" : "Inactive",
-                          ]}
-                          disabledKeys={[
-                            item?.isActive ? "Active" : "Inactive",
-                          ]}
-                          color="primary"
-                        >
-                          <ListboxItem
-                            key="Active"
-                            onPress={() =>
-                              handleActiveOrInactive(item._id, true)
-                            }
-                          >
-                            Active
-                          </ListboxItem>
-                          <ListboxItem
-                            key="Inactive"
-                            onPress={() =>
-                              handleActiveOrInactive(item._id, false)
-                            }
-                          >
-                            Inactive
-                          </ListboxItem>
-                        </Listbox>
-                      </PopoverContent>
-                    </Popover>
+                  {item?.isApproved && (
+                    <Tooltip
+                      content={
+                        item?.isActive
+                          ? "Deactivate this room? Click to proceed."
+                          : "Activate this room? Click to proceed."
+                      }
+                    >
+                      <Switch
+                        isSelected={item?.isActive}
+                        color={item?.isActive ? "primary" : "danger"}
+                        size="sm"
+                        onValueChange={() =>
+                          handleActiveOrInactive(
+                            item?._id!,
+                            item?.isActive ? false : true
+                          )
+                        }
+                      />
+                    </Tooltip>
                   )}
                 </div>
               </TableCell>
@@ -234,49 +210,21 @@ export default function page() {
                 {" "}
                 <div className="flex items-center gap-2">
                   <Chip
-                    color={
-                      item?.approvalDetails?.isApproved ? "success" : "danger"
-                    }
+                    color={item?.isApproved ? "success" : "danger"}
                     variant="flat"
                     size="sm"
                   >
-                    {item?.approvalDetails?.isApproved ? "Approved" : "Pending"}
+                    {item?.isApproved ? "Approved" : "Pending"}
                   </Chip>
-                  {!item?.approvalDetails?.isApproved && (
-                    <Popover placement="bottom" showArrow={true}>
-                      <PopoverTrigger>
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          color="primary"
-                        >
-                          {" "}
-                          <MoreIcon />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <Listbox
-                          aria-label="Single selection example"
-                          variant="solid"
-                          disallowEmptySelection
-                          selectionMode="single"
-                          selectedKeys={[
-                            item?.approvalDetails?.isApproved
-                              ? "Approved"
-                              : "Pending",
-                          ]}
-                          color="primary"
-                        >
-                          <ListboxItem
-                            key="Unblock"
-                            onPress={() => handleApproved(item._id)}
-                          >
-                            Approved
-                          </ListboxItem>
-                        </Listbox>
-                      </PopoverContent>
-                    </Popover>
+                  {!item?.isApproved && (
+                    <Tooltip content="Do you confirm the approval of this room? Please click to proceed.">
+                      <Switch
+                        isSelected={item?.isApproved}
+                        color="primary"
+                        size="sm"
+                        onValueChange={(value) => handleApproved(item?._id!)}
+                      />
+                    </Tooltip>
                   )}
                 </div>
               </TableCell>
@@ -288,9 +236,8 @@ export default function page() {
                       color="primary"
                       variant="flat"
                       size="sm"
-                      onPress={() => {
-                        setRoomId(item._id), modalDetails.onOpen();
-                      }}
+                      as={Link}
+                      href={`/admin/manage-rooms/${item?._id!}`}
                     >
                       <InfoIcon />
                     </Button>
@@ -303,7 +250,7 @@ export default function page() {
                       variant="flat"
                       size="sm"
                       onPress={() => {
-                        setRoomId(item._id), modalForm.onOpen();
+                        setRoomId(item._id!), modalForm.onOpen();
                       }}
                     >
                       <EditIcon />

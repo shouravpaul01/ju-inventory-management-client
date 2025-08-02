@@ -81,56 +81,56 @@ export default function CreateUpdateRoomsModal({
   }, [roomId, room, useDisclosure]);
 
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
-    console.log(data,"formData")
-    // try {
-    //   console.log(data, "room");
+  
+    try {
+      console.log(data, "room");
 
-    //   // Validate images
-    //   if (storedImges?.length + previewImages?.length > 3) {
-    //     methods.setError("images", { message: "Make sure to save 3 images." });
-    //     return;
-    //   }
+      // Validate images
+      // if (storedImges?.length + previewImages?.length > 3) {
+      //   methods.setError("images", { message: "Make sure to save 3 images." });
+      //   return;
+      // }
 
-    //   // Prepare form data
-    //   const formData = new FormData();
-    //   if (data?.images?.length > 0) {
-    //     data.images.forEach((image: File) => {
-    //       formData.append("images", image);
-    //     });
-    //   }
+      // Prepare form data
+      const formData = new FormData();
+      if (data?.images?.length > 0) {
+        data.images.forEach((image: File) => {
+          formData.append("images", image);
+        });
+      }
 
-    //   formData.append("data", JSON.stringify(formData));
-    //   setIsLoading(true);
+      formData.append("data", JSON.stringify(formData));
+      setIsLoading(true);
 
-    //   // API call
-    //   const res = roomId
-    //     ? await updateRoomIntroReq(roomId, formData)
-    //     : await createRoomReq(formData);
+      // API call
+      const res = roomId
+        ? await updateRoomIntroReq(roomId, formData)
+        : await createRoomReq(data);
 
-    //   console.log(res, "res");
+      console.log(res, "res");
 
-    //   // Handle response
-    //   if (res?.success) {
-    //     queryClient.invalidateQueries({ queryKey: ["rooms"] });
-    //     queryClient.invalidateQueries({ queryKey: ["single-room"] });
-    //     toast.success(res?.message);
-    //     !roomId && methods.reset();
-    //   } else if (!res?.success && res?.errorMessages?.length > 0) {
-    //     if (res?.errorMessages[0]?.path == "roomError") {
-    //       toast.error(res?.errorMessages[0]?.message);
-    //       return;
-    //     }
+      // Handle response
+      if (res?.success) {
+        queryClient.invalidateQueries({ queryKey: ["rooms"] });
+        queryClient.invalidateQueries({ queryKey: ["single-room"] });
+        toast.success(res?.message);
+        !roomId && methods.reset();
+      } else if (!res?.success && res?.errorMessages?.length > 0) {
+        if (res?.errorMessages[0]?.path == "roomError") {
+          toast.error(res?.errorMessages[0]?.message);
+          return;
+        }
 
-    //     res?.errorMessages?.forEach((err: TErrorMessage) => {
-    //       methods.setError(err.path, { type: "server", message: err.message });
-    //     });
-    //   }
-    // } catch (error) {
-    //   console.error("Room operation failed:", error);
-    //   toast.error("An unexpected error occurred");
-    // } finally {
-    //   setIsLoading(false);
-    // }
+        res?.errorMessages?.forEach((err: TErrorMessage) => {
+          methods.setError(err.path, { type: "server", message: err.message });
+        });
+      }
+    } catch (error) {
+      console.error("Room operation failed:", error);
+      toast.error("An unexpected error occurred");
+    } finally {
+      setIsLoading(false);
+    }
   };
   const handleDeleteStoredImage = async (roomId: string, imageUrl: string) => {
     const res = await deleteSingleImageFromDBReq(roomId, imageUrl);
@@ -214,18 +214,33 @@ export default function CreateUpdateRoomsModal({
                         registerOptions={{ valueAsNumber: true }}
                       />
                     </div>
+                    <div className="flex flex-col md:flex-row gap-3">
                     <JUSelect
                       selectProps={{
                         label: "Features",
                         selectionMode: "multiple",
                         "aria-label":"Select room features",
                         defaultSelectedKeys: [...(room?.features! || [])],
+                        className:"w-full "
                       }}
 
                       name="features"
                       options={roomFeaturesOptions}
                     />
-                    <div>
+                    {/* <JUSelect
+                      selectProps={{
+                        label: "Incharge",
+                        selectionMode: "multiple",
+                        "aria-label":"Select room features",
+                        defaultSelectedKeys: [...(room?.features! || [])],
+                        className:"w-full md:w-[33%]"
+                      }}
+
+                      name="incharge"
+                      options={roomFeaturesOptions}
+                    /> */}
+                    </div>
+                    {/* <div>
                       <JUFileInput
                         labelName="Images"
                         name="images"
@@ -249,12 +264,9 @@ export default function CreateUpdateRoomsModal({
                           }
                         />
                       )}
-                    </div>
-                    {/* <JUTextarea
-                      textareaProps={{ label: "Description" }}
-                      name="description"
-                    /> */}
-                    <JUTextEditor label="Description" name="description"/>
+                    </div> */}
+                  
+                    {/* <JUTextEditor label="Description" name="description"/> */}
                   </div>
                 </ModalBody>
                 <ModalFooter>

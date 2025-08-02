@@ -12,8 +12,9 @@ type TProps = {
   name: string;
   label: string;
   placeholder?: string;
+  className?:string
 };
-export default function JUTextEditor({ name, label, placeholder }: TProps) {
+export default function JUTextEditor({ name, label, placeholder,className }: TProps) {
   const {
     control,
     formState: { errors },
@@ -72,6 +73,7 @@ export default function JUTextEditor({ name, label, placeholder }: TProps) {
             modules={modules}
             formats={formats}
             placeholder={placeholder || "Start typing..."}
+            className={className}
           />
         )}
       />
