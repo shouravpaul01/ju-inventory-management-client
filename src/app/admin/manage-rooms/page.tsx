@@ -35,7 +35,6 @@ export default function page() {
   const searchParams = useSearchParams();
   const searchTerm = searchParams.get("search");
   const modalForm = useDisclosure();
-  const modalDetails = useDisclosure();
   const queryClient = useQueryClient();
   const [page, setPage] = useState<number>(1);
   const [roomId, setRoomId] = useState("");
@@ -52,7 +51,6 @@ export default function page() {
   const loadingState = isLoading ? "loading" : "idle";
   useEffect(() => {
     if (!modalForm.isOpen) {
-      console.log("1s");
       setRoomId("");
     }
   }, [!modalForm.isOpen]);
@@ -180,7 +178,7 @@ export default function page() {
                     variant="flat"
                     size="sm"
                   >
-                    {item?.isActive ? "Active" : "Inactive"}
+                   {item?.isActive ? "Activated" : "Deactivated"}
                   </Chip>
 
                   {item?.isApproved && (

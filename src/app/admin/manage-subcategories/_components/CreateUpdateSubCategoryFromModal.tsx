@@ -8,7 +8,7 @@ import {
   createSubCategoryReq,
   updateSubCategoryReq,
 } from "@/src/services/Sub Category";
-import { TErrorMessage } from "@/src/types";
+import { TErrorMessage, TSelectOption } from "@/src/types";
 import { subCategoryValidation } from "@/src/validations/subCategory.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/button";
@@ -25,6 +25,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import JUTextEditor from "@/src/components/form/JUTextEditor";
 
 interface IProps {
   useDisclosure: UseDisclosureProps | any;
@@ -42,15 +43,23 @@ export default function CreateUpdateSubCategoryFromModal({
   useEffect(() => {
     if (subCategoryId) {
       methods.reset({
-        category: subCategory?.category,
+        category: subCategory?.category?._id,
         name: subCategory?.name,
+        description:subCategory?.description
       });
+    }else{
+      methods.reset({
+        category: "",
+        name:"",
+        description:""
+      })
+      
     }
-  }, [subCategoryId, subCategory]);
+  }, [subCategoryId, subCategory,useDisclosure.isOpen]);
   const { data: allActiveCategories } = getAllCategories({
     query: [
       { name: "isActive", value: true },
-      { name: "approvalDetails.isApproved", value: true },
+      { name: "isApproved", value: true },
     ],
   });
 
@@ -60,15 +69,10 @@ export default function CreateUpdateSubCategoryFromModal({
       value: category._id,
     }));
   }, [allActiveCategories]);
-  const defaultValues = useMemo(() => {
-    if (!subCategoryId) return {};
-    return {
-      name: subCategory?.name || "",
-      category: subCategory?.category._id,
-    };
-  }, [subCategoryId, subCategory]);
+ 
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
     const res = subCategoryId
       ? await updateSubCategoryReq(subCategoryId, data)
       : await createSubCategoryReq(data);
@@ -89,14 +93,20 @@ export default function CreateUpdateSubCategoryFromModal({
       });
     }
 
-    setIsLoading(false);
+    
+    } catch (error) {
+      console.error("Room operation failed:", error);
+      toast.error("An unexpected error occurred");
+    }finally{
+      setIsLoading(false);
+    }
   };
 
   return (
     <Modal
       isOpen={useDisclosure.isOpen}
       onOpenChange={useDisclosure.onOpenChange}
-      size="xl"
+      size="2xl"
       classNames={{ closeButton: "bg-violet-100 hover:bg-red-200" }}
     >
       <ModalContent>
@@ -121,22 +131,28 @@ export default function CreateUpdateSubCategoryFromModal({
                   <div className="flex flex-col md:flex-row gap-5">
                     <JUSelect
                       name="category"
-                      options={activeCategoriesOptions!}
+                    
+                      options={activeCategoriesOptions as TSelectOption[]}
                       selectProps={{
+                        isRequired:true,
                         label: "Category",
                         placeholder: "Select Category",
                         className: "w-full md:w-[40%]",
+                        defaultSelectedKeys:subCategoryId?[subCategory?.category?._id]:[]
                       }}
                     />
                     <JUInput
                       name="name"
                       inputProps={{
+                        isRequired:true,
                         label: "Name",
                         type: "text",
                         className: "w-full md:w-[60%]",
                       }}
                     />
+                  
                   </div>
+                  <JUTextEditor name="description" label="Description" className="h-40 mb-16"/>
                 </ModalBody>
                 <ModalFooter>
                   <Button type="submit" color="primary" isLoading={isLoading}>

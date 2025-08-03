@@ -17,9 +17,10 @@ import {
 } from "@heroui/modal";
 import { Skeleton } from "@heroui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { useEffect,  useState } from "react";
+import { useEffect, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import JUTextEditor from "@/src/components/form/JUTextEditor";
 
 interface IProps {
   useDisclosure: UseDisclosureProps | any;
@@ -38,36 +39,52 @@ export default function CreateUpdateCategoryFromModal({
   );
 
   useEffect(() => {
-   
     if (categoryId) {
-      methods.reset({ name: category?.name });
-    }else{
-      methods.reset({})
-    }
-  }, [categoryId,useDisclosure]);
-  const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
-    setIsLoading(true);
-    const res = categoryId
-      ? await updateCategoryReq(categoryId, data)
-      : await createCategoryReq(data);
-
-    if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["categories"] });
-      queryClient.invalidateQueries({ queryKey: ["single-category"] });
-      toast.success(res?.message);
-      !categoryId && methods.reset();
-    } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "categoryError") {
-        toast.error(res?.errorMessages[0]?.message);
-        return;
-      }
-
-      res?.errorMessages?.forEach((err: TErrorMessage) => {
-        methods.setError(err.path, { type: "server", message: err.message });
+      
+      methods.reset({
+        name: category?.name,
+        description: category?.description,
+      });
+    } else {
+      
+      methods.reset({
+        name:"",
+        description:""
       });
     }
+  }, [categoryId,category, useDisclosure.isOpen]);
+  console.log(categoryId,"categoryId")
+  const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
+    
+    setIsLoading(true);
+    try {
+      const res = categoryId
+        ? await updateCategoryReq(categoryId, data)
+        : await createCategoryReq(data);
 
-    setIsLoading(false);
+      if (res?.success) {
+        queryClient.invalidateQueries({ queryKey: ["categories"] });
+        queryClient.invalidateQueries({ queryKey: ["single-category"] });
+        toast.success(res?.message);
+        if (!categoryId) methods.reset();
+      } else if (res?.errorMessages?.length > 0) {
+        if (res.errorMessages[0].path === "categoryError") {
+          toast.error(res.errorMessages[0].message);
+          return;
+        }
+
+        res.errorMessages.forEach((err: TErrorMessage) => {
+          methods.setError(err.path, {
+            type: "server",
+            message: err.message,
+          });
+        });
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -99,9 +116,15 @@ export default function CreateUpdateCategoryFromModal({
                   <JUInput
                     name="name"
                     inputProps={{
+                      isRequired:true,
                       label: "Name",
                       type: "text",
                     }}
+                  />
+                  <JUTextEditor
+                    name="description"
+                    label="Description"
+                    className="h-40 mb-16"
                   />
                 </ModalBody>
                 <ModalFooter>

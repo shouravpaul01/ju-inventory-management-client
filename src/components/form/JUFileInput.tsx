@@ -58,7 +58,7 @@ export default function JUFileInput({
     const updatedPreviews = multiple ? [...previewUrls, ...newPreviews] : newPreviews;
     setPreviewUrls(updatedPreviews);
 
-    setValue(name, multiple ? newFiles : selectedFiles[0] || null, { shouldValidate: true });
+    setValue(name, multiple ? newFiles : selectedFiles , { shouldValidate: true });
     onPreview?.(updatedPreviews);
   };
 

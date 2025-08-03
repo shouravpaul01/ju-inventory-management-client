@@ -30,7 +30,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@heroui/popover";
 import { Listbox, ListboxItem } from "@heroui/listbox";
 import { Tooltip } from "@heroui/tooltip";
 import { getAllAccessories } from "@/src/hooks/Accessory";
-import { TQuery } from "@/src/types";
+import { TCategory, TQuery, TStock, TSubCategory } from "@/src/types";
 import { User } from "@heroui/user";
 import {
   updateAccessoryActiveStatus,
@@ -39,6 +39,8 @@ import {
 import { toast } from "sonner";
 import StockModal from "./_components/StockModal";
 import { Avatar } from "@heroui/avatar";
+import HeadingSection from "@/src/components/ui/HeadingSection";
+import { Switch } from "@heroui/switch";
 
 export default function ManageAccessories() {
   const searchParams = useSearchParams();
@@ -97,44 +99,23 @@ export default function ManageAccessories() {
   };
   
   return (
-    <div>
-      <div className="flex border-b pb-2">
-        <p className="text-lg font-bold flex-1">
-          {tab == "trash" ? "Trash" : "Manage Accessories"}
-        </p>
-        <div>
-          <ButtonGroup size="sm" color="primary" variant="ghost">
-            <Button
-              href="/admin/manage-accessories"
-              as={Link}
-              onPress={() => modalForm.onOpen()}
-              startContent={<AddIcon className="size-5" />}
-            >
-              {" "}
-              Add
-            </Button>
-            <Button
-              href={
-                tab == "trash"
-                  ? "/admin/manage-accessories"
-                  : "/admin/manage-accessories?tab=trash"
-              }
-              as={Link}
-              startContent={
-                tab == "trash" ? (
-                  <WidgetIcon className="size-5" />
-                ) : (
-                  <DeleteIcon className="size-5" />
-                )
-              }
-            >
-              {tab == "trash" ? "Manage Accessories" : "Trash"}
-            </Button>
-          </ButtonGroup>
-        </div>
-      </div>
+    <div className="space-y-4">
+      <HeadingSection title="Manage Accessories" > 
+        <>
+        <Button
+            size="sm"
+            color="primary"
+            onPress={() => modalForm.onOpen()}
+            startContent={<AddIcon className="size-5 fill-white" />}
+          >
+            {" "}
+            Add
+          </Button>
+        </>
+      </HeadingSection>
       <Table
         aria-label="Example table with client side pagination"
+        removeWrapper
         shadow="none"
         bottomContent={
           <div className=" w-full ">
@@ -182,12 +163,12 @@ export default function ManageAccessories() {
                     <p className="font-bold line-clamp-1">{item.name}</p>
                     <div className="flex items-center gap-1 text-slate-600">
                       <span>Cat:</span>
-                      <p className="font-semibold">{item?.category?.name}</p>
+                      <p className="font-semibold">{(item?.category as TCategory).name}</p>
                     </div>
 
                     <div className="flex items-center gap-1 text-slate-600">
                       <span>Sub Cat:</span>
-                      <p className="font-semibold">{item?.subCategory?.name}</p>
+                      <p className="font-semibold">{(item?.subCategory as TSubCategory)?.name}</p>
                     </div>
                     {
                       item?.codeTitle && <div className="flex items-center gap-1 text-slate-600">
@@ -202,30 +183,30 @@ export default function ManageAccessories() {
               <TableCell>
                 <div className="flex items-center gap-2">
                   <div>
-                    <p>
+                    <div>
                       Total Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
                         {item.quantityDetails.totalQuantity}
                       </Chip>
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                       Current Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
                         {item.quantityDetails.currentQuantity}
                       </Chip>
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                       Distributed Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
                         {item.quantityDetails.distributedQuantity}
                       </Chip>
-                    </p>
-                    <p>
+                    </div>
+                    <div>
                       Order Qty:{" "}
                       <Chip radius="sm" size="sm" className="ms-2">
                         {item.quantityDetails.orderQuantity}
                       </Chip>
-                    </p>
+                    </div>
                   </div>
 
                   <Tooltip
@@ -238,9 +219,9 @@ export default function ManageAccessories() {
                       size="sm"
                       variant="light"
                       color="primary"
-                      isDisabled={!item.approvalDetails.isApproved}
+                      isDisabled={!item?.isApproved}
                       onPress={() => {
-                        setStockId(item.stock._id!);
+                        setStockId((item.stock as TStock)?._id!);
                         setAccessoryId(item._id!);
                         modalStock.onOpen();
                       }}
@@ -257,55 +238,29 @@ export default function ManageAccessories() {
                     variant="flat"
                     size="sm"
                   >
-                    {item?.isActive ? "Active" : "Inactive"}
+                    {item?.isActive ? "Activated" : "Deactivated"}
                   </Chip>
 
-                  {item?.approvalDetails.isApproved && (
-                    <Popover placement="bottom" showArrow={true}>
-                      <PopoverTrigger>
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          color="primary"
-                        >
-                          {" "}
-                          <MoreIcon />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <Listbox
-                          aria-label="Single selection example"
-                          variant="solid"
-                          disallowEmptySelection
-                          selectionMode="single"
-                          selectedKeys={[
-                            item?.isActive ? "Active" : "Inactive",
-                          ]}
-                          disabledKeys={[
-                            item?.isActive ? "Active" : "Inactive",
-                          ]}
-                          color="primary"
-                        >
-                          <ListboxItem
-                            key="Active"
-                            onPress={() =>
-                              handleActiveOrInactive(item._id!, true)
-                            }
-                          >
-                            Active
-                          </ListboxItem>
-                          <ListboxItem
-                            key="Inactive"
-                            onPress={() =>
-                              handleActiveOrInactive(item._id!, false)
-                            }
-                          >
-                            Inactive
-                          </ListboxItem>
-                        </Listbox>
-                      </PopoverContent>
-                    </Popover>
+                  {item?.isApproved && (
+                    <Tooltip
+                      content={
+                        item?.isActive
+                          ? "Deactivate this Accessory? Click to proceed."
+                          : "Activate this Accessory? Click to proceed."
+                      }
+                    >
+                      <Switch
+                        isSelected={item?.isActive}
+                        color={item?.isActive ? "primary" : "danger"}
+                        size="sm"
+                        onValueChange={() =>
+                          handleActiveOrInactive(
+                            item?._id!,
+                            item?.isActive ? false : true
+                          )
+                        }
+                      />
+                    </Tooltip>
                   )}
                 </div>
               </TableCell>
@@ -313,49 +268,21 @@ export default function ManageAccessories() {
                 {" "}
                 <div className="flex items-center gap-2">
                   <Chip
-                    color={
-                      item?.approvalDetails.isApproved ? "success" : "danger"
-                    }
+                    color={item?.isApproved ? "success" : "danger"}
                     variant="flat"
                     size="sm"
                   >
-                    {item?.approvalDetails.isApproved ? "Approved" : "Pending"}
+                    {item?.isApproved ? "Approved" : "Pending"}
                   </Chip>
-                  {!item?.approvalDetails.isApproved && (
-                    <Popover placement="bottom" showArrow={true}>
-                      <PopoverTrigger>
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          variant="light"
-                          color="primary"
-                        >
-                          {" "}
-                          <MoreIcon />
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent>
-                        <Listbox
-                          aria-label="Single selection example"
-                          variant="solid"
-                          disallowEmptySelection
-                          selectionMode="single"
-                          selectedKeys={[
-                            item?.approvalDetails.isApproved
-                              ? "Approved"
-                              : "Pending",
-                          ]}
-                          color="primary"
-                        >
-                          <ListboxItem
-                            key="Unblock"
-                            onPress={() => handleApproved(item._id!)}
-                          >
-                            Approved
-                          </ListboxItem>
-                        </Listbox>
-                      </PopoverContent>
-                    </Popover>
+                  {!item?.isApproved && (
+                    <Tooltip content="Do you confirm the approval? Please click to proceed.">
+                      <Switch
+                        isSelected={item?.isApproved}
+                        color="primary"
+                        size="sm"
+                        onValueChange={(value) => handleApproved(item?._id!)}
+                      />
+                    </Tooltip>
                   )}
                 </div>
               </TableCell>
@@ -381,7 +308,7 @@ export default function ManageAccessories() {
                       color="primary"
                       variant="flat"
                       size="sm"
-                      isDisabled={item.approvalDetails.isApproved}
+                      isDisabled={item?.isApproved}
                       onPress={() => {
                         setAccessoryId(item._id!), modalForm.onOpen();
                       }}

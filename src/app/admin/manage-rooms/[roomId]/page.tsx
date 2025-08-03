@@ -22,10 +22,10 @@ export default async function page({
   
   const { data: room } = await getSingleRoomReq(roomId);
  
-  console.log(roomId, room, "details");
+  
   return (
     <>
-    <div>
+    <div className="space-y-2">
       <HeadingSection title="Room Details" linkUrl="/admin/manage-rooms">
         <EditRoomModel roomId={roomId}/>
       </HeadingSection>

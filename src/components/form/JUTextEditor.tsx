@@ -65,7 +65,7 @@ export default function JUTextEditor({ name, label, placeholder,className }: TPr
       <Controller
         name={name}
         control={control}
-        defaultValue=""
+       
         render={({ field }) => (
           <ReactQuill
             value={field.value}

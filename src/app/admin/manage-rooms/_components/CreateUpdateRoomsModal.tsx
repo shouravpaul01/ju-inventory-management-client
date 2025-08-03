@@ -76,12 +76,21 @@ export default function CreateUpdateRoomsModal({
     } else {
       setStoredImages([]);
       setPreviewImages([]);
-      methods.reset({});
+      methods.reset({
+        roomNo: "",
+        roomType: "",
+
+        department: "",
+        building: "",
+        floor: "",
+        capacity: 0,
+        features: [],
+        description: "",
+      });
     }
   }, [roomId, room, useDisclosure]);
 
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
-  
     try {
       console.log(data, "room");
 
@@ -172,13 +181,14 @@ export default function CreateUpdateRoomsModal({
                       <JUInput
                         name="roomNo"
                         inputProps={{
+                          isRequired: true,
                           label: "Room No",
                           type: "text",
                           classNames: { input: "uppercase" },
                         }}
                       />
                       <JUSelect
-                        selectProps={{ label: "Room Type" }}
+                        selectProps={{ isRequired: true, label: "Room Type" }}
                         name="roomType"
                         options={roomTypeOptions}
                       />
@@ -192,6 +202,7 @@ export default function CreateUpdateRoomsModal({
                       <JUInput
                         name="building"
                         inputProps={{
+                          isRequired: true,
                           label: "Building",
                           type: "text",
                         }}
@@ -199,6 +210,7 @@ export default function CreateUpdateRoomsModal({
                       <JUInput
                         name="floor"
                         inputProps={{
+                          isRequired: true,
                           label: "Floor",
                           type: "text",
                           classNames: { input: "uppercase" },
@@ -208,6 +220,7 @@ export default function CreateUpdateRoomsModal({
                       <JUInput
                         name="capacity"
                         inputProps={{
+                          isRequired: true,
                           label: "Capacity",
                           type: "number",
                         }}
@@ -215,19 +228,19 @@ export default function CreateUpdateRoomsModal({
                       />
                     </div>
                     <div className="flex flex-col md:flex-row gap-3">
-                    <JUSelect
-                      selectProps={{
-                        label: "Features",
-                        selectionMode: "multiple",
-                        "aria-label":"Select room features",
-                        defaultSelectedKeys: [...(room?.features! || [])],
-                        className:"w-full "
-                      }}
-
-                      name="features"
-                      options={roomFeaturesOptions}
-                    />
-                    {/* <JUSelect
+                      <JUSelect
+                        selectProps={{
+                          isRequired: true,
+                          label: "Features",
+                          selectionMode: "multiple",
+                          "aria-label": "Select room features",
+                          defaultSelectedKeys: [...(room?.features! || [])],
+                          className: "w-full ",
+                        }}
+                        name="features"
+                        options={roomFeaturesOptions}
+                      />
+                      {/* <JUSelect
                       selectProps={{
                         label: "Incharge",
                         selectionMode: "multiple",
@@ -265,7 +278,7 @@ export default function CreateUpdateRoomsModal({
                         />
                       )}
                     </div> */}
-                  
+
                     {/* <JUTextEditor label="Description" name="description"/> */}
                   </div>
                 </ModalBody>

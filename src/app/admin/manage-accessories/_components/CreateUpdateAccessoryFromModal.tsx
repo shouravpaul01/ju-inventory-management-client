@@ -18,7 +18,7 @@ import {
   updateAccessoryReq,
 } from "@/src/services/Accessory";
 
-import { TErrorMessage } from "@/src/types";
+import { TCategory, TErrorMessage, TSelectOption, TSubCategory } from "@/src/types";
 import { accessoryValidation } from "@/src/validations/accessory.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/button";
@@ -57,7 +57,7 @@ export default function CreateUpdateAccessoryFromModal({
     getAllCategories({
       query: [
         { name: "isActive", value: true },
-        { name: "approvalDetails.isApproved", value: true },
+        { name: "isApproved", value: true },
       ],
     });
   const { data: allActiveSubCategories, isLoading: isActiveSubCatLoading } =
@@ -87,17 +87,17 @@ export default function CreateUpdateAccessoryFromModal({
     accessoryId!
   );
 
-  useEffect(() => {
-    if (!useDisclosure.isOpen) {
-      methods.reset();
-    }
-    if (selectedIsItReturnable == "false") {
-      methods.clearErrors("codeTitle");
-    }
-  }, [!useDisclosure.isOpen, selectedIsItReturnable]);
+  // useEffect(() => {
+  //   if (!useDisclosure.isOpen) {
+  //     methods.reset();
+  //   }
+  //   if (selectedIsItReturnable == "false") {
+  //     methods.clearErrors("codeTitle");
+  //   }
+  // }, [!useDisclosure.isOpen, selectedIsItReturnable]);
 
   useEffect(() => {
-    if (accessory) {
+    if (accessoryId && accessory) {
       methods.reset({
         name: accessory.name,
         category: accessory.category,
@@ -107,13 +107,26 @@ export default function CreateUpdateAccessoryFromModal({
         description: accessory.description,
       });
       setPreviewUrls([accessory.image!])
+    }else{
+      {
+        methods.reset({
+          name:"",
+          category: "",
+          subCategory: "",
+          codeTitle: "",
+          isItReturnable:"",
+          description: "",
+        });
+        setPreviewUrls([])
+      }
     }
-  }, [accessory]);
+  }, [accessoryId,accessory]);
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
-    setIsLoading(true);
+    try {
+      setIsLoading(true);
   
     const formData = new FormData();
-    data?.image && formData.append("file", data?.image);
+    data?.image && formData.append("file", data?.image[0]);
     delete data["image"];
     formData.append("data", JSON.stringify(data));
     const updateData = {
@@ -140,7 +153,12 @@ export default function CreateUpdateAccessoryFromModal({
       });
     }
 
-    setIsLoading(false);
+    
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.");
+    }finally{
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -174,14 +192,16 @@ export default function CreateUpdateAccessoryFromModal({
                   <div className="flex flex-col md:flex-row gap-5">
                     <JUSelect
                       name="category"
-                      options={activeCategoriesOptions!}
+                      options={activeCategoriesOptions as TSelectOption[]}
                       selectProps={{
+                        isRequired:true,
                         label: "Category",
                         placeholder: isCatLoading
                           ? "Loading.."
                           : "Select Category",
                         selectionMode: "single",
                         isDisabled: accessoryId ? false : isCatLoading,
+                        defaultSelectedKeys:(accessory?.category as TCategory)?._id,
                         className: "w-full md:w-[33%]",
                       }}
                     
@@ -190,7 +210,9 @@ export default function CreateUpdateAccessoryFromModal({
                       name="subCategory"
                       options={activeSubCategoriesOptions!}
                       selectProps={{
+                        isRequired:true,
                         label: "Sub Category",
+                        defaultSelectedKeys:(accessory?.subCategory as TSubCategory)?._id,
                         placeholder: isActiveSubCatLoading
                           ? "Loading.."
                           : "Select Sub Category",
@@ -203,6 +225,7 @@ export default function CreateUpdateAccessoryFromModal({
                       name="isItReturnable"
                       options={returnableOptions!}
                       selectProps={{
+                        isRequired:true,
                         label: "Returnable",
                         placeholder:
                           "Select whether the accessory is returnable.",
@@ -214,15 +237,17 @@ export default function CreateUpdateAccessoryFromModal({
                     <JUInput
                       name="name"
                       inputProps={{
+                        isRequired:true,
                         label: "Name",
                         type: "text",
                         className: "w-full md:w-[66%]",
                       }}
                     />
-                    {!accessory?.approvalDetails.isApproved && (
+                    {!accessory?.isApproved && (
                       <JUInput
                         name="codeTitle"
                         inputProps={{
+                          isRequired:true,
                           label: "Code Title",
                           type: "text",
                           className: "w-full md:w-[33%] ",
@@ -253,7 +278,7 @@ export default function CreateUpdateAccessoryFromModal({
                   {previewUrls?.length > 0 && (
                     <PreviewImage previews={previewUrls} />
                   )}
-                  {/* <JUTextEditor name="description" label="Description" /> */}
+                  <JUTextEditor name="description" label="Description" className="h-40 mb-10"/>
                 </ModalBody>
                 <ModalFooter>
                   <Button type="submit" color="primary" isLoading={isLoading}>

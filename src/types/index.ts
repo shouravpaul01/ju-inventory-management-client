@@ -24,7 +24,7 @@ export type TUser = {
   needChangePassword?: boolean;
   role: "Admin" | "Faculty";
   userAccess: string[];
-  approvalDetails: TApprovalDetails;
+  
   isBlocked: boolean;
   isDeleted: boolean;
 };
@@ -69,12 +69,21 @@ export type TResetDetails = {
   iat: number;
   exp: number;
 };
+export type TEventHistory = {
+  _id:string;
+  eventType: "created" | "updated" | "approved" | "activated" | "deactivated" ;
+  performedBy: TFaculty | string;
+  performedAt?: Date;
+  comments?: string;
+};
 export type TCategory = {
-  _id: string;
+  _id?:string;
   name: string;
   description?: string;
   isActive: boolean;
-  approvalDetails: TApprovalDetails;
+  isApproved:boolean;
+  isDeleted:boolean;
+  eventsHistory: TEventHistory[];
 };
 export type TSubCategory = {
   _id: string;
@@ -82,12 +91,21 @@ export type TSubCategory = {
   category: TCategory;
   description?: string;
   isActive: boolean;
-  approvalDetails: TApprovalDetails;
+  isApproved:boolean;
+  isDeleted:boolean;
+  eventsHistory: TEventHistory[];
 };
-export type TApprovalDetails = {
-  isApproved: boolean;
-  approvedBy?: string;
-  approvedDate?: Date;
+export type TAccessoryEventHistory = {
+  eventType:
+    | "created"
+    | "updated"
+    | "approved"
+    | "activated"
+    | "deactivated"
+    | "New Stock";
+  performedBy: TFaculty;
+  performedAt?: Date;
+  comments?: string;
 };
 export type TQuantityDetails = {
   totalQuantity: number;
@@ -103,36 +121,43 @@ export type TCodeDetails = {
   orderCodes: string[];
 };
 export type TAccessory = {
-  _id?: string;
+  _id?:  string;
   name: string;
-  category: TCategory;
-  subCategory: TSubCategory;
+  category: TCategory | string;
+  subCategory: TSubCategory | string;
   image?: string;
   codeTitle: string;
   description?: string;
-  isItReturnable: boolean;
+  isItReturnable: boolean | string;
   quantityDetails: TQuantityDetails;
   codeDetails: TCodeDetails;
-  stock: TStock;
+  stock:  TStock | string;
   status: "Available" | "Low Stock" | "Out of Stock";
   isActive: boolean;
-  approvalDetails: TApprovalDetails;
+  isApproved: boolean;
   isDeleted: boolean;
+  eventsHistory: TAccessoryEventHistory;
   createdAt?: Date;
   updatedAt?: Date;
 };
+
 export type TStockDetail = {
   _id?: string;
   quantity: number;
   accessoryCodes: string[];
-  images: string[];
+  documentImages: string[];
+  locatedDetails:{
+    roomNo:string,
+    place:string,
+    locatedImages:string[]
+  }
   isActive: boolean;
   isDeleted: boolean;
-  approvalDetails: TApprovalDetails;
+  isApproved: boolean;
   description?: string;
-  createdAt?: Date;
-  updatedAt?: Date;
+  eventsHistory: TEventHistory[];
 };
+
 
 
 
