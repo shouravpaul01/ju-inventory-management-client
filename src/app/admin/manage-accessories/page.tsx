@@ -208,7 +208,18 @@ export default function ManageAccessories() {
                       </Chip>
                     </div>
                   </div>
-
+                  <Tooltip color="primary" content="Stock Details" showArrow>
+                    <Button
+                      isIconOnly
+                      color="primary"
+                      variant="flat"
+                      size="sm"
+                     as={Link}
+                     href={`/admin/manage-accessories/${item?._id}/stock/${(item?.stock as TStock)?._id}`}
+                    >
+                      <InfoIcon />
+                    </Button>
+                  </Tooltip>
                   <Tooltip
                     color="success"
                     showArrow
@@ -308,7 +319,7 @@ export default function ManageAccessories() {
                       color="primary"
                       variant="flat"
                       size="sm"
-                      isDisabled={item?.isApproved}
+                      // isDisabled={item?.isApproved}
                       onPress={() => {
                         setAccessoryId(item._id!), modalForm.onOpen();
                       }}

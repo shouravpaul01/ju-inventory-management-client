@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import JUFileInput from "@/src/components/form/JUFileInput";
 import JUForm from "@/src/components/form/JUForm";
 import JUInput from "@/src/components/form/JUInput";
@@ -18,7 +18,12 @@ import {
   updateAccessoryReq,
 } from "@/src/services/Accessory";
 
-import { TCategory, TErrorMessage, TSelectOption, TSubCategory } from "@/src/types";
+import {
+  TCategory,
+  TErrorMessage,
+  TSelectOption,
+  TSubCategory,
+} from "@/src/types";
 import { accessoryValidation } from "@/src/validations/accessory.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/button";
@@ -51,6 +56,7 @@ export default function CreateUpdateAccessoryFromModal({
   const selectSubCategoryId = methods.watch("subCategory");
   const selectedIsItReturnable = methods.watch("isItReturnable");
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [storedImages, setStoredImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const { data: allActiveCategories, isLoading: isCatLoading } =
@@ -86,7 +92,7 @@ export default function CreateUpdateAccessoryFromModal({
   const { data: accessory, isLoading: isAccessoryLoading } = getSingleAccessory(
     accessoryId!
   );
-
+  console.log(accessory, "access");
   // useEffect(() => {
   //   if (!useDisclosure.isOpen) {
   //     methods.reset();
@@ -100,67 +106,68 @@ export default function CreateUpdateAccessoryFromModal({
     if (accessoryId && accessory) {
       methods.reset({
         name: accessory.name,
-        category: accessory.category,
-        subCategory: accessory.subCategory,
+        category: (accessory.category as TCategory)?._id,
+        subCategory: (accessory.subCategory as TSubCategory)?._id,
         codeTitle: accessory.codeTitle.split("-")[2],
         isItReturnable: accessory.isItReturnable,
         description: accessory.description,
       });
-      setPreviewUrls([accessory.image!])
-    }else{
+      setStoredImages([accessory.image!]);
+    } else {
       {
         methods.reset({
-          name:"",
+          name: "",
           category: "",
           subCategory: "",
           codeTitle: "",
-          isItReturnable:"",
+          isItReturnable: "",
           description: "",
         });
-        setPreviewUrls([])
+        setPreviewUrls([]);
+        setStoredImages([]);
       }
     }
-  }, [accessoryId,accessory]);
+  }, [accessoryId, accessory]);
   const handleCreateUpdate: SubmitHandler<FieldValues> = async (data) => {
     try {
       setIsLoading(true);
-  
-    const formData = new FormData();
-    data?.image && formData.append("file", data?.image[0]);
-    delete data["image"];
-    formData.append("data", JSON.stringify(data));
-    const updateData = {
-      accessoryId,
-      data: formData,
-    };
-    const res = accessoryId
-      ? await updateAccessoryReq(updateData)
-      : await createAccessoryReq(formData);
-    console.log(res, "res");
-    if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["accessories"] });
-      queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
-      toast.success(res?.message);
-      !accessoryId && (methods.reset(), setPreviewUrls([]));
-      accessoryId && useDisclosure.onClose();
-    } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "accessoryError") {
-        toast.error(res?.errorMessages[0]?.message);
+
+      const formData = new FormData();
+      data?.image && formData.append("file", data?.image[0]);
+      delete data["image"];
+      formData.append("data", JSON.stringify(data));
+      const updateData = {
+        accessoryId,
+        data: formData,
+      };
+      const res = accessoryId
+        ? await updateAccessoryReq(updateData)
+        : await createAccessoryReq(formData);
+      console.log(res, "res");
+      if (res?.success) {
+        queryClient.invalidateQueries({ queryKey: ["accessories"] });
+        queryClient.invalidateQueries({ queryKey: ["single-accessory"] });
+        toast.success(res?.message);
+        !accessoryId && (methods.reset(), setPreviewUrls([]));
+        accessoryId && useDisclosure.onClose();
+      } else if (!res?.success && res?.errorMessages?.length > 0) {
+        if (res?.errorMessages[0]?.path == "accessoryError") {
+          toast.error(res?.errorMessages[0]?.message);
+        }
+
+        res?.errorMessages?.forEach((err: TErrorMessage) => {
+          methods.setError(err.path, { type: "server", message: err.message });
+        });
       }
-
-      res?.errorMessages?.forEach((err: TErrorMessage) => {
-        methods.setError(err.path, { type: "server", message: err.message });
-      });
-    }
-
-    
     } catch (error) {
       toast.error("Something went wrong. Please try again.");
-    }finally{
+    } finally {
       setIsLoading(false);
     }
   };
-
+  const handleDeleteStoredImage = (url: string, accessoryId: string) => {
+    console.log(url, accessoryId);
+  };
   return (
     <Modal
       isOpen={useDisclosure.isOpen}
@@ -194,38 +201,40 @@ export default function CreateUpdateAccessoryFromModal({
                       name="category"
                       options={activeCategoriesOptions as TSelectOption[]}
                       selectProps={{
-                        isRequired:true,
+                        isRequired: true,
                         label: "Category",
                         placeholder: isCatLoading
                           ? "Loading.."
                           : "Select Category",
                         selectionMode: "single",
                         isDisabled: accessoryId ? false : isCatLoading,
-                        defaultSelectedKeys:(accessory?.category as TCategory)?._id,
+                        defaultSelectedKeys: [
+                          (accessory?.category as TCategory)?._id,
+                        ],
                         className: "w-full md:w-[33%]",
                       }}
-                    
                     />
                     <JUSelect
                       name="subCategory"
                       options={activeSubCategoriesOptions!}
                       selectProps={{
-                        isRequired:true,
+                        isRequired: true,
                         label: "Sub Category",
-                        defaultSelectedKeys:(accessory?.subCategory as TSubCategory)?._id,
+                        defaultSelectedKeys: [
+                          (accessory?.subCategory as TSubCategory)?._id,
+                        ],
                         placeholder: isActiveSubCatLoading
                           ? "Loading.."
                           : "Select Sub Category",
 
                         className: "w-full md:w-[33%]",
                       }}
-                     
                     />
                     <JUSelect
                       name="isItReturnable"
                       options={returnableOptions!}
                       selectProps={{
-                        isRequired:true,
+                        isRequired: true,
                         label: "Returnable",
                         placeholder:
                           "Select whether the accessory is returnable.",
@@ -237,7 +246,7 @@ export default function CreateUpdateAccessoryFromModal({
                     <JUInput
                       name="name"
                       inputProps={{
-                        isRequired:true,
+                        isRequired: true,
                         label: "Name",
                         type: "text",
                         className: "w-full md:w-[66%]",
@@ -247,7 +256,7 @@ export default function CreateUpdateAccessoryFromModal({
                       <JUInput
                         name="codeTitle"
                         inputProps={{
-                          isRequired:true,
+                          isRequired: true,
                           label: "Code Title",
                           type: "text",
                           className: "w-full md:w-[33%] ",
@@ -278,7 +287,20 @@ export default function CreateUpdateAccessoryFromModal({
                   {previewUrls?.length > 0 && (
                     <PreviewImage previews={previewUrls} />
                   )}
-                  <JUTextEditor name="description" label="Description" className="h-40 mb-10"/>
+                  {storedImages?.length > 0 && (
+                    <PreviewImage
+                    heading="Stored Images"
+                      previews={storedImages}
+                      onDelete={(url) =>
+                        handleDeleteStoredImage(url, accessoryId as string)
+                      }
+                    />
+                  )}
+                  <JUTextEditor
+                    name="description"
+                    label="Description"
+                    className="h-40 mb-10"
+                  />
                 </ModalBody>
                 <ModalFooter>
                   <Button type="submit" color="primary" isLoading={isLoading}>

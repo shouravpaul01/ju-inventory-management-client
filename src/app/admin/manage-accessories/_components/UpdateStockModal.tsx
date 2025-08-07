@@ -6,7 +6,7 @@ import JULoading from "@/src/components/ui/JULoading";
 import PreviewImage from "@/src/components/ui/PreviewImage";
 import { getSingleStock } from "@/src/hooks/Stock";
 import { createStock, updateStockReq } from "@/src/services/Stock";
-import { TErrorMessage } from "@/src/types";
+import { TErrorMessage, TSelectOption } from "@/src/types";
 import { updateStockQuantityValidation } from "@/src/validations/stock.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/button";
@@ -24,6 +24,8 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
+import JUSelect from "@/src/components/form/JUSelect";
+import { getAllRooms } from "@/src/hooks/Room";
 
 interface IProps {
   useDisclosure: UseDisclosureProps | any;
@@ -40,19 +42,28 @@ export default function UpdateStockModal({
     resolver: zodResolver(updateStockQuantityValidation),
   });
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
-
+  const [documentImages, setPreviewDocumentImages] = useState<string[]>([]);
+  const [locatedImages, setPreviewLocatedImages] = useState<string[]>([]);
+  const { data: rooms } = getAllRooms({
+    query: [{ name: "isActive", value: true }],
+  });
+  const roomOptions = useMemo(() => {
+    return rooms?.data?.map((room) => ({
+      label: room?.roomNo,
+      value: room?._id,
+    }));
+  }, [rooms]);
   useEffect(() => {
     if (!useDisclosure.isOpen) {
-      methods.reset()
-      setPreviewUrls([]);
+      methods.reset();
+      setPreviewDocumentImages([]);
     }
   }, [useDisclosure.isOpen]);
   const { data: stock, isLoading: isStockLoading } = getSingleStock(
     stockId!,
     stockDetailsId!
   );
-  console.log(stock,"stock")
+  console.log(stock, "stock");
 
   useEffect(() => {
     if (stockDetailsId) {
@@ -60,7 +71,8 @@ export default function UpdateStockModal({
         quantity: stock?.quantity,
         description: stock?.description,
       });
-      stock?.images?.length! > 0 && setPreviewUrls(stock?.images!);
+      stock?.documentImages?.length! > 0 &&
+        setPreviewDocumentImages(stock?.documentImages!);
     }
   }, [stockDetailsId, stock]);
   const handleUpdateStock: SubmitHandler<FieldValues> = async (data) => {
@@ -104,10 +116,9 @@ export default function UpdateStockModal({
       <Modal
         isOpen={useDisclosure.isOpen}
         onOpenChange={useDisclosure.onOpenChange}
-        isDismissable={false}
-        size="3xl"
-        classNames={{ closeButton: "bg-violet-100 hover:bg-red-200" }}
         scrollBehavior="inside"
+        size="3xl"
+        classNames={{ closeButton: "bg-violet-100 hover:bg-red-200", }}
       >
         <ModalContent>
           {(onClose) => (
@@ -127,31 +138,83 @@ export default function UpdateStockModal({
                 <JULoading className="h-[300px]" />
               ) : (
                 <JUForm onSubmit={handleUpdateStock} methods={methods}>
-                  <ModalBody>
-                    <JUInput
-                      name="quantity"
-                      inputProps={{
-                        label: "Quantity",
-                        type: "number",
-                        className: "w-full md:w-[40%]",
-                      }}
-                      registerOptions={{ valueAsNumber: true }}
-                    />
-                    <div className="flex flex-col md:flex-row gap-5">
-                      <div className="w-full md:w-[66%]">
+                  <ModalBody className="relative">
+                    <div>
+                      <JUInput
+                        name="quantity"
+                        inputProps={{
+                          label: "Quantity",
+                          type: "number",
+                          className: "w-full md:w-[40%]",
+                        }}
+                        registerOptions={{ valueAsNumber: true }}
+                      />
+                      <div className="w-full md:w-[6o%]">
                         <JUFileInput
-                          name="images"
-                          onPreview={(previews) => setPreviewUrls(previews)}
+                          name="documentImages"
+                          labelName="Document Images"
+                          onPreview={(previews) =>
+                            setPreviewDocumentImages(previews)
+                          }
                           multiple
                         />
                       </div>
                     </div>
-                    {previewUrls?.length > 0 && (
-                      <PreviewImage previews={previewUrls} />
+
+                    {documentImages?.length > 0 && (
+                      <PreviewImage
+                        previews={documentImages}
+                        heading="Preview Document Images"
+                      />
                     )}
-                    {/* <JUTextEditor name="description" label="Description" /> */}
+                    <div className="border border-dashed rounded-md p-2">
+                      <h3 className="text-lg border-b border-dashed pb-1 mb-2">Located Details</h3>
+                      <div className="flex flex-col md:flex-row gap-2">
+                        <JUSelect
+                          name="roomNo"
+                          options={roomOptions as TSelectOption[]}
+                          selectProps={{
+                            label: "Select Room",
+                            className: "w-full md:w-[40%]",
+                          }}
+                        />
+                        <JUInput
+                          name="locatedDetails.place"
+                          inputProps={{
+                            label: "Place",
+                            className: "w-full md:w-[60%]",
+                          }}
+                        />
+                      </div>
+                      
+                        <JUFileInput
+                          name="locatedImages"
+                          labelName="Located Images"
+                          onPreview={(previews) =>
+                            setPreviewLocatedImages(previews)
+                          }
+                          multiple
+                        />
+                    
+
+                     <div className="block">
+                     {locatedImages?.length > 0 && (
+                        <PreviewImage
+                          previews={locatedImages}
+                          heading="Located Images"
+                        />
+                      )}
+                     </div>
+                    </div>
+                    <div>
+                      <JUTextEditor
+                        name="description"
+                        label="Description"
+                        className="h-28"
+                      />
+                    </div>
                   </ModalBody>
-                  <ModalFooter>
+                  <ModalFooter >
                     <Button type="submit" color="primary" isLoading={isLoading}>
                       {stockDetailsId ? "Update" : "Submit"}
                     </Button>
