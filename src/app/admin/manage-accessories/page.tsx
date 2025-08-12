@@ -305,9 +305,8 @@ export default function ManageAccessories() {
                       color="primary"
                       variant="flat"
                       size="sm"
-                      onPress={() => {
-                        setAccessoryId(item._id!), modalDetails.onOpen();
-                      }}
+                     as={Link}
+                     href={`/admin/manage-accessories/${item?._id}`}
                     >
                       <InfoIcon />
                     </Button>

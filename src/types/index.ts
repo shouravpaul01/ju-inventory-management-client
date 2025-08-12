@@ -136,7 +136,7 @@ export type TAccessory = {
   isActive: boolean;
   isApproved: boolean;
   isDeleted: boolean;
-  eventsHistory: TAccessoryEventHistory;
+  eventsHistory: TAccessoryEventHistory[];
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -156,6 +156,8 @@ export type TStockDetail = {
   isApproved: boolean;
   description?: string;
   eventsHistory: TEventHistory[];
+  createdAt:string,
+  
 };
 
 

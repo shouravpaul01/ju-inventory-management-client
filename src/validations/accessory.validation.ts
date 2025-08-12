@@ -1,6 +1,5 @@
-import { FieldValues } from "react-hook-form";
 import { z } from "zod";
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_FILE_SIZE = 2 * 1024 * 1024; // 2MB
 const ACCEPTED_IMAGE_TYPES = [
   "image/jpeg",
   "image/jpg",
@@ -20,7 +19,7 @@ export const accessoryValidation = z.object({
       .max(3, "Maximum 3 files allowed")
       .refine(
         (files) => files.every((file) => file.size <= MAX_FILE_SIZE),
-        "Each file must be less than 5MB"
+        "Each file must be less than 2MB"
       )
       .refine(
         (files) => files.every((file) => ACCEPTED_IMAGE_TYPES.includes(file.type)),

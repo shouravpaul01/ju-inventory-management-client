@@ -6,8 +6,10 @@ import { FieldValues } from "react-hook-form";
 export const createStock=async(payload:FieldValues)=>{
   try {
     const res = await axiosInstance.post(`/stocks/create-stock/${payload.stockId}`,payload.data);
+    console.log(res,"serverss")
     return res.data;
   } catch (error: any) {
+    console.log(error,"axios")
     return error?.response?.data;
   }
 }

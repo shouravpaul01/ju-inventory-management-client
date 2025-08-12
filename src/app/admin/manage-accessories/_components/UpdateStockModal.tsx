@@ -37,6 +37,7 @@ export default function UpdateStockModal({
   stockId,
   stockDetailsId,
 }: IProps) {
+  console.log(stockId,stockDetailsId,"my")
   const queryClient = useQueryClient();
   const methods = useForm({
     resolver: zodResolver(updateStockQuantityValidation),
@@ -53,12 +54,7 @@ export default function UpdateStockModal({
       value: room?._id,
     }));
   }, [rooms]);
-  useEffect(() => {
-    if (!useDisclosure.isOpen) {
-      methods.reset();
-      setPreviewDocumentImages([]);
-    }
-  }, [useDisclosure.isOpen]);
+
   const { data: stock, isLoading: isStockLoading } = getSingleStock(
     stockId!,
     stockDetailsId!
@@ -73,52 +69,72 @@ export default function UpdateStockModal({
       });
       stock?.documentImages?.length! > 0 &&
         setPreviewDocumentImages(stock?.documentImages!);
+      setPreviewLocatedImages(stock?.locatedDetails?.locatedImages!);
     }
-  }, [stockDetailsId, stock]);
+    if (!useDisclosure.isOpen) {
+      methods.reset();
+      setPreviewDocumentImages([]);
+      setPreviewLocatedImages([])
+    }
+  }, [stockDetailsId, stock,useDisclosure.isOpen]);
   const handleUpdateStock: SubmitHandler<FieldValues> = async (data) => {
+    console.log(data,"formData")
     setIsLoading(true);
-    const formData = new FormData();
-    Array.from(data.images).forEach((image: any) => {
-      formData.append("images", image);
-    });
+    try {
+      const formData = new FormData();
 
-    delete data["images"];
-    formData.append("data", JSON.stringify(data));
-    const updateData = {
-      stockId,
-      stockDetailsId,
-      data: formData,
-    };
-    const res = stockDetailsId
-      ? await updateStockReq(updateData)
-      : await createStock({ stockId, data: formData });
+      Array.isArray(data?.documentImages) &&
+        data?.documentImages?.forEach((image: any) =>
+          formData.append("documentImages", image)
+        );
+      Array.isArray(data?.locatedImages) &&
+        data?.locatedImages?.forEach((image: any) =>
+          formData.append("locatedImages", image)
+        );
 
-    if (res?.success) {
-      queryClient.invalidateQueries({ queryKey: ["accessories"] });
-      queryClient.invalidateQueries({ queryKey: ["stocks"] });
+      delete (data as any)["documentImages"];
+      delete (data as any)["locatedImages"];
+      
+console.log(stockId,stockDetailsId," here")
+      formData.append("data", JSON.stringify(data));
+      const updateData = { stockId, stockDetailsId, data: formData } as const;
 
-      toast.success(res?.message);
-
-      useDisclosure.onClose();
-    } else if (!res?.success && res?.errorMessages?.length > 0) {
-      if (res?.errorMessages[0]?.path == "accessoryError") {
-        toast.error(res?.errorMessages[0]?.message);
-        return;
+      const res = stockDetailsId
+        ? await updateStockReq(updateData)
+        : await createStock({ stockId, data: formData });
+console.log(res,"res")
+      if (res?.success) {
+        queryClient.invalidateQueries({ queryKey: ["accessories"] });
+        queryClient.invalidateQueries({ queryKey: ["stocks"] });
+        toast.success(res?.message);
+        useDisclosure.onClose();
+      } else if (!res?.success && res?.errorMessages?.length > 0) {
+        if (res?.errorMessages[0]?.path === "stockError") {
+          toast.error(res?.errorMessages[0]?.message);
+        }else {
+          res?.errorMessages?.forEach((err: TErrorMessage) => {
+            methods.setError(err.path, {
+              type: "server",
+              message: err.message,
+            });
+          });
+        }
       }
-      res?.errorMessages?.forEach((err: TErrorMessage) => {
-        methods.setError(err.path, { type: "server", message: err.message });
-      });
+    } catch (error: any) {
+      console.log(error,"error")
+      toast.error(error?.message || "Something went wrong");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
   return (
     <div>
       <Modal
         isOpen={useDisclosure.isOpen}
         onOpenChange={useDisclosure.onOpenChange}
-        scrollBehavior="inside"
+        // scrollBehavior="inside"
         size="3xl"
-        classNames={{ closeButton: "bg-violet-100 hover:bg-red-200", }}
+        classNames={{ closeButton: "bg-violet-100 hover:bg-red-200" }}
       >
         <ModalContent>
           {(onClose) => (
@@ -138,7 +154,7 @@ export default function UpdateStockModal({
                 <JULoading className="h-[300px]" />
               ) : (
                 <JUForm onSubmit={handleUpdateStock} methods={methods}>
-                  <ModalBody className="relative">
+                  <ModalBody>
                     <div>
                       <JUInput
                         name="quantity"
@@ -168,10 +184,12 @@ export default function UpdateStockModal({
                       />
                     )}
                     <div className="border border-dashed rounded-md p-2">
-                      <h3 className="text-lg border-b border-dashed pb-1 mb-2">Located Details</h3>
+                      <h3 className="text-lg border-b border-dashed pb-1 mb-2">
+                        Located Details
+                      </h3>
                       <div className="flex flex-col md:flex-row gap-2">
                         <JUSelect
-                          name="roomNo"
+                          name="locatedDetails.roomNo"
                           options={roomOptions as TSelectOption[]}
                           selectProps={{
                             label: "Select Room",
@@ -186,35 +204,33 @@ export default function UpdateStockModal({
                           }}
                         />
                       </div>
-                      
-                        <JUFileInput
-                          name="locatedImages"
-                          labelName="Located Images"
-                          onPreview={(previews) =>
-                            setPreviewLocatedImages(previews)
-                          }
-                          multiple
-                        />
-                    
 
-                     <div className="block">
-                     {locatedImages?.length > 0 && (
-                        <PreviewImage
-                          previews={locatedImages}
-                          heading="Located Images"
-                        />
-                      )}
-                     </div>
-                    </div>
-                    <div>
-                      <JUTextEditor
-                        name="description"
-                        label="Description"
-                        className="h-28"
+                      <JUFileInput
+                        name="locatedImages"
+                        labelName="Located Images"
+                        onPreview={(previews) =>
+                          setPreviewLocatedImages(previews)
+                        }
+                        multiple
                       />
+
+                      <div className="block">
+                        {locatedImages?.length > 0 && (
+                          <PreviewImage
+                            previews={locatedImages}
+                            heading="Located Images"
+                          />
+                        )}
+                      </div>
                     </div>
+
+                    <JUTextEditor
+                      name="description"
+                      label="Description"
+                      className="h-28"
+                    />
                   </ModalBody>
-                  <ModalFooter >
+                  <ModalFooter className="mt-14">
                     <Button type="submit" color="primary" isLoading={isLoading}>
                       {stockDetailsId ? "Update" : "Submit"}
                     </Button>

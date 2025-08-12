@@ -5,6 +5,14 @@ export const updateStockQuantityValidation = z.object({
     required_error: "Quantity is required.",
     invalid_type_error: "Quantity is required.",
   }).positive("Quantity must be a positive number."),
-  images: z.any().optional(),
+  documentImages: z.any().optional(),
+  locatedImages: z.any().optional(),
+  locatedDetails: z
+    .object({
+      roomNo: z.string().min(1, "Room number is required"),
+      place: z.string().min(1, "Place is required"),
+     
+    })
+    .optional(),
   description: z.string().optional(),
 });

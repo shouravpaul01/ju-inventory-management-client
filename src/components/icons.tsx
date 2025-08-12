@@ -903,3 +903,31 @@ export const RoomIcon: React.FC<IconSvgProps> = ({
     </svg>
   );
 };
+
+export const NetworkTreeIcon: React.FC<IconSvgProps> = ({
+  size = 24,
+  width,
+  height,
+  ...props
+}) => {
+  return (
+    <svg
+  xmlns="http://www.w3.org/2000/svg"
+  height={size || height}
+  width={size || width}
+  {...props}
+  viewBox="0 0 48 48"
+>
+  <g
+    fill="none"
+    stroke="currentColor"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    strokeWidth={4}
+  >
+    <path d="M4 34h8v8H4zM8 6h32v12H8zm16 28V18"></path>
+    <path d="M8 34v-8h32v8m-4 0h8v8h-8zm-16 0h8v8h-8zm-6-22h2"></path>
+  </g>
+</svg>
+  );
+};

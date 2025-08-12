@@ -5,6 +5,7 @@ import {
   ImageIcon,
   InfoIcon,
   MoreIcon,
+  NetworkTreeIcon,
   XmarkIcon,
 } from "@/src/components/icons";
 import JULoading from "@/src/components/ui/JULoading";
@@ -43,6 +44,7 @@ import { getAllStocks } from "@/src/hooks/Stock";
 import UpdateStockModal from "../../../_components/UpdateStockModal";
 import { useDisclosure } from "@heroui/modal";
 import HeadingSection from "@/src/components/ui/HeadingSection";
+import { Switch } from "@heroui/switch";
 export default function StockPage({
   params,
 }: {
@@ -121,10 +123,10 @@ export default function StockPage({
           className=""
           color="primary"
           size="sm"
-          startContent={<AddIcon className="fill-white" />}
+          startContent={<NetworkTreeIcon className="fill-white" />}
           onPress={() => modalUpdateStock.onOpen()}
         >
-          Add
+          Stock
         </Button>
       </HeadingSection>
       <div>
@@ -375,7 +377,7 @@ export default function StockPage({
           )}
         </div>
       </div>
-      {/* {isLoading ? (
+      {isLoading ? (
         <JULoading className="h-[300px]" />
       ) : (
         <Table
@@ -452,56 +454,24 @@ export default function StockPage({
                 <TableCell>
                   {" "}
                   <div className="flex items-center gap-2">
-                    <Chip
-                      color={
-                        item?.isApproved ? "success" : "danger"
-                      }
-                      variant="flat"
-                      size="sm"
-                    >
-                      {item?.isApproved
-                        ? "Approved"
-                        : "Pending"}
-                    </Chip>
-                    {!item?.isApproved && (
-                      <Popover placement="bottom" showArrow={true}>
-                        <PopoverTrigger>
-                          <Button
-                            isIconOnly
-                            size="sm"
-                            variant="light"
-                            color="primary"
-                          >
-                            {" "}
-                            <MoreIcon />
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent>
-                          <Listbox
-                            aria-label="Single selection example"
-                            variant="solid"
-                            disallowEmptySelection
-                            selectionMode="single"
-                            selectedKeys={[
-                              item?.isApproved
-                                ? "Approved"
-                                : "Pending",
-                            ]}
-                            color="primary"
-                          >
-                            <ListboxItem
-                              key="Unblock"
-                              onPress={() =>
-                                handleApproved(stockId!, item._id!)
-                              }
-                            >
-                              Approved
-                            </ListboxItem>
-                          </Listbox>
-                        </PopoverContent>
-                      </Popover>
-                    )}
-                  </div>
+                  <Chip
+                    color={item?.isApproved ? "success" : "danger"}
+                    variant="flat"
+                    size="sm"
+                  >
+                    {item?.isApproved ? "Approved" : "Pending"}
+                  </Chip>
+                  {!item?.isApproved && (
+                    <Tooltip content="Do you confirm the approval? Please click to proceed.">
+                      <Switch
+                        isSelected={item?.isApproved}
+                        color="primary"
+                        size="sm"
+                        onValueChange={(value) => handleApproved(stockId,item?._id!)}
+                      />
+                    </Tooltip>
+                  )}
+                </div>
                 </TableCell>
                 <TableCell>
                   <div className="relative flex items-center gap-2">
@@ -537,7 +507,7 @@ export default function StockPage({
             )}
           </TableBody>
         </Table>
-      )} */}
+      )}
       <UpdateStockModal
         useDisclosure={modalUpdateStock}
         stockId={stockId}
