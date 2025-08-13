@@ -34,8 +34,9 @@ export default function EditAccessoryAndUpdateStockModal({
         onPress={() => modalStock.onOpen()}
       >
         {" "}
-        Stock
+        Add Stock
       </Button>
+     
       <CreateUpdateAccessoryFromModal
         accessoryId={accessoryId!}
         useDisclosure={modalForm}

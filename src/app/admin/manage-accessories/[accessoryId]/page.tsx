@@ -7,6 +7,12 @@ import EventsHistoryTable from "../_components/EventsHistoryTable";
 import Link from "next/link";
 import { blankImage } from "@/src/constents";
 import EditAccessoryAndUpdateStockModal from "../_components/EditAccessoryAndUpdateStockModal";
+import { Button } from "@heroui/button";
+import { Tooltip } from "@heroui/tooltip";
+import { MoreHorzIcon } from "@/src/components/icons";
+import DisplaycodesCard from "../_components/DisplayCodesCard";
+import DisplayQuantityCard from "../_components/DisplayQuantityCard";
+import StockTable from "../_components/StockTable";
 
 export default async function AccessoryDetailsPage({
   params,
@@ -24,7 +30,10 @@ export default async function AccessoryDetailsPage({
         title="Accessory Details"
         linkUrl="/admin/manage-accessories"
       >
-        <EditAccessoryAndUpdateStockModal accessoryId={acc?._id!} stockId={(acc?.stock as TStock)?._id!}></EditAccessoryAndUpdateStockModal>
+        <EditAccessoryAndUpdateStockModal
+          accessoryId={acc?._id!}
+          stockId={(acc?.stock as TStock)?._id!}
+        ></EditAccessoryAndUpdateStockModal>
       </HeadingSection>
 
       {/* Header with image and basic info */}
@@ -95,59 +104,23 @@ export default async function AccessoryDetailsPage({
 
       {/* Quantities */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded border">
-          <p className="text-sm text-slate-600">Total Qty</p>
-          <p className="text-xl font-semibold">
-            {acc?.quantityDetails?.totalQuantity ?? 0}
-          </p>
-        </div>
-        <div className="p-4 rounded border">
-          <p className="text-sm text-slate-600">Current Qty</p>
-          <p className="text-xl font-semibold">
-            {acc?.quantityDetails?.currentQuantity ?? 0}
-          </p>
-        </div>
-        <div className="p-4 rounded border">
-          <p className="text-sm text-slate-600">Distributed Qty</p>
-          <p className="text-xl font-semibold">
-            {acc?.quantityDetails?.distributedQuantity ?? 0}
-          </p>
-        </div>
-        <div className="p-4 rounded border">
-          <p className="text-sm text-slate-600">Order Qty</p>
-          <p className="text-xl font-semibold">
-            {acc?.quantityDetails?.orderQuantity ?? 0}
-          </p>
-        </div>
+        <DisplayQuantityCard quantity={acc?.quantityDetails?.totalQuantity} />
+        <DisplayQuantityCard quantity={acc?.quantityDetails?.currentQuantity} />
+        <DisplayQuantityCard
+          quantity={acc?.quantityDetails?.distributedQuantity}
+        />
+        <DisplayQuantityCard quantity={acc?.quantityDetails?.totalQuantity} />
       </div>
 
       {/* Codes summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="p-4 rounded border">
-          <p className="text-sm text-slate-600">Total Codes</p>
-          <p className="text-xl font-semibold">
-            {acc?.codeDetails?.totalCodes?.length ?? 0}
-          </p>
+      {acc?.isItReturnable && (
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <DisplaycodesCard codes={acc?.codeDetails?.totalCodes} />
+          <DisplaycodesCard codes={acc?.codeDetails?.currentCodes} />
+          <DisplaycodesCard codes={acc?.codeDetails?.distributedCodes} />
+          <DisplaycodesCard codes={acc?.codeDetails?.orderCodes} />
         </div>
-        <div className="p-4 rounded border">
-          <p className="text-sm text-slate-600">Current Codes</p>
-          <p className="text-xl font-semibold">
-            {acc?.codeDetails?.currentCodes?.length ?? 0}
-          </p>
-        </div>
-        <div className="p-4 rounded border">
-          <p className="text-sm text-slate-600">Distributed Codes</p>
-          <p className="text-xl font-semibold">
-            {acc?.codeDetails?.distributedCodes?.length ?? 0}
-          </p>
-        </div>
-        <div className="p-4 rounded border">
-          <p className="text-sm text-slate-600">Ordered Codes</p>
-          <p className="text-xl font-semibold">
-            {acc?.codeDetails?.orderCodes?.length ?? 0}
-          </p>
-        </div>
-      </div>
+      )}
 
       {/* Description */}
       {acc?.description && (
@@ -160,16 +133,11 @@ export default async function AccessoryDetailsPage({
         </div>
       )}
 
-      {/* Link to Stock details page */}
-      <div>
-        <Link
-          href={`/admin/manage-accessories/${acc?._id}/stock/${(acc?.stock as TStock)?._id}`}
-          className="text-primary hover:underline"
-        >
-          View Stock Details →
-        </Link>
-      </div>
-
+     
+      <StockTable
+        accessoryId={acc?._id!}
+        stockId={(acc?.stock as TStock)?._id!}
+      />
       {/* Events History */}
       {Array.isArray(acc?.eventsHistory) && acc?.eventsHistory?.length > 0 && (
         <EventsHistoryTable eventsHistory={acc?.eventsHistory} />

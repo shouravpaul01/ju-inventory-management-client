@@ -147,7 +147,7 @@ export type TStockDetail = {
   accessoryCodes: string[];
   documentImages: string[];
   locatedDetails:{
-    roomNo:string,
+    roomNo:TRoom | string,
     place:string,
     locatedImages:string[]
   }
@@ -155,7 +155,7 @@ export type TStockDetail = {
   isDeleted: boolean;
   isApproved: boolean;
   description?: string;
-  eventsHistory: TEventHistory[];
+  eventsHistory: TAccessoryEventHistory[];
   createdAt:string,
   
 };
