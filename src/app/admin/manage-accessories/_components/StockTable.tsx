@@ -46,6 +46,9 @@ import { useDisclosure } from "@heroui/modal";
 
 import { Switch } from "@heroui/switch";
 import Link from "next/link";
+import UpdateStockQuantityModal from "./UpdateStockQuantityModal";
+import StockModal from "./StockModal";
+import UpdateStockModal from "./UpdateStockModal";
 
 export default function StockTable({
   accessoryId,
@@ -305,6 +308,13 @@ export default function StockTable({
           </TableBody>
         </Table>
       )}
+      <UpdateStockModal
+      useDisclosure={modalUpdateStock}
+      stockId={stockId}
+      stockDetailsId={stockDetailsId!}
+      
+      
+      />
     </div>
   );
 }

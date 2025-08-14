@@ -6,6 +6,7 @@ import {
   ImageIcon,
   InfoIcon,
   MoreIcon,
+  NetworkTreeIcon,
   WidgetIcon,
 } from "@/src/components/icons";
 import { Button, ButtonGroup } from "@heroui/button";
@@ -41,6 +42,7 @@ import StockModal from "./_components/StockModal";
 import { Avatar } from "@heroui/avatar";
 import HeadingSection from "@/src/components/ui/HeadingSection";
 import { Switch } from "@heroui/switch";
+import UpdateStockModal from "./_components/UpdateStockModal";
 
 export default function ManageAccessories() {
   const searchParams = useSearchParams();
@@ -208,36 +210,27 @@ export default function ManageAccessories() {
                       </Chip>
                     </div>
                   </div>
-                  <Tooltip color="primary" content="Stock Details" showArrow>
-                    <Button
-                      isIconOnly
-                      color="primary"
-                      variant="flat"
-                      size="sm"
-                     as={Link}
-                     href={`/admin/manage-accessories/${item?._id}/stock/${(item?.stock as TStock)?._id}`}
-                    >
-                      <InfoIcon />
-                    </Button>
-                  </Tooltip>
+                 
                   <Tooltip
                     color="success"
                     showArrow
-                    content="Update Stock Quantity"
+                    content="Add Stock Quantity"
                   >
                     <Button
-                      isIconOnly
+                      
                       size="sm"
-                      variant="light"
+                      variant="flat"
                       color="primary"
+                      startContent={<NetworkTreeIcon className="size-5 fill-white" />}
                       isDisabled={!item?.isApproved}
+                      
                       onPress={() => {
                         setStockId((item.stock as TStock)?._id!);
                         setAccessoryId(item._id!);
                         modalStock.onOpen();
                       }}
                     >
-                      <MoreIcon />
+                     Add stock
                     </Button>
                   </Tooltip>
                 </div>
@@ -336,10 +329,10 @@ export default function ManageAccessories() {
         accessoryId={accessoryId!}
         useDisclosure={modalForm}
       />
-      <StockModal
-        modalStocks={modalStock}
+      <UpdateStockModal
+        useDisclosure={modalStock}
         stockId={stockId!}
-        accessoryId={accessoryId!}
+        
       />
     </div>
   );

@@ -5,8 +5,8 @@ import JUTextEditor from "@/src/components/form/JUTextEditor";
 import JULoading from "@/src/components/ui/JULoading";
 import PreviewImage from "@/src/components/ui/PreviewImage";
 import { getSingleStock } from "@/src/hooks/Stock";
-import { createStock, updateStockReq } from "@/src/services/Stock";
-import { TErrorMessage, TSelectOption } from "@/src/types";
+import { createStock, updateStockReq, deleteStockImageReq } from "@/src/services/Stock";
+import { TErrorMessage, TRoom, TSelectOption } from "@/src/types";
 import { updateStockQuantityValidation } from "@/src/validations/stock.validation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@heroui/button";
@@ -45,6 +45,8 @@ export default function UpdateStockModal({
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [documentImages, setPreviewDocumentImages] = useState<string[]>([]);
   const [locatedImages, setPreviewLocatedImages] = useState<string[]>([]);
+  const [storedDocumentImages, setStoredPreviewDocumentImages] = useState<string[]>([]);
+  const [storedLocatedImages, setStoredPreviewLocatedImages] = useState<string[]>([]);
   const { data: rooms } = getAllRooms({
     query: [{ name: "isActive", value: true }],
   });
@@ -65,16 +67,20 @@ export default function UpdateStockModal({
     if (stockDetailsId) {
       methods.reset({
         quantity: stock?.quantity,
+        "locatedDetails.roomNo":(stock?.locatedDetails.roomNo as TRoom)?._id,
+        "locatedDetails.place":stock?.locatedDetails?.place,
         description: stock?.description,
       });
       stock?.documentImages?.length! > 0 &&
-        setPreviewDocumentImages(stock?.documentImages!);
-      setPreviewLocatedImages(stock?.locatedDetails?.locatedImages!);
+        setStoredPreviewDocumentImages(stock?.documentImages!);
+      setStoredPreviewLocatedImages(stock?.locatedDetails?.locatedImages!);
     }
     if (!useDisclosure.isOpen) {
       methods.reset();
       setPreviewDocumentImages([]);
       setPreviewLocatedImages([])
+      setStoredPreviewDocumentImages([]);
+      setStoredPreviewLocatedImages([])
     }
   }, [stockDetailsId, stock,useDisclosure.isOpen]);
   const handleUpdateStock: SubmitHandler<FieldValues> = async (data) => {
@@ -125,6 +131,25 @@ console.log(res,"res")
       toast.error(error?.message || "Something went wrong");
     } finally {
       setIsLoading(false);
+    }
+  };
+  const handleDeleteImage = async (
+    stockId: string,
+    stockDetailsId: string,
+    imageUrl: string,
+    fieldName: "documentImages" | "locatedImages"
+  ) => {
+    try {
+      const res = await deleteStockImageReq(stockId, stockDetailsId, imageUrl, fieldName);
+      if (res?.success) {
+       
+        queryClient.invalidateQueries({ queryKey: ["single-stock"] });
+        toast.success(res?.message);
+      } else if (!res?.success && res?.errorMessages?.length > 0) {
+        toast.error(res?.errorMessages[0]?.message);
+      }
+    } catch (error: any) {
+      toast.error(error?.message || "Failed to delete image");
     }
   };
   return (
@@ -183,6 +208,13 @@ console.log(res,"res")
                         heading="Preview Document Images"
                       />
                     )}
+                      {storedDocumentImages?.length > 0 && (
+                          <PreviewImage
+                            previews={storedDocumentImages}
+                            heading="Stored Document Images"
+                            onDelete={(url) => handleDeleteImage(stockId!, stockDetailsId!, url, "documentImages")}
+                          />
+                        )}
                     <div className="border border-dashed rounded-md p-2">
                       <h3 className="text-lg border-b border-dashed pb-1 mb-2">
                         Located Details
@@ -214,14 +246,21 @@ console.log(res,"res")
                         multiple
                       />
 
-                      <div className="block">
+                      
                         {locatedImages?.length > 0 && (
                           <PreviewImage
                             previews={locatedImages}
                             heading="Located Images"
                           />
                         )}
-                      </div>
+                      
+                      {storedLocatedImages?.length > 0 && (
+                          <PreviewImage
+                            previews={storedLocatedImages}
+                            heading="Stored Located Images"
+                            onDelete={(url) => handleDeleteImage(stockId!, stockDetailsId!, url, "locatedImages")}
+                          />
+                        )}
                     </div>
 
                     <JUTextEditor

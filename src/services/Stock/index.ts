@@ -74,3 +74,22 @@ export const getAllStocksReq = async ({
         return error?.response?.data;
       }
     };
+    export const deleteStockImageReq = async (
+      stockId: string,
+      stockDetailsId: string,
+      imageUrl: string,
+      fieldName: "documentImages" | "locatedImages"
+    ) => {
+      try {
+        const params = new URLSearchParams({
+          stockId,
+          stockDetailsId,
+          imageUrl,
+          fieldName,
+        } as any);
+        const res = await axiosInstance.delete(`/stocks/delete-image?${params.toString()}`);
+        return res.data;
+      } catch (error: any) {
+        return error?.response?.data;
+      }
+    };

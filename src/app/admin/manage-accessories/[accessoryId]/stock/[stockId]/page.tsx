@@ -9,6 +9,7 @@ import EventsHistoryTable from "../../../_components/EventsHistoryTable";
 import DisplaycodesCard from "../../../_components/DisplayCodesCard";
 import { Skeleton } from "@heroui/skeleton";
 import { getSingleStockReq } from "@/src/services/Stock";
+import EditStockButton from "../../../_components/EditStockButton";
 
 export default async function StockPage({
   params,
@@ -44,7 +45,9 @@ export default async function StockPage({
       <HeadingSection
         title="Stock Detail"
         linkUrl={`/admin/manage-accessories/${accessoryId}`}
-      />
+      >
+        <EditStockButton stockId={stockId} stockDetailsId={stockDetailsId as string}/>
+      </HeadingSection>
 
       <div>
         <h4 className="text-md font-semibold border-b border-dashed pb-1 mb-2">
