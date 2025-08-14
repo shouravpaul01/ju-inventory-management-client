@@ -25,6 +25,15 @@ import { useEffect, useMemo, useState } from "react";
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { getAllAccessories } from "@/src/hooks/Accessory";
+import JUSelect from "@/src/components/form/JUSelect";
+import { departmentOptions, locationTypeOptions } from "@/src/constents";
+import { getAllRooms } from "@/src/hooks/Room";
+import { TSelectOption } from "@/src/types";
+import JUInput from "@/src/components/form/JUInput";
+import JUTextEditor from "@/src/components/form/JUTextEditor";
+import JUDatePicker from "@/src/components/form/JUDatePicker";
+import { getLocalTimeZone, now } from "@internationalized/date";
+import { DatePicker } from "@heroui/date-picker";
 
 export default function CartPage() {
   const queryClient = useQueryClient();
@@ -44,12 +53,18 @@ export default function CartPage() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isSelectedDistributeOption, setIsSelectedDistributeOption] =
     useState<boolean>(false);
-
+const {data:rooms}=getAllRooms({query:[{name:"isActive",value:true}]})
     
   const selectedItems = useMemo(
     () => cart.filter((item) => item.isSelected).map((item) => item._id),
     [cart]
   );
+  const roomOptions = useMemo(() => {
+    return rooms?.data?.map((room) => ({
+      label: room?.roomNo,
+      value: room?._id,
+    }));
+  }, [rooms]);
 
   const handleSelectedItem = (id: string) => {
     const isSelected = selectedItems.includes(id);
@@ -75,7 +90,7 @@ export default function CartPage() {
         
       }));
 
-      methods.reset({ items: defaultValues });
+      methods.reset({ items: defaultValues,expectedDeliveryDateTime:now(getLocalTimeZone()) });
     }
   }, [cart]);
   const handleQuantityChange = (id: string, newQuantity: number) => {
@@ -201,8 +216,23 @@ export default function CartPage() {
             )}
           </TableBody>
         </Table>
+        <div className="space-y-2">
+          <h4 className="text-base font-semibold border-b border-dashed pb-1">Delivery Details</h4>
+          <div className="flex gap-2 ">
+            <JUSelect name="deliveryDetails.locationType" options={locationTypeOptions} selectProps={{label:"Select type of location",className:"w-full md:w-[30%]"}}/>
+            <JUSelect name="deliveryDetails.department" options={departmentOptions} selectProps={{label:"Select Department",className:"w-full md:w-[40%]"}}/>
+            <JUSelect name="deliveryDetails.roomNo" options={roomOptions as TSelectOption[]} selectProps={{label:"Select Room",className:"w-full md:w-[30%]"}}/>
+          </div>
+          <div className="flex gap-2">
+          <JUInput name="deliveryDetails.place" inputProps={{label:"Place",className:"w-full md:w-[60%]"}}/>
+          <JUDatePicker name="expectedDeliveryDateTime" inputProps={{hideTimeZone:true,showMonthAndYearPickers:true,variant:"bordered",
+       label:"Expected Delivery Date",className:"w-full md:w-[40%]"}}/>
+       
+          </div>
+          <JUTextEditor name="description" label="Description" className="h-28"/>
+        </div>
         {cart.length > 0 && (
-          <div className="flex gap-3 justify-end mx-6 my-6">
+          <div className="flex gap-3 justify-end  mt-16 mb-6">
             {isSelectedDistributeOption ? (
               <Button
                 as={Link}

@@ -1,45 +1,36 @@
-"use client"; // Mark this as a client-side component
-import {
-  CalendarDate,
-  CalendarDateTime,
-  ZonedDateTime,
-} from "@internationalized/date";
-import { DatePicker, DatePickerProps } from "@heroui/date-picker";
-import dayjs from "dayjs";
-import React from "react";
+"use client";
 
-import { useFormContext } from "react-hook-form";
+import { DatePicker, DatePickerProps } from "@heroui/date-picker";
+
+import { Controller, useFormContext } from "react-hook-form";
 
 interface IProps {
   name: string;
-  inputProps?: DatePickerProps;
+  inputProps: DatePickerProps | any;
 }
 
 export default function JUDatePicker({ name, inputProps }: IProps) {
   const {
-    register,
-    setValue,
-    watch,
+    control,
     formState: { errors },
   } = useFormContext();
-
-  const currentValue = watch(name);
-
-  // Handle date change
-  const handleDateChange = (
-    date: CalendarDate | CalendarDateTime | ZonedDateTime | null
-  ) => {
-    setValue(name, date);
-  };
+ 
 
   return (
-    <DatePicker
-      {...register(name)}
-      value={currentValue || null}
-      onChange={handleDateChange}
-      {...inputProps}
-      isInvalid={!!errors[name]}
-      errorMessage={errors[name]?.message as string}
+    <Controller
+      name={name}
+      control={control}
+      defaultValue={null as any}
+      render={({ field: { ref, ...field } }) => (
+        <DatePicker
+
+          {...inputProps}
+          value={field.value ?? null}
+          onChange={field.onChange}
+          isInvalid={!!errors[name]}
+          errorMessage={errors[name]?.message as string}
+        />
+      )}
     />
   );
 }
